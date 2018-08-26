@@ -34,7 +34,7 @@ private:
 	Render								*m_render;
 	std::vector<vecInt *>				m_gameField;
 	int 								m_N;
-	int 								m_AI_play;
+	//int 								m_AI_play;
 	eType								m_currentTurn;
 
 };

@@ -12,7 +12,7 @@
 
 #include "Gomoku.hpp"
 
-Gomoku::Gomoku():m_N(19)
+Gomoku::Gomoku():m_N(19), m_currentTurn(BLACK)
 {
 	initGameField(m_N);
 	m_render = &Render::Instance();
@@ -40,7 +40,7 @@ void 	Gomoku::initGameField(int N)
 
 void 	Gomoku::render()
 {
-	int cycl = 1;
+	//int cycl = 1;
 	m_render->renderConfigure(&m_gameField, &m_currentTurn);
 	m_render->mainLoop();
 	// while (cycl){

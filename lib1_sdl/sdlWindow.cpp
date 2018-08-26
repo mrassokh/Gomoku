@@ -125,6 +125,10 @@ EVENTS 			SdlWindow::handleKeyDown(int key) const
 {
 	if (key == SDLK_ESCAPE)
 		return EXIT;
+	if (key == SDLK_n)
+		return NEW_GAME;
+	if (key == SDLK_p)
+		return PUSH_SQUARE;
 	return DEFAULT;
 }
 //
@@ -158,7 +162,7 @@ void 				SdlWindow::drawStart()
 
 void 				SdlWindow::drawGameOver(std::string const & finishMessage)
 {
-	SDL_SetRenderDrawColor(m_renderer, 32, 178, 170, 255);
+	SDL_SetRenderDrawColor(m_renderer, 232, 178, 170, 255);
 	SDL_RenderClear(m_renderer);
 
 	std::string message = finishMessage;
