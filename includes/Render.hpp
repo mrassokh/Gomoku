@@ -14,7 +14,15 @@
 # define RENDER_HPP
 # include "IWindow.hpp"
 # include <vector>
+# include <array>
 # include <dlfcn.h>
+
+typedef	enum windowState
+{
+	START,
+	GAME,
+	GAME_OVER
+}			eWindowState;
 
 typedef std::vector<std::vector<int> *> vecVecInt;
 
@@ -22,9 +30,16 @@ class Render
 {
 public:
 	static Render	&Instance();
+	void 			renderConfigure(vecVecInt 	*gameField, eType *currentTurn);
 	void 			drawField(vecVecInt  *gamefield) const;
+	void 			init() const;
 	void 			attachSharedLibrary(const char* sharedLibrary, int height, int weight);
 	void 			deAttachSharedLibrary();
+	void 			mainLoop();
+
+	void 			eventHandling();
+
+	EVENTS 			getEvent();
 
 private:
 	Render();
@@ -38,6 +53,27 @@ private:
 	void			(*m_windowDestructor)(IWindow *);
 	void 			*dl_handle;
 	IWindow 		*m_newWindow;
+
+	vecVecInt 		*m_gameField;
+	eType			*m_currentTurn;
+
+	std::array<void (Render::*)(), 3>	m_eventFunctions;
+	std::array<void (Render::*)(), 3>	m_windowStateFunctions;
+
+	void 			drawStart();
+	void 			drawGame();
+	void 			drawGameOver();
+	
+	void 			handleExit();
+	void 			handlePushSquare();
+	void 			handleNewGame();
+
+	int				m_startCondition;
+	int				m_gameCondition;
+	int				m_gameOverCondition;
+	int 			m_exit;
+	eWindowState	m_windowState;
+
 };
 
 #endif

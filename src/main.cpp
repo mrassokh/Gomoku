@@ -18,8 +18,9 @@ int main(int ac, char **av)
 	if (ac == 3)
 		av[2][0] = 'a';
 	Gomoku *gomoku = new Gomoku;
-	while (1)
+	// while (1){
 		gomoku->render();
+	//}
 
 	// dl_handle = dlopen("lib1_sdl.so", RTLD_LAZY | RTLD_LOCAL);
 	// 	if (!dl_handle) {

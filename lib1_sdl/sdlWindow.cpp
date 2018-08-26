@@ -106,40 +106,27 @@ void 					SdlWindow::endCycl()
 // // 	printf("%s\n", finishMessage.c_str());
 // // }
 //
-// EVENTS 			SdlWindow::getEvent(void)
-// {
-// 	while (SDL_PollEvent(&m_event)){
-// 		if (m_event.type == SDL_QUIT || m_event.key.keysym.sym == SDLK_ESCAPE)
-// 			return EXIT;
-// 		else if (m_event.type == SDL_KEYDOWN)
-// 		{
-// 			return handleKeyDown(m_event.key.keysym.sym);
-// 		}
-// 	}
-// 	return DEFAULT;
-// }
-//
-// EVENTS 			SdlWindow::handleKeyDown(int key) const
-// {
-// 	if (key == SDLK_LEFT)
-// 		return LEFT_FIRST;
-// 	else if (key == SDLK_RIGHT)
-// 		return RIGHT_FIRST;
-// 	else if (key == SDLK_q)
-// 		return LEFT_SECOND;
-// 	else if (key == SDLK_w)
-// 		return RIGHT_SECOND;
-// 	else if (key == SDLK_a)
-// 		return CHANGE_TO_SDL_WIN;
-// 	else if (key == SDLK_s)
-// 		return CHANGE_TO_SFML_WIN;
-// 	else if (key == SDLK_d)
-// 		return CHANGE_TO_GLFW_WIN;
-// 	else if (key == SDLK_n)
-// 		return NEW_GAME;
-// 	else
-// 		return DEFAULT;
-// }
+EVENTS 			SdlWindow::getEvent(void)
+{
+	while (SDL_PollEvent(&m_event)){
+		if (m_event.type == SDL_QUIT || m_event.key.keysym.sym == SDLK_ESCAPE){
+			printf ("events!!!! EXIT in sdlWindow\n");
+			return EXIT;
+		}
+		else if (m_event.type == SDL_KEYDOWN)
+		{
+			return handleKeyDown(m_event.key.keysym.sym);
+		}
+	}
+	return DEFAULT;
+}
+
+EVENTS 			SdlWindow::handleKeyDown(int key) const
+{
+	if (key == SDLK_ESCAPE)
+		return EXIT;
+	return DEFAULT;
+}
 //
 void 			SdlWindow::drawSquare(int x, int y, eType type)
 {
@@ -159,26 +146,26 @@ void 			SdlWindow::drawSquare(int x, int y, eType type)
 	SDL_RenderFillRect(m_renderer, &rectangle);
 }
 //
-// void 				SdlWindow::drawStart()
-// {
-// 	std::string text("For start new game press <<N>>\nFor Exit press <<ECS>>");
-//
-// 	SDL_SetRenderDrawColor(m_renderer, 32,178,170, 255);
-// 	SDL_RenderClear(m_renderer);
-// 	showText(0, 0, text.c_str());
-// 	SDL_RenderPresent(m_renderer);
-// }
-//
-// void 				SdlWindow::drawGameOver(std::string const & finishMessage)
-// {
-// 	SDL_SetRenderDrawColor(m_renderer, 32, 178, 170, 255);
-// 	SDL_RenderClear(m_renderer);
-//
-// 	std::string message = finishMessage;
-// 	message += "\nFor start new game press <<N>>\nFor Exit press <<ECS>>";
-// 	showText(0, 0, message.c_str());
-// 	SDL_RenderPresent(m_renderer);
-// }
+void 				SdlWindow::drawStart()
+{
+	std::string text("For start new game press <<N>>\nFor Exit press <<ECS>>");
+
+	SDL_SetRenderDrawColor(m_renderer, 32,178,170, 255);
+	SDL_RenderClear(m_renderer);
+	showText(0, 0, text.c_str());
+	SDL_RenderPresent(m_renderer);
+}
+
+void 				SdlWindow::drawGameOver(std::string const & finishMessage)
+{
+	SDL_SetRenderDrawColor(m_renderer, 32, 178, 170, 255);
+	SDL_RenderClear(m_renderer);
+
+	std::string message = finishMessage;
+	message += "\nFor start new game press <<N>>\nFor Exit press <<ECS>>";
+	showText(0, 0, message.c_str());
+	SDL_RenderPresent(m_renderer);
+}
 
 SdlWindow		*createWindow(int width, int height)
 {

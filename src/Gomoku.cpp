@@ -17,11 +17,12 @@ Gomoku::Gomoku():m_N(19)
 	initGameField(m_N);
 	m_render = &Render::Instance();
 	m_render->attachSharedLibrary("lib1_sdl.so", m_N, m_N);
+	m_render->init();
 }
 
 Gomoku::~Gomoku()
 {
-	m_render->deAttachSharedLibrary();
+
 }
 
 void 	Gomoku::initGameField(int N)
@@ -39,5 +40,18 @@ void 	Gomoku::initGameField(int N)
 
 void 	Gomoku::render()
 {
-	m_render->drawField(&m_gameField);
+	int cycl = 1;
+	m_render->renderConfigure(&m_gameField, &m_currentTurn);
+	m_render->mainLoop();
+	// while (cycl){
+	// 	//printf ("draw!!!!\n");
+	// 	m_render->drawField(&m_gameField);
+	// 	//printf ("events!!!!\n");
+	// 	EVENTS ev = m_render->getEvent();
+	// 	if (ev == EXIT){
+	// 		printf ("EXIT!!!!\n");
+	// 		cycl = 0;
+	// 	}
+	// }
+	m_render->deAttachSharedLibrary();
 }
