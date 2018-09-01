@@ -17,9 +17,12 @@ int main(int ac, char **av)
 
 	if (ac == 3)
 		av[2][0] = 'a';
+		printf(" print %d \n", 1);
 	Gomoku *gomoku = new Gomoku;
 	// while (1){
+	printf(" print %d \n", 2);
 		gomoku->render();
+		printf(" print %d \n", 3);
 	//}
 
 	// dl_handle = dlopen("lib1_sdl.so", RTLD_LAZY | RTLD_LOCAL);

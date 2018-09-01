@@ -30,7 +30,7 @@ class Render
 {
 public:
 	static Render	&Instance();
-	void 			renderConfigure(vecVecInt 	*gameField, eType *currentTurn);
+	void 			renderConfigure(vecVecInt 	*gameField, eType *currentTurn, event *ev, int *ex);
 	void 			drawField(vecVecInt  *gamefield) const;
 	void 			init() const;
 	void 			attachSharedLibrary(const char* sharedLibrary, int height, int weight);
@@ -39,7 +39,7 @@ public:
 
 	void 			eventHandling();
 
-	EVENTS 			getEvent();
+	// void			getEvent();
 
 private:
 	Render();
@@ -63,7 +63,7 @@ private:
 	void 			drawStart();
 	void 			drawGame();
 	void 			drawGameOver();
-	
+
 	void 			handleExit();
 	void 			handlePushSquare();
 	void 			handleNewGame();
@@ -71,7 +71,8 @@ private:
 	int				m_startCondition;
 	int				m_gameCondition;
 	int				m_gameOverCondition;
-	int 			m_exit;
+	event 			*m_event;
+	int 			*m_exit;
 	eWindowState	m_windowState;
 
 };

@@ -27,6 +27,13 @@ enum EVENTS
 	EXIT,
 	DEFAULT
 };
+
+typedef struct  s_event
+{
+	EVENTS	event;
+	int 	x;
+	int		y;
+}				event;
 //# include "gomoku.hpp"
 //
 // enum STATE
@@ -53,7 +60,7 @@ enum EVENTS
 class IWindow
 {
 public:
-	 virtual EVENTS 			getEvent(void)  = 0;
+	 virtual void 			getEvent(event *ev)  = 0;
 	 virtual void 			drawSquare(int x, int y, eType type) = 0;
 	 //virtual void 			drawScore(int score, int velocity, eType type, int mult) = 0;
 	virtual void 			drawStart() = 0;

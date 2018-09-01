@@ -75,39 +75,46 @@ void 		Render::deAttachSharedLibrary()
 // {
 //
 // }
-EVENTS 	Render::getEvent()
-{
-	return m_newWindow->getEvent();
-}
+// void 	Render::getEvent()
+// {
+// 	return m_newWindow->getEvent();
+// }
 
 
 void 			Render::drawField(vecVecInt 	*gamefield) const
 {
 	 m_newWindow->startCycl();
-	 vecVecInt game = *(gamefield);
+	  vecVecInt game = *(gamefield);
+	 // std::vector<int>  row = *game;
+	  int k;
 	// m_newWindow->drawStart();
 	for (int i = 0; i < 19; i++){
 		for (int j = 0; j < 19; j++){
+			k = 0;//row[j].at(0);
 			//m_newWindow->drawSquare(i, j, static_cast<eType>((*gamefield)[i]->at[j]));
-			m_newWindow->drawSquare(i, j, *m_currentTurn);
+			m_newWindow->drawSquare(i, j, static_cast<eType>(k));
 		}
 	}
 	m_newWindow->endCycl();
 }
 
-void 			Render::renderConfigure(vecVecInt 	*gameField, eType *currentTurn)
+void 			Render::renderConfigure(vecVecInt 	*gameField, eType *currentTurn,
+												event *ev, int *ex)
 {
 	m_gameField = gameField;
 	m_currentTurn = currentTurn;
+	m_event = ev;
+	m_exit = ex;
 }
 
 void 			Render::mainLoop()
 {
-	while (!m_exit){
+	//while (!m_exit){
 		printf("Current state is %d\n", static_cast<int>(m_windowState));
 		(this->*m_windowStateFunctions[m_windowState])();
-	}
+	//}
 }
+
 void 			Render::drawStart()
 {
 	m_startCondition = 1;
@@ -123,34 +130,34 @@ void 			Render::drawStart()
 void 			Render::drawGame()
 {
 	m_gameCondition = 1;
-	printf("game\n");
+	//printf("game\n");
 	while (m_gameCondition){
-		printf("game_0\n");
+		//printf("game_0\n");
 		drawField(m_gameField);
-			printf("game_1\n");
+			//printf("game_1\n");
 		eventHandling();
-			printf("game_2\n");
+			//printf("game_2\n");
 	}
 }
 void 			Render::drawGameOver()
 {
 	m_gameOverCondition = 1;
-	printf("gameOver\n");
+	//printf("gameOver\n");
 	while (m_gameOverCondition){
-		printf("gameOver_1\n");
+		//printf("gameOver_1\n");
 		m_newWindow->drawGameOver("AAAAAA");
-		printf("gameOver_2\n");
+		//printf("gameOver_2\n");
 		eventHandling();
-		printf("gameOver_3\n");
+		//printf("gameOver_3\n");
 	}
 }
 
 void 			Render::eventHandling()
 {
-	EVENTS ev = m_newWindow->getEvent();
-	printf("Current EVENTS is %d\n", static_cast<int>(ev));
-	if (ev != DEFAULT)
-		(this->*m_eventFunctions[ev])();
+ 	m_newWindow->getEvent(m_event);
+	//printf("Current EVENTS is %d\n", static_cast<int>(m_event->event));
+	if (m_event->event != DEFAULT)
+		(this->*m_eventFunctions[m_event->event])();
 }
 
 void 			Render::handleExit()
@@ -158,16 +165,16 @@ void 			Render::handleExit()
 	m_startCondition = 0;
 	m_gameCondition = 0;
 	m_gameOverCondition = 0;
-	m_exit = 1;
-		printf("handleEXIT");
+	*m_exit = 1;
+	printf("handleEXIT");
 }
 
 void 			Render::handlePushSquare()
 {
-	m_startCondition = 0;
-	m_gameCondition = 0;
-	m_gameOverCondition = 0;
-	m_windowState = GAME_OVER;
+	// m_startCondition = 0;
+	// m_gameCondition = 0;
+	// m_gameOverCondition = 0;
+	// m_windowState = GAME_OVER;
 	printf("handlePUSH");
 }
 

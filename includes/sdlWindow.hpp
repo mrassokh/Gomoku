@@ -21,7 +21,7 @@ class SdlWindow : public IWindow
 public:
 	SdlWindow(int width, int height);
 	virtual ~SdlWindow();
-	 virtual EVENTS 					getEvent(void);
+	 virtual void 					getEvent(event *ev);
 	 virtual void 					drawSquare(int x, int y, eType type);
 	// virtual void 					drawScore(int score, int velocity, eType type, int mult);
 	 virtual void 					drawStart();
@@ -30,7 +30,8 @@ public:
 	virtual void 					endCycl(void);
 	virtual void 					init(void);
 
-	EVENTS 							handleKeyDown(int key) const;
+	void 							handleKeyDown(int key, event *ev) const;
+	void							handleMouseDown(int x, int y, event *ev) const;
 private:
 	SdlWindow();
 	void					showText(int x, int y, const char *text);

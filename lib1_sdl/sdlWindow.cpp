@@ -106,30 +106,57 @@ void 					SdlWindow::endCycl()
 // // 	printf("%s\n", finishMessage.c_str());
 // // }
 //
-EVENTS 			SdlWindow::getEvent(void)
+void 			SdlWindow::getEvent(event *ev)
 {
 	while (SDL_PollEvent(&m_event)){
-		if (m_event.type == SDL_QUIT || m_event.key.keysym.sym == SDLK_ESCAPE){
+		if (m_event.type == SDL_MOUSEWHEEL)
+			return ;
+		if (m_event.type == SDL_QUIT){
 			printf ("events!!!! EXIT in sdlWindow\n");
-			return EXIT;
+			ev->event = EXIT;
+			return ;
 		}
 		else if (m_event.type == SDL_KEYDOWN)
 		{
-			return handleKeyDown(m_event.key.keysym.sym);
+			handleKeyDown(m_event.key.keysym.sym, ev);
+			return;
+		} else if (m_event.type == SDL_MOUSEBUTTONDOWN
+					&& m_event.button.button == SDL_BUTTON_LEFT
+						&& m_event.button.state == SDL_PRESSED){
+			handleMouseDown(m_event.button.x, m_event.button.y, ev);
+			return;
 		}
 	}
-	return DEFAULT;
+	ev->event = DEFAULT;
+	return ;
 }
 
-EVENTS 			SdlWindow::handleKeyDown(int key) const
+void 			SdlWindow::handleKeyDown(int key, event *ev) const
 {
-	if (key == SDLK_ESCAPE)
-		return EXIT;
-	if (key == SDLK_n)
-		return NEW_GAME;
-	if (key == SDLK_p)
-		return PUSH_SQUARE;
-	return DEFAULT;
+	if (key == SDLK_ESCAPE){
+		ev->event = EXIT;
+		return ;
+	}
+	if (key == SDLK_n){
+		ev->event = NEW_GAME;
+		return ;
+	}
+	if (key == SDLK_p) {
+		ev->event = PUSH_SQUARE;
+		ev->x = 10;
+		ev->y = 10;
+		return;
+	}
+	ev->event = DEFAULT;
+	return ;
+}
+
+void 			SdlWindow::handleMouseDown(int x, int y, event *ev) const
+{
+	ev->event = PUSH_SQUARE;
+	ev->x = x;
+	ev->y = y;
+	return ;
 }
 //
 void 			SdlWindow::drawSquare(int x, int y, eType type)

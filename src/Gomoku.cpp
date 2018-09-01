@@ -12,11 +12,14 @@
 
 #include "Gomoku.hpp"
 
-Gomoku::Gomoku():m_N(19), m_currentTurn(BLACK)
+Gomoku::Gomoku():m_N(19), m_currentTurn(BLACK), m_exit(0)
 {
 	initGameField(m_N);
 	m_render = &Render::Instance();
 	m_render->attachSharedLibrary("lib1_sdl.so", m_N, m_N);
+	m_event.event = DEFAULT;
+	m_event.x = -100;
+	m_event.x = -100;
 	m_render->init();
 }
 
@@ -40,18 +43,15 @@ void 	Gomoku::initGameField(int N)
 
 void 	Gomoku::render()
 {
-	//int cycl = 1;
-	m_render->renderConfigure(&m_gameField, &m_currentTurn);
-	m_render->mainLoop();
-	// while (cycl){
-	// 	//printf ("draw!!!!\n");
-	// 	m_render->drawField(&m_gameField);
-	// 	//printf ("events!!!!\n");
-	// 	EVENTS ev = m_render->getEvent();
-	// 	if (ev == EXIT){
-	// 		printf ("EXIT!!!!\n");
-	// 		cycl = 0;
-	// 	}
-	// }
+	m_render->renderConfigure(&m_gameField, &m_currentTurn, &m_event, &m_exit);
+	while (!m_exit) {
+		m_render->mainLoop();
+		if (m_event.event == PUSH_SQUARE){
+			printf("Push point with x =%d and y =%d\n", m_event.x, m_event.y);
+			m_event.event = DEFAULT;
+			m_event.x = -100;
+			m_event.x = -100;
+		}
+	}
 	m_render->deAttachSharedLibrary();
 }

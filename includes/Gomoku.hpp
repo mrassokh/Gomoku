@@ -36,6 +36,8 @@ private:
 	int 								m_N;
 	//int 								m_AI_play;
 	eType								m_currentTurn;
+	event								m_event;
+	int									m_exit;
 
 };
 
