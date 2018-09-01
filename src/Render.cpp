@@ -81,36 +81,42 @@ void 		Render::deAttachSharedLibrary()
 // }
 
 
-void 			Render::drawField(vecVecInt 	*gamefield) const
+void 			Render::drawField(std::vector<vecInt *> 	*gamefield) const
 {
 	 m_newWindow->startCycl();
-	  vecVecInt game = *(gamefield);
+	 std::vector<vecInt *> game = *(gamefield);
 	 // std::vector<int>  row = *game;
 	  int k;
 	// m_newWindow->drawStart();
 	for (int i = 0; i < 19; i++){
-		for (int j = 0; j < 19; j++){
-			k = 0;//row[j].at(0);
+		m_newWindow->drawLine(i, 0);
+		m_newWindow->drawLine(0, i);
+	}
+	for (int i = 0; i < 18; i++){
+		for (int j = 0; j < 18; j++){
+			k = (*game[j])[i];
 			//m_newWindow->drawSquare(i, j, static_cast<eType>((*gamefield)[i]->at[j]));
-			m_newWindow->drawSquare(i, j, static_cast<eType>(k));
+			m_newWindow->drawTile(i, j, static_cast<eType>(k));
 		}
 	}
+	m_newWindow->drawTime(*m_turnTime, *m_currentTurn);
 	m_newWindow->endCycl();
 }
 
-void 			Render::renderConfigure(vecVecInt 	*gameField, eType *currentTurn,
-												event *ev, int *ex)
+void 			Render::renderConfigure(std::vector<vecInt *>	*gameField, eType *currentTurn,
+												event *ev, int *ex, double *turnTime)
 {
 	m_gameField = gameField;
 	m_currentTurn = currentTurn;
 	m_event = ev;
 	m_exit = ex;
+	m_turnTime = turnTime;
 }
 
 void 			Render::mainLoop()
 {
 	//while (!m_exit){
-		printf("Current state is %d\n", static_cast<int>(m_windowState));
+		//printf("Current state is %d\n", static_cast<int>(m_windowState));
 		(this->*m_windowStateFunctions[m_windowState])();
 	//}
 }
@@ -130,14 +136,16 @@ void 			Render::drawStart()
 void 			Render::drawGame()
 {
 	m_gameCondition = 1;
+	// m_start = clock();
+	// m_turnTime = 0;
 	//printf("game\n");
-	while (m_gameCondition){
+	//while (m_gameCondition){
 		//printf("game_0\n");
 		drawField(m_gameField);
 			//printf("game_1\n");
 		eventHandling();
 			//printf("game_2\n");
-	}
+	//}
 }
 void 			Render::drawGameOver()
 {
@@ -175,6 +183,8 @@ void 			Render::handlePushSquare()
 	// m_gameCondition = 0;
 	// m_gameOverCondition = 0;
 	// m_windowState = GAME_OVER;
+	// m_start = clock();
+	// m_turnTime = 0;
 	printf("handlePUSH");
 }
 

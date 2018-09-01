@@ -13,6 +13,7 @@
 #ifndef WINDOW_HPP
 # define WINDOW_HPP
 # include <iostream>
+# include <sstream>
 typedef enum  	type
 {
 	EMPTY,
@@ -61,8 +62,9 @@ class IWindow
 {
 public:
 	 virtual void 			getEvent(event *ev)  = 0;
-	 virtual void 			drawSquare(int x, int y, eType type) = 0;
-	 //virtual void 			drawScore(int score, int velocity, eType type, int mult) = 0;
+	 virtual void 			drawTile(int x, int y, eType type) = 0;
+	 virtual void 			drawLine(int i, int j) = 0;
+	 virtual void 			drawTime(double time, eType type) = 0;
 	virtual void 			drawStart() = 0;
  	virtual void 			drawGameOver(std::string const & finishMessage) = 0;
 	virtual void 			startCycl() = 0;

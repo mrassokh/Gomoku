@@ -16,6 +16,9 @@
 # include <vector>
 # include <array>
 # include <dlfcn.h>
+# include <ctime>
+
+typedef std::vector<int> vecInt;
 
 typedef	enum windowState
 {
@@ -24,14 +27,15 @@ typedef	enum windowState
 	GAME_OVER
 }			eWindowState;
 
-typedef std::vector<std::vector<int> *> vecVecInt;
+//typedef std::vector<std::vector<int> *> vecVecInt;
 
 class Render
 {
 public:
 	static Render	&Instance();
-	void 			renderConfigure(vecVecInt 	*gameField, eType *currentTurn, event *ev, int *ex);
-	void 			drawField(vecVecInt  *gamefield) const;
+	void 			renderConfigure(std::vector<vecInt *> *gamefield, eType *currentTurn,
+		 									event *ev, int *ex, double *turnTime);
+	void 			drawField(std::vector<vecInt *>  *gamefield) const;
 	void 			init() const;
 	void 			attachSharedLibrary(const char* sharedLibrary, int height, int weight);
 	void 			deAttachSharedLibrary();
@@ -49,13 +53,14 @@ private:
 
 	void 			dlerror_wrapper();
 
-	IWindow 		*(*m_windowCreator)(int width, int height);
-	void			(*m_windowDestructor)(IWindow *);
-	void 			*dl_handle;
-	IWindow 		*m_newWindow;
+	IWindow 				*(*m_windowCreator)(int width, int height);
+	void					(*m_windowDestructor)(IWindow *);
+	void 					*dl_handle;
+	IWindow 				*m_newWindow;
 
-	vecVecInt 		*m_gameField;
-	eType			*m_currentTurn;
+	std::vector<vecInt *>	*m_gameField;
+	eType					*m_currentTurn;
+	double 					*m_turnTime;
 
 	std::array<void (Render::*)(), 3>	m_eventFunctions;
 	std::array<void (Render::*)(), 3>	m_windowStateFunctions;

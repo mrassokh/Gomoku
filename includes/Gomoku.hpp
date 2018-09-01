@@ -15,8 +15,9 @@
 # include "IWindow.hpp"
 # include <dlfcn.h>
 # include <vector>
+# include <ctime>
 # include <Render.hpp>
-typedef std::vector<int> vecInt;
+
 
 class Gomoku
 {
@@ -38,6 +39,7 @@ private:
 	eType								m_currentTurn;
 	event								m_event;
 	int									m_exit;
+	double 								m_turnTime;
 
 };
 
