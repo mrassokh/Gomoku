@@ -19,18 +19,20 @@
 # define SQUARE_SIZE 40
 # define SQUARE_SIZE_HALF SQUARE_SIZE / 2
 # define SIDE_SIZE SQUARE_SIZE * 19
+
+
+
 class SdlWindow : public IWindow
 {
 public:
 	SdlWindow(int width, int height);
 	virtual ~SdlWindow();
-	 virtual void 					getEvent(event *ev);
-	 virtual void 					drawTile(int x, int y, eType type);
-	 virtual void 					drawLine(int i, int j);
-	 virtual void 					drawTime(double time, eType type);
-	// virtual void 					drawScore(int score, int velocity, eType type, int mult);
-	 virtual void 					drawStart();
-	 virtual void 					drawGameOver(std::string const & finishMessage);
+	virtual void 					getEvent(event *ev);
+	virtual void 					drawTile(int x, int y, eType type);
+	virtual void 					drawLine(int i, int j);
+	virtual void 					drawTime(eType type, double *turnTime, int AI);
+	virtual void 					drawStart();
+	virtual void 					drawGameOver(std::string const & finishMessage);
 	virtual void 					startCycl(void);
 	virtual void 					endCycl(void);
 	virtual void 					init(void);
@@ -40,6 +42,7 @@ public:
 private:
 	SdlWindow();
 	void					showText(int x, int y, const char *text);
+	void 					DrawCircle(int x, int y, int radius);
 	int 					m_width;
 	int 					m_height;
 	SDL_Event 				m_event;

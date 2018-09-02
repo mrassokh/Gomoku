@@ -85,37 +85,14 @@ void 					SdlWindow::endCycl()
 	SDL_RenderPresent(m_renderer);
 }
 
-void 					SdlWindow::drawTime(double time, eType type)
+void 					SdlWindow::drawTime(eType type, double 	*turnTime, int 	AI)
 {
-	//
 	std::ostringstream results;
-	results << "Turn : "  << (type == BLACK ? "BLACK" : "WHITE") << "\nTimer: " + std::to_string(time)+ "\n";
+	results << "Turn : "  << (type == BLACK ? "BLACK" : "WHITE") << "\nAI_Timer: " + (AI ? std::to_string(*turnTime) : " - ")+ "\n";
 	std::string output = results.str();
-	//	std::string results("Turn : "  + std::to_string("BLACK") + "\nTimer: - " + std::to_string(time)+ "\n");
 	showText(m_width - 200, 50,output.c_str());
 }
-//
-// void 					SdlWindow::drawScore(int score, int velocity, eType type, int mult)
-// {
-// 	std::string results("score - " +std::to_string(score)+ "\nvelocity - " +std::to_string(velocity)+ "\n");
-// 	if (!mult){
-// 		showText(m_width - 200, 50, results.c_str());
-// 	} else {
-// 		if (type == SNAKE_HEAD) {
-// 			results.insert(0, "FIRST PLAYER:\n");
-// 			showText(m_width - 200, 50, results.c_str());
-// 		} else if (type == SNAKE_SECOND_HEAD){
-// 			results.insert(0, "SECOND PLAYER:\n");
-// 			showText(m_width - 200, 150, results.c_str());
-// 		}
-// 	}
-// }
-//
-// // void 					SdlWindow::quit(std::string const & finishMessage)
-// // {
-// // 	printf("%s\n", finishMessage.c_str());
-// // }
-//
+
 void 			SdlWindow::getEvent(event *ev)
 {
 	while (SDL_PollEvent(&m_event)){
@@ -163,64 +140,55 @@ void 			SdlWindow::handleKeyDown(int key, event *ev) const
 
 void 			SdlWindow::handleMouseDown(int x, int y, event *ev) const
 {
-	if (x < SQUARE_SIZE_HALF || x > SIDE_SIZE - SQUARE_SIZE_HALF
-		|| y < SQUARE_SIZE_HALF || y > SIDE_SIZE - SQUARE_SIZE_HALF)
+	if (x <= SQUARE_SIZE_HALF || x >= SIDE_SIZE - SQUARE_SIZE_HALF
+		|| y <= SQUARE_SIZE_HALF || y >= SIDE_SIZE - SQUARE_SIZE_HALF)
 		return;
-	ev->event = PUSH_SQUARE;
+
 	ev->x = (x - SQUARE_SIZE_HALF) / SQUARE_SIZE;
 	ev->y = (y - SQUARE_SIZE_HALF) / SQUARE_SIZE;
+	if (ev->x < 0 || ev->x > 17 || ev->y < 0 || ev->y > 17)
 	return ;
+	ev->event = PUSH_SQUARE;
 }
-//
+
 void 			SdlWindow::drawLine(int i, int j)
 {
-	int x_start = j * SQUARE_SIZE;
-	int y_start = i * SQUARE_SIZE;
-	int x_end = i ? SIDE_SIZE : x_start;
-	int y_end = i ? i * SQUARE_SIZE : SIDE_SIZE;
+	int x_start = j * SQUARE_SIZE ;
+	int y_start = i * SQUARE_SIZE ;
+	int x_end = i ? SIDE_SIZE + 1 : x_start;
+	int y_end = i ? i * SQUARE_SIZE : SIDE_SIZE + 1;
 	SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
 	SDL_RenderDrawLine(m_renderer, x_start, y_start, x_end, y_end);
 }
 
+
+void SdlWindow::DrawCircle(int x, int y, int radius)
+{
+	int leftX = x - radius;
+	int rightX = x + radius;
+	int topY = y - radius;
+	int bottomY = y + radius;
+	for (int i = leftX; i < rightX; ++i){
+		for (int j = topY; j < bottomY; ++j){
+			if ((i - x) * (i - x) + (j - y) * (j - y) <= radius * radius)
+				SDL_RenderDrawPoint(m_renderer, i, j);
+		}
+	}
+}
 
 void 			SdlWindow::drawTile(int x, int y, eType type)
 {
 	if (type == EMPTY){
 		return;
 	}
-	SDL_Rect rectangle;
-
-	rectangle.x = x * SQUARE_SIZE + 1.5 * SQUARE_SIZE_HALF;
-	rectangle.y = y * SQUARE_SIZE + 1.5 * SQUARE_SIZE_HALF;
-	rectangle.w = SQUARE_SIZE_HALF;
-	rectangle.h = SQUARE_SIZE_HALF;
-
 	if (type == BLACK) {
 		SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
 	} else if (type == WHITE) {
 		SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 255);
 	}
-	SDL_RenderFillRect(m_renderer, &rectangle);
-
+	DrawCircle((x + 1)* SQUARE_SIZE , (y + 1) * SQUARE_SIZE , SQUARE_SIZE_HALF);
 }
-// void 			SdlWindow::drawSquare(int x, int y, eType type)
-// {
-// 	SDL_Rect rectangle;
-//
-// 	rectangle.x = x *  SQUARE_SIZE;
-// 	rectangle.y = y * SQUARE_SIZE;
-// 	rectangle.w = SQUARE_SIZE;
-// 	rectangle.h = SQUARE_SIZE;
-// 	if (type == EMPTY){
-// 		SDL_SetRenderDrawColor(m_renderer, 165, 42, 42, 255);
-// 	} else if (type == BLACK) {
-// 		SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
-// 	} else if (type == WHITE) {
-// 		SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
-// 	}
-// 	SDL_RenderFillRect(m_renderer, &rectangle);
-// }
-//
+
 void 				SdlWindow::drawStart()
 {
 	std::string text("For start new game press <<N>>\nFor Exit press <<ECS>>");

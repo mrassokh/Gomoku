@@ -70,7 +70,7 @@ $(NAME): $(OBJ) make_libs
 
 $(OBJ_DIR)%.o: %.cpp
 	@echo "\033[0;32mCreating object file\033[0m \033[31m$@\033[0m"
-	@ $(CCXX) $(FLAGS) -c $< -o $@  $(INC) -g
+	@ $(CCXX) $(FLAGS) -c $< -o $@  $(INC) -g 
 	@ printf ' $(GREEN)[add]$(RESET) $<\n'
 
 $(OBJ): | $(OBJ_DIR)

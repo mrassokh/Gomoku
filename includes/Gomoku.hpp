@@ -16,6 +16,7 @@
 # include <dlfcn.h>
 # include <vector>
 # include <ctime>
+# include <cmath>
 # include <Render.hpp>
 
 
@@ -23,7 +24,7 @@ class Gomoku
 {
 
 public:
-	Gomoku();
+	Gomoku(std::string input);
 	Gomoku(Gomoku & rhs) = delete;
 	Gomoku& operator = (Gomoku & rhs) = delete;
 	virtual ~Gomoku();
@@ -39,7 +40,9 @@ private:
 	eType								m_currentTurn;
 	event								m_event;
 	int									m_exit;
+	int									m_AI;
 	double 								m_turnTime;
+	clock_t 							m_start;
 
 };
 

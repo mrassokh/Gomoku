@@ -71,23 +71,13 @@ void 		Render::deAttachSharedLibrary()
 	dlclose(dl_handle);
 }
 
-// void 			drawCell(int x, int y, eType type) const
-// {
-//
-// }
-// void 	Render::getEvent()
-// {
-// 	return m_newWindow->getEvent();
-// }
-
 
 void 			Render::drawField(std::vector<vecInt *> 	*gamefield) const
 {
 	 m_newWindow->startCycl();
+
 	 std::vector<vecInt *> game = *(gamefield);
-	 // std::vector<int>  row = *game;
 	  int k;
-	// m_newWindow->drawStart();
 	for (int i = 0; i < 19; i++){
 		m_newWindow->drawLine(i, 0);
 		m_newWindow->drawLine(0, i);
@@ -95,30 +85,29 @@ void 			Render::drawField(std::vector<vecInt *> 	*gamefield) const
 	for (int i = 0; i < 18; i++){
 		for (int j = 0; j < 18; j++){
 			k = (*game[j])[i];
-			//m_newWindow->drawSquare(i, j, static_cast<eType>((*gamefield)[i]->at[j]));
 			m_newWindow->drawTile(i, j, static_cast<eType>(k));
 		}
 	}
-	m_newWindow->drawTime(*m_turnTime, *m_currentTurn);
+
+	m_newWindow->drawTime(*m_currentTurn, m_turnTime, m_AI);
 	m_newWindow->endCycl();
 }
 
 void 			Render::renderConfigure(std::vector<vecInt *>	*gameField, eType *currentTurn,
-												event *ev, int *ex, double *turnTime)
+												event *ev, int *ex, double *turnTime, int AI)
 {
 	m_gameField = gameField;
 	m_currentTurn = currentTurn;
 	m_event = ev;
 	m_exit = ex;
 	m_turnTime = turnTime;
+	m_AI = AI;
 }
 
 void 			Render::mainLoop()
 {
-	//while (!m_exit){
 		//printf("Current state is %d\n", static_cast<int>(m_windowState));
 		(this->*m_windowStateFunctions[m_windowState])();
-	//}
 }
 
 void 			Render::drawStart()
@@ -126,7 +115,6 @@ void 			Render::drawStart()
 	m_startCondition = 1;
 	printf("start\n");
 	while (m_startCondition){
-		//drawField(m_gameField);
 		m_newWindow->drawStart();
 		eventHandling();
 	}
@@ -136,27 +124,16 @@ void 			Render::drawStart()
 void 			Render::drawGame()
 {
 	m_gameCondition = 1;
-	// m_start = clock();
-	// m_turnTime = 0;
-	//printf("game\n");
-	//while (m_gameCondition){
-		//printf("game_0\n");
-		drawField(m_gameField);
-			//printf("game_1\n");
-		eventHandling();
-			//printf("game_2\n");
-	//}
+	drawField(m_gameField);
+	eventHandling();
 }
+
 void 			Render::drawGameOver()
 {
 	m_gameOverCondition = 1;
-	//printf("gameOver\n");
 	while (m_gameOverCondition){
-		//printf("gameOver_1\n");
 		m_newWindow->drawGameOver("AAAAAA");
-		//printf("gameOver_2\n");
 		eventHandling();
-		//printf("gameOver_3\n");
 	}
 }
 
@@ -179,12 +156,6 @@ void 			Render::handleExit()
 
 void 			Render::handlePushSquare()
 {
-	// m_startCondition = 0;
-	// m_gameCondition = 0;
-	// m_gameOverCondition = 0;
-	// m_windowState = GAME_OVER;
-	// m_start = clock();
-	// m_turnTime = 0;
 	printf("handlePUSH");
 }
 
@@ -195,5 +166,4 @@ void 			Render::handleNewGame()
 	m_gameOverCondition = 0;
 	m_windowState = GAME;
 	printf("handleNEWGame");
-
 }

@@ -15,10 +15,11 @@
 int main(int ac, char **av)
 {
 
-	if (ac == 3)
-		av[2][0] = 'a';
-		printf(" print %d \n", 1);
-	Gomoku *gomoku = new Gomoku;
+	Gomoku *gomoku;
+	if (ac == 2)
+		gomoku = new Gomoku(std::string(av[1]));
+	else
+	 	gomoku = new Gomoku("none");
 	// while (1){
 	printf(" print %d \n", 2);
 		gomoku->render();

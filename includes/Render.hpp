@@ -27,14 +27,13 @@ typedef	enum windowState
 	GAME_OVER
 }			eWindowState;
 
-//typedef std::vector<std::vector<int> *> vecVecInt;
 
 class Render
 {
 public:
 	static Render	&Instance();
 	void 			renderConfigure(std::vector<vecInt *> *gamefield, eType *currentTurn,
-		 									event *ev, int *ex, double *turnTime);
+		 									event *ev, int *ex, double *turnTime, int AI);
 	void 			drawField(std::vector<vecInt *>  *gamefield) const;
 	void 			init() const;
 	void 			attachSharedLibrary(const char* sharedLibrary, int height, int weight);
@@ -42,8 +41,6 @@ public:
 	void 			mainLoop();
 
 	void 			eventHandling();
-
-	// void			getEvent();
 
 private:
 	Render();
@@ -61,6 +58,7 @@ private:
 	std::vector<vecInt *>	*m_gameField;
 	eType					*m_currentTurn;
 	double 					*m_turnTime;
+	//clock_t 				*m_start;
 
 	std::array<void (Render::*)(), 3>	m_eventFunctions;
 	std::array<void (Render::*)(), 3>	m_windowStateFunctions;
@@ -78,8 +76,8 @@ private:
 	int				m_gameOverCondition;
 	event 			*m_event;
 	int 			*m_exit;
+	int 			m_AI;
 	eWindowState	m_windowState;
-
 };
 
 #endif
