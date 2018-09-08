@@ -38,6 +38,13 @@ typedef struct  s_event
 	int		y;
 }				event;
 
+typedef struct  s_pos
+{
+	EVENTS	event;
+	int 	x;
+	int		y;
+}				t_pos;
+
 typedef struct  s_windowCondition
 {
 	int			startCondition;

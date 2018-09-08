@@ -12,7 +12,7 @@
 
 #include "Render.hpp"
 
-Render::Render()
+Render::Render() : m_gameOverMessage("")
 {
 	m_eventFunctions[0] = &Render::handlePushSquare;
 	m_eventFunctions[1] = &Render::handleNewGame;
@@ -132,7 +132,7 @@ void 			Render::drawGameOver()
 {
 	m_windowCondition->gameOverCondition = 1;
 	while (m_windowCondition->gameOverCondition){
-		m_newWindow->drawGameOver("AAAAAA");
+		m_newWindow->drawGameOver(m_gameOverMessage);
 		eventHandling();
 	}
 }
@@ -151,12 +151,22 @@ void 			Render::handleExit()
 	m_windowCondition->gameCondition = 0;
 	m_windowCondition->gameOverCondition = 0;
 	*m_exit = 1;
-	printf("handleEXIT");
+	printf("handleEXIT\n");
 }
 
 void 			Render::handlePushSquare()
 {
-	printf("handlePUSH");
+	printf("handlePUSH\n");
+}
+
+void 			Render::GameOver(std::string const & message)
+{
+	m_windowCondition->startCondition = 0;
+	m_windowCondition->gameCondition = 0;
+	m_windowCondition->gameOverCondition = 1;
+	m_windowState = GAME_OVER;
+	m_gameOverMessage = message;
+	printf("handleGameOVER\n");
 }
 
 void 			Render::handleNewGame()
@@ -165,5 +175,5 @@ void 			Render::handleNewGame()
 	m_windowCondition->gameCondition = 0;
 	m_windowCondition->gameOverCondition = 0;
 	m_windowState = GAME;
-	printf("handleNEWGame");
+	printf("handleNEWGame\n");
 }

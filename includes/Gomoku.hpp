@@ -51,9 +51,19 @@ public:
 private:
 
 	void 								initGameField(int N);
+	void 								clearGameField(int N);
 	void 								moving(t_move* currentMove);
 	void 								moveChecking(t_move* currentMove);
+	int 								checkWin(t_move* currentMove, int x, int y);
+	int 								checkWinHorizontal(t_move* currentMove, int x, int y);
+	int 								checkWinVertical(t_move* currentMove, int x, int y);
+	int 								checkWinDiagonalLeft(t_move* currentMove, int x, int y);
+	int 								checkWinDiagonalRight(t_move* currentMove, int x, int y);
+	int 								checkCapture(t_move* currentMove);
+	int 								checkFreeTree(t_move* currentMove);
+
 	void 								moveProcessing(t_move* currentMove);
+	void 								moveReset(t_move* currentMove);
 	Render								*m_render;
 	//std::vector<vecInt *>				m_gameField;
 	int 								m_N;

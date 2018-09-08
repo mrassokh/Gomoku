@@ -52,6 +52,28 @@ void 	Gomoku::initGameField(int N)
 	}
 }
 
+void 		Gomoku::moveReset(t_move* currentMove)
+{
+	currentMove->moveResult = NO_RESULT;
+	if (currentMove->currentTurn == BLACK)
+		currentMove->currentTurn = WHITE;
+	else
+		currentMove->currentTurn = BLACK;
+	m_event.event = DEFAULT;
+	m_event.x = -100;
+	m_event.x = -100;
+}
+void 	Gomoku::clearGameField(int N)
+{
+	// vecInt* row;
+	//m_gameField = new std::vector<vecInt>;
+	for (int i = 0; i < N; i++){
+		for (int j = 0; j < N; j++) {
+			(*m_currentMove.gameField[i])[j] = EMPTY;
+		}
+	}
+}
+
 void 	Gomoku::render()
 {
 	m_render->renderConfigure(&m_currentMove.gameField, &m_currentMove.currentTurn, &m_event, &m_exit, &m_turnTime, m_AI, &m_windowCondition);
@@ -103,7 +125,11 @@ void 		Gomoku::moveChecking(t_move* currentMove)
 	if ((*currentMove->gameField[m_event.y])[m_event.x] != EMPTY){
 		currentMove->moveResult = NON_EMPTY;
 		printf("Push point with x =%d and y =%d denied - qquare is not empty\n", m_event.x, m_event.y);
-	} else {
+	} else if (checkWin(currentMove, m_event.x, m_event.y)){
+		printf("Push point with x =%d and y =%d and win!\n", m_event.x, m_event.y);
+		(*currentMove->gameField[m_event.y])[m_event.x] = m_currentMove.currentTurn;
+		currentMove->moveResult = WIN;
+	} else 	{
 		(*currentMove->gameField[m_event.y])[m_event.x] = m_currentMove.currentTurn;
 		currentMove->moveResult = DEF;
 	}
@@ -112,17 +138,129 @@ void 		Gomoku::moveChecking(t_move* currentMove)
 void 		Gomoku::moveProcessing(t_move* currentMove)
 {
 	if (currentMove->moveResult == DEF){
-		currentMove->moveResult = NO_RESULT;
-		if (currentMove->currentTurn == BLACK)
-			currentMove->currentTurn = WHITE;
-		else
-			currentMove->currentTurn = BLACK;
-		m_event.event = DEFAULT;
-		m_event.x = -100;
-		m_event.x = -100;
+		moveReset(currentMove);
 
 	} else if (currentMove->moveResult == WIN) {
-		m_windowCondition.gameCondition = 0;
-		m_windowCondition.gameOverCondition = 1;
+		// m_windowCondition.gameCondition = 0;
+		// m_windowCondition.gameOverCondition = 1;
+		std::string result = currentMove->currentTurn == BLACK ? "BLACK WIN!!!" : "WHITE WIN!!!";
+		clearGameField(m_N);
+		//moveReset(currentMove);
+		m_render->GameOver(result);
+
 	}
 }
+
+int 			Gomoku::checkWin(t_move* currentMove, int x, int y)
+{
+	printf("Chek x =%d and y =%d to win\n", m_event.x, m_event.y );
+	if (checkWinHorizontal(currentMove, x, y))
+		return 1;
+	else if (checkWinVertical(currentMove, x, y))
+		return 1;
+	else if (checkWinDiagonalLeft(currentMove, x, y))
+		return 1;
+	else if (checkWinDiagonalRight(currentMove, x, y))
+		return 1;
+	return 0;
+}
+
+int 			Gomoku::checkWinHorizontal(t_move* currentMove, int x, int y)
+{
+	int match = 1;
+	for (int i = 1; i < 5; ++i) {
+		int posX = x + i;
+		if (posX > 17 || (*currentMove->gameField[y])[posX] != currentMove->currentTurn)
+			break;
+		else if(++match == 5){
+			printf("match for x =%d and y =%d is %d\n", x, y, match );
+			return 1;
+		}
+		printf("match for x =%d and y =%d is %d\n", x, y, match );
+	}
+	for (int i = 1; i < 5 ; ++i) {
+		int posX = x - i;
+		if (posX < 0 || (*currentMove->gameField[y])[posX] != currentMove->currentTurn)
+			break;
+		else if(++match == 5){
+			printf("match for x =%d and y =%d is %d\n", x, y, match );
+			return 1;
+		}
+		printf("match for x =%d and y =%d is %d\n", x, y, match );
+	}
+	return 0;
+}
+
+int 			Gomoku::checkWinVertical(t_move* currentMove, int x, int y)
+{
+	int match = 1;
+	for (int i = 1; i < 5; ++i) {
+		int posY = y + i;
+		if (posY > 17 || (*currentMove->gameField[posY])[x] != currentMove->currentTurn)
+			break;
+		else if(++match == 5) {
+			return 1;
+		}
+	}
+	for (int i = 1; i < 5 ; ++i){
+		int posY = y - i;
+		if (posY < 0 || (*currentMove->gameField[posY])[x] != currentMove->currentTurn)
+			break;
+		else if (++match == 5){
+			return 1;
+		}
+	}
+	return 0;
+
+}
+
+int 			Gomoku::checkWinDiagonalLeft(t_move* currentMove, int x, int y)
+{
+	int match = 1;
+	for (int i = 1; i < 5; ++i) {
+		int posX = x + i;
+		int posY = y + i;
+		if (posX > 17 || posY > 17 || (*currentMove->gameField[posY])[posX] != currentMove->currentTurn)
+			break;
+		else if (++match == 5) {
+			return 1;
+		}
+	}
+	for (int i = 1; i < 5 ; ++i){
+		int posX = x - i;
+		int posY = y - i;
+		if (posX < 0 || posY < 0 || (*currentMove->gameField[posY])[posX] != currentMove->currentTurn)
+			break;
+		else if (++match == 5){
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int 			Gomoku::checkWinDiagonalRight(t_move* currentMove, int x, int y)
+{
+	int match = 1;
+	for (int i = 1; i < 5; ++i) {
+		int posX = x - i;
+		int posY = y + i;
+		if (posX < 0 || posY > 17 || (*currentMove->gameField[posY])[posX] != currentMove->currentTurn)
+			break;
+		else if(++match == 5) {
+			return 1;
+		}
+	}
+	for (int i = 1; i < 5 ; ++i){
+		int posX = x + i;
+		int posY = y - i;
+		if (posX > 17 || posY < 0 || (*currentMove->gameField[posY])[posX] != currentMove->currentTurn)
+			break;
+		else if (++match == 5){
+			return 1;
+		}
+	}
+	return 0;
+}
+// int 								checkWinDiagonalRight(t_move* currentMove, int x, int y);
+// int 								checkCapture(t_move* currentMove);
+// int 								checkFreeTree(t_move* currentMove);

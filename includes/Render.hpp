@@ -39,6 +39,7 @@ public:
 	void 			attachSharedLibrary(const char* sharedLibrary, int height, int weight);
 	void 			deAttachSharedLibrary();
 	void 			mainLoop();
+	void 			GameOver(std::string const & message);
 
 	void 			eventHandling();
 
@@ -72,11 +73,13 @@ private:
 	void 			handleNewGame();
 
 
+
 	windowCondition *m_windowCondition;
 	event 			*m_event;
 	int 			*m_exit;
 	int 			m_AI;
 	eWindowState	m_windowState;
+	std::string		m_gameOverMessage;
 };
 
 #endif
