@@ -52,6 +52,8 @@ private:
 
 	void 								initGameField(int N);
 	void 								clearGameField(int N);
+	eType								findOppositeType(eType type);
+	void								eraseTiles(std::vector<vecInt *>	*gameField, int startX, int startY, int endX, int endY);
 	void 								moving(t_move* currentMove);
 	void 								moveChecking(t_move* currentMove);
 	int 								checkWin(t_move* currentMove, int x, int y);
@@ -59,11 +61,17 @@ private:
 	int 								checkWinVertical(t_move* currentMove, int x, int y);
 	int 								checkWinDiagonalLeft(t_move* currentMove, int x, int y);
 	int 								checkWinDiagonalRight(t_move* currentMove, int x, int y);
-	int 								checkCapture(t_move* currentMove);
+
+	int 								checkCapture(t_move* currentMove, int x, int y);
+	int 								checkCaptureHorizontal(t_move* currentMove, int x, int y);
+	int 								checkCaptureVertical(t_move* currentMove, int x, int y);
+	int 								checkCaptureDiagonalLeft(t_move* currentMove, int x, int y);
+	int 								checkCaptureDiagonalRight(t_move* currentMove, int x, int y);
 	int 								checkFreeTree(t_move* currentMove);
 
 	void 								moveProcessing(t_move* currentMove);
 	void 								moveReset(t_move* currentMove);
+
 	Render								*m_render;
 	//std::vector<vecInt *>				m_gameField;
 	int 								m_N;

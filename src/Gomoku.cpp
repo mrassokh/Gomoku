@@ -129,7 +129,10 @@ void 		Gomoku::moveChecking(t_move* currentMove)
 		printf("Push point with x =%d and y =%d and win!\n", m_event.x, m_event.y);
 		(*currentMove->gameField[m_event.y])[m_event.x] = m_currentMove.currentTurn;
 		currentMove->moveResult = WIN;
-	} else 	{
+	} else 	if (checkCapture(currentMove, m_event.x, m_event.y)){
+		(*currentMove->gameField[m_event.y])[m_event.x] = m_currentMove.currentTurn;
+		currentMove->moveResult = CAPTURE;
+	} else {
 		(*currentMove->gameField[m_event.y])[m_event.x] = m_currentMove.currentTurn;
 		currentMove->moveResult = DEF;
 	}
@@ -140,7 +143,10 @@ void 		Gomoku::moveProcessing(t_move* currentMove)
 	if (currentMove->moveResult == DEF){
 		moveReset(currentMove);
 
-	} else if (currentMove->moveResult == WIN) {
+	} else if (currentMove->moveResult == CAPTURE){
+		moveReset(currentMove);
+	}
+	else if (currentMove->moveResult == WIN) {
 		// m_windowCondition.gameCondition = 0;
 		// m_windowCondition.gameOverCondition = 1;
 		std::string result = currentMove->currentTurn == BLACK ? "BLACK WIN!!!" : "WHITE WIN!!!";
@@ -261,6 +267,91 @@ int 			Gomoku::checkWinDiagonalRight(t_move* currentMove, int x, int y)
 	}
 	return 0;
 }
+
+eType			Gomoku::findOppositeType(eType type)
+{
+	return type == BLACK ? WHITE : (type == WHITE ? BLACK : EMPTY);
+}
+
+void			Gomoku::eraseTiles(std::vector<vecInt *>	*gameField, int startX, int startY, int endX, int endY)
+{
+	printf("ERASE TILE x =%d and y =%d x2 =%d and y2 =%d\n", startX, startY,  endX, endY);
+	if (startX < 0 || startX > 17 || endX > 17
+		|| startY < 0 || startY > 17 || endY > 17 )
+		return;
+	for (int i = startY; i < endY; ++i) {
+		for (int j = startX; j < endX; ++j){
+			printf("ERASE TILE x =%d and y =%d\n", j, i );
+			(*(*gameField)[i])[j] = EMPTY;
+		}
+	}
+}
+
+int 			Gomoku::checkCapture(t_move* currentMove, int x, int y)
+{
+
+	if (checkCaptureHorizontal(currentMove, x, y)){
+		printf("Chek capture x =%d and y =%d\n", m_event.x, m_event.y );
+				return 1;
+	}
+
+	// else if (checkCaptureVertical(currentMove, x, y))
+	// 	return 1;
+	// else if (checkCaptureDiagonalLeft(currentMove, x, y))
+	// 	return 1;
+	// else if (checkCaptureDiagonalRight(currentMove, x, y))
+	// 	return 1;
+	return 0;
+}
+
+int 			Gomoku::checkCaptureHorizontal(t_move* currentMove, int x, int y)
+{
+	for (int i = 1; i < 4; ++i) {
+		int posX = x + i;
+		if (i < 3){
+			if (posX > 17 || (*currentMove->gameField[y])[posX] != findOppositeType(currentMove->currentTurn))
+				break;
+		}
+		if (i == 3){
+			if (posX > 17 || (*currentMove->gameField[y])[posX] != currentMove->currentTurn)
+				break;
+		}
+		printf("Chek capture x =%d and y =%d\n", x, y );
+		eraseTiles(&currentMove->gameField, x + 1 , y, x + 2, y);
+		return 1;
+	}
+	for (int i = 1; i < 4; ++i) {
+		int posX = x - i;
+		if (i < 3){
+			if (posX < 0 || (*currentMove->gameField[y])[posX] != findOppositeType(currentMove->currentTurn))
+				break;
+		}
+		if (i == 3){
+			if (posX < 0 || (*currentMove->gameField[y])[posX] != currentMove->currentTurn)
+				break;
+		}
+		printf("Chek capture x =%d and y =%d\n", x, y );
+		eraseTiles(&currentMove->gameField, x - 1 , y, x - 2, y);
+		return 1;
+	}
+	return 0;
+}
+
+// int 			Gomoku::checkCaptureVertical(t_move* currentMove, int x, int y)
+// {
+//
+// }
+//
+// int 			Gomoku::checkCaptureDiagonalLeft(t_move* currentMove, int x, int y)
+// {
+//
+// }
+//
+// int 			Gomoku::checkCaptureDiagonalRight(t_move* currentMove, int x, int y)
+// {
+//
+// }
+
 // int 								checkWinDiagonalRight(t_move* currentMove, int x, int y);
 // int 								checkCapture(t_move* currentMove);
 // int 								checkFreeTree(t_move* currentMove);
