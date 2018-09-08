@@ -38,6 +38,13 @@ typedef struct  s_event
 	int		y;
 }				event;
 
+typedef struct  s_windowCondition
+{
+	int			startCondition;
+	int			gameCondition;
+	int			gameOverCondition;
+}				windowCondition;
+
 class IWindow
 {
 public:

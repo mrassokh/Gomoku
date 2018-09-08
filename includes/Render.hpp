@@ -33,7 +33,7 @@ class Render
 public:
 	static Render	&Instance();
 	void 			renderConfigure(std::vector<vecInt *> *gamefield, eType *currentTurn,
-		 									event *ev, int *ex, double *turnTime, int AI);
+		 									event *ev, int *ex, double *turnTime, int AI, windowCondition *condition);
 	void 			drawField(std::vector<vecInt *>  *gamefield) const;
 	void 			init() const;
 	void 			attachSharedLibrary(const char* sharedLibrary, int height, int weight);
@@ -71,9 +71,8 @@ private:
 	void 			handlePushSquare();
 	void 			handleNewGame();
 
-	int				m_startCondition;
-	int				m_gameCondition;
-	int				m_gameOverCondition;
+
+	windowCondition *m_windowCondition;
 	event 			*m_event;
 	int 			*m_exit;
 	int 			m_AI;

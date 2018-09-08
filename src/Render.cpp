@@ -12,7 +12,7 @@
 
 #include "Render.hpp"
 
-Render::Render(): m_startCondition(0), m_gameCondition(0), m_gameOverCondition(0)
+Render::Render()
 {
 	m_eventFunctions[0] = &Render::handlePushSquare;
 	m_eventFunctions[1] = &Render::handleNewGame;
@@ -94,7 +94,7 @@ void 			Render::drawField(std::vector<vecInt *> 	*gamefield) const
 }
 
 void 			Render::renderConfigure(std::vector<vecInt *>	*gameField, eType *currentTurn,
-												event *ev, int *ex, double *turnTime, int AI)
+											event *ev, int *ex, double *turnTime, int AI, windowCondition *condition)
 {
 	m_gameField = gameField;
 	m_currentTurn = currentTurn;
@@ -102,6 +102,7 @@ void 			Render::renderConfigure(std::vector<vecInt *>	*gameField, eType *current
 	m_exit = ex;
 	m_turnTime = turnTime;
 	m_AI = AI;
+	m_windowCondition = condition;
 }
 
 void 			Render::mainLoop()
@@ -112,26 +113,25 @@ void 			Render::mainLoop()
 
 void 			Render::drawStart()
 {
-	m_startCondition = 1;
+	m_windowCondition->startCondition = 1;
 	printf("start\n");
-	while (m_startCondition){
+	while (m_windowCondition->startCondition){
 		m_newWindow->drawStart();
 		eventHandling();
 	}
-
 }
 
 void 			Render::drawGame()
 {
-	m_gameCondition = 1;
+	m_windowCondition->gameCondition = 1;
 	drawField(m_gameField);
 	eventHandling();
 }
 
 void 			Render::drawGameOver()
 {
-	m_gameOverCondition = 1;
-	while (m_gameOverCondition){
+	m_windowCondition->gameOverCondition = 1;
+	while (m_windowCondition->gameOverCondition){
 		m_newWindow->drawGameOver("AAAAAA");
 		eventHandling();
 	}
@@ -147,9 +147,9 @@ void 			Render::eventHandling()
 
 void 			Render::handleExit()
 {
-	m_startCondition = 0;
-	m_gameCondition = 0;
-	m_gameOverCondition = 0;
+	m_windowCondition->startCondition = 0;
+	m_windowCondition->gameCondition = 0;
+	m_windowCondition->gameOverCondition = 0;
 	*m_exit = 1;
 	printf("handleEXIT");
 }
@@ -161,9 +161,9 @@ void 			Render::handlePushSquare()
 
 void 			Render::handleNewGame()
 {
-	m_startCondition = 0;
-	m_gameCondition = 0;
-	m_gameOverCondition = 0;
+	m_windowCondition->startCondition = 0;
+	m_windowCondition->gameCondition = 0;
+	m_windowCondition->gameOverCondition = 0;
 	m_windowState = GAME;
 	printf("handleNEWGame");
 }
