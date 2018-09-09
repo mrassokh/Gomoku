@@ -16,19 +16,22 @@ Gomoku::Gomoku(std::string input):m_N(18), m_exit(0)
 {
 	initGameField(m_N);
 	m_currentMove.currentTurn = BLACK;
+	m_currentMove.whiteCaptures = 0;
+	m_currentMove.blackCaptures = 0;
 	m_render = &Render::Instance();
 	m_render->attachSharedLibrary("lib1_sdl.so", m_N + 1, m_N + 1);
 	m_event.event = DEFAULT;
 	m_event.x = -100;
 	m_event.x = -100;
 	m_render->init();
-	if (input == "AI"){
-		m_AI = 1;
-		printf("AI mode\n");
-	} else {
-		printf("Two user mode\n");
-		m_AI = 0;
-	}
+	m_AI = input == "AI" ? 1 : 0;
+	// if (input == "AI"){
+	// 	m_AI = 1;
+	// 	printf("AI mode\n");
+	// } else {
+	// 	printf("Two user mode\n");
+	// 	m_AI = 0;
+	// }
 	m_windowCondition.startCondition = 1;
 	m_windowCondition.gameCondition = 0;
 	m_windowCondition.gameOverCondition = 0;
@@ -76,7 +79,7 @@ void 	Gomoku::clearGameField(int N)
 
 void 	Gomoku::render()
 {
-	m_render->renderConfigure(&m_currentMove.gameField, &m_currentMove.currentTurn, &m_event, &m_exit, &m_turnTime, m_AI, &m_windowCondition);
+	m_render->renderConfigure(&m_currentMove, &m_event, &m_exit, &m_turnTime, m_AI, &m_windowCondition);
 	//clock_t start = clock();
 	//double timeFromLastTurn = 0.0;
 	m_turnTime =0.0;
@@ -131,6 +134,7 @@ void 		Gomoku::moveChecking(t_move* currentMove)
 		currentMove->moveResult = WIN;
 	} else 	if (checkCapture(currentMove, m_event.x, m_event.y)){
 		(*currentMove->gameField[m_event.y])[m_event.x] = m_currentMove.currentTurn;
+
 		currentMove->moveResult = CAPTURE;
 	} else {
 		(*currentMove->gameField[m_event.y])[m_event.x] = m_currentMove.currentTurn;
@@ -279,8 +283,23 @@ void			Gomoku::eraseTiles(std::vector<vecInt *>	*gameField, int startX, int star
 	if (startX < 0 || startX > 17 || endX > 17
 		|| startY < 0 || startY > 17 || endY > 17 )
 		return;
-	for (int i = startY; i < endY; ++i) {
-		for (int j = startX; j < endX; ++j){
+	if (startX == endX){
+		for (int i = startY; i <= endY; ++i) {
+			printf("ERASE TILE x =%d and y =%d\n", startX, i );
+			(*(*gameField)[i])[startX] = EMPTY;
+		}
+		return;
+	}
+
+	if (startY == endY){
+		for (int i = startX; i <= endX; ++i) {
+			printf("ERASE TILE x =%d and y =%d\n", i, startY );
+			(*(*gameField)[startY])[i] = EMPTY;
+		}
+		return;
+	}
+	for (int i = startY; i <= endY; ++i) {
+		for (int j = startX; j <= endX; ++j){
 			printf("ERASE TILE x =%d and y =%d\n", j, i );
 			(*(*gameField)[i])[j] = EMPTY;
 		}
@@ -290,10 +309,16 @@ void			Gomoku::eraseTiles(std::vector<vecInt *>	*gameField, int startX, int star
 int 			Gomoku::checkCapture(t_move* currentMove, int x, int y)
 {
 
-	if (checkCaptureHorizontal(currentMove, x, y)){
-		printf("Chek capture x =%d and y =%d\n", m_event.x, m_event.y );
-				return 1;
-	}
+	int captures = 0;
+	captures += checkCaptureHorizontal(currentMove, x, y);
+	if (currentMove->currentTurn == WHITE)
+		currentMove->whiteCaptures += captures;
+	else
+	 	currentMove->blackCaptures += captures;
+	// if (checkCaptureHorizontal(currentMove, x, y)){
+	// 	printf("Chek capture x =%d and y =%d\n", m_event.x, m_event.y );
+	// 			return 1;
+	// }
 
 	// else if (checkCaptureVertical(currentMove, x, y))
 	// 	return 1;
@@ -301,40 +326,45 @@ int 			Gomoku::checkCapture(t_move* currentMove, int x, int y)
 	// 	return 1;
 	// else if (checkCaptureDiagonalRight(currentMove, x, y))
 	// 	return 1;
-	return 0;
+	return captures;
 }
 
 int 			Gomoku::checkCaptureHorizontal(t_move* currentMove, int x, int y)
 {
-	for (int i = 1; i < 4; ++i) {
-		int posX = x + i;
-		if (i < 3){
-			if (posX > 17 || (*currentMove->gameField[y])[posX] != findOppositeType(currentMove->currentTurn))
+	int capture = 0;
+	int cursor = 0;
+	for (cursor = 1; cursor < 4; ++cursor) {
+		int posX = x + cursor;
+		printf("Chek type for capture x =%d and y =%d\n type = %d current move = %d iteration = %d\n", posX, y, (int)findOppositeType(currentMove->currentTurn), (int)(*currentMove->gameField[y])[posX], cursor);
+		if (cursor < 3
+			&& (posX > 17 || (*currentMove->gameField[y])[posX] != findOppositeType(currentMove->currentTurn)))
 				break;
-		}
-		if (i == 3){
-			if (posX > 17 || (*currentMove->gameField[y])[posX] != currentMove->currentTurn)
+		if (cursor == 3
+			 &&	(posX > 17 || (*currentMove->gameField[y])[posX] != currentMove->currentTurn))
 				break;
-		}
+	}
+	if (cursor == 4){
+		//cursor = 0;
 		printf("Chek capture x =%d and y =%d\n", x, y );
 		eraseTiles(&currentMove->gameField, x + 1 , y, x + 2, y);
-		return 1;
+		capture++;
 	}
-	for (int i = 1; i < 4; ++i) {
-		int posX = x - i;
-		if (i < 3){
-			if (posX < 0 || (*currentMove->gameField[y])[posX] != findOppositeType(currentMove->currentTurn))
+	for (cursor = 1; cursor < 4; ++cursor) {
+		int posX = x - cursor;
+		printf("Chek type for capture to left x =%d and y =%d\n type = %d current move = %d iteration = %d\n", posX, y, (int)findOppositeType(currentMove->currentTurn), (int)(*currentMove->gameField[y])[posX], cursor);
+		if (cursor < 3
+			&& (posX < 0 || (*currentMove->gameField[y])[posX] != findOppositeType(currentMove->currentTurn)))
 				break;
-		}
-		if (i == 3){
-			if (posX < 0 || (*currentMove->gameField[y])[posX] != currentMove->currentTurn)
+		if (cursor == 3
+			&& (posX < 0 || (*currentMove->gameField[y])[posX] != currentMove->currentTurn))
 				break;
-		}
+	}
+	if (cursor == 4){
 		printf("Chek capture x =%d and y =%d\n", x, y );
-		eraseTiles(&currentMove->gameField, x - 1 , y, x - 2, y);
-		return 1;
+		eraseTiles(&currentMove->gameField, x - 2 , y, x -1, y);
+		capture++;
 	}
-	return 0;
+	return capture;
 }
 
 // int 			Gomoku::checkCaptureVertical(t_move* currentMove, int x, int y)

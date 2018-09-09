@@ -18,8 +18,6 @@
 # include <dlfcn.h>
 # include <ctime>
 
-typedef std::vector<int> vecInt;
-
 typedef	enum windowState
 {
 	START,
@@ -32,7 +30,7 @@ class Render
 {
 public:
 	static Render	&Instance();
-	void 			renderConfigure(std::vector<vecInt *> *gamefield, eType *currentTurn,
+	void 			renderConfigure(t_move	*currentMove,
 		 									event *ev, int *ex, double *turnTime, int AI, windowCondition *condition);
 	void 			drawField(std::vector<vecInt *>  *gamefield) const;
 	void 			init() const;
@@ -56,8 +54,8 @@ private:
 	void 					*dl_handle;
 	IWindow 				*m_newWindow;
 
-	std::vector<vecInt *>	*m_gameField;
-	eType					*m_currentTurn;
+	//std::vector<vecInt *>	*m_gameField;
+	//eType					*m_currentTurn;
 	double 					*m_turnTime;
 	//clock_t 				*m_start;
 
@@ -72,7 +70,7 @@ private:
 	void 			handlePushSquare();
 	void 			handleNewGame();
 
-
+	t_move			*m_currentMove;
 
 	windowCondition *m_windowCondition;
 	event 			*m_event;

@@ -85,12 +85,14 @@ void 					SdlWindow::endCycl()
 	SDL_RenderPresent(m_renderer);
 }
 
-void 					SdlWindow::drawTime(eType type, double 	*turnTime, int 	AI)
+void 					SdlWindow::drawTime(eType type, int wCaptures, int bCaptures, double 	*turnTime, int 	AI)
 {
 	std::ostringstream results;
-	results << "Turn : "  << (type == BLACK ? "BLACK" : "WHITE") << "\nAI_Timer: " + (AI ? std::to_string(*turnTime) : " - ")+ "\n";
+	results << "Turn : "  << (type == BLACK ? "BLACK" : "WHITE")
+	<< "\nCaptures:" << "W (" + std::to_string(wCaptures) << ") B(" + std::to_string(bCaptures) << ")"
+	<< "\nAI_Timer: " + (AI ? std::to_string(*turnTime) : " - ")+ "\n";
 	std::string output = results.str();
-	showText(m_width - 200, 50,output.c_str());
+	showText(m_width - 240, 50,output.c_str());
 }
 
 void 			SdlWindow::getEvent(event *ev)

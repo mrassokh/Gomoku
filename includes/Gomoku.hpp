@@ -19,24 +19,7 @@
 # include <cmath>
 # include <Render.hpp>
 
-typedef enum  	moveResult
-{
-	NO_RESULT,
-	NON_EMPTY,
-	FREE_TREE,
-	CAPTURE,
-	WIN,
-	LOSE,
-	DEF
-}				eMoveResult;
 
-
-typedef struct  			s_move
-{
-	eType					currentTurn;
-	std::vector<vecInt *>	gameField;
-	eMoveResult				moveResult;
-}							t_move;
 
 class Gomoku
 {

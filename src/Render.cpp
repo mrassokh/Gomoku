@@ -89,15 +89,17 @@ void 			Render::drawField(std::vector<vecInt *> 	*gamefield) const
 		}
 	}
 
-	m_newWindow->drawTime(*m_currentTurn, m_turnTime, m_AI);
+	m_newWindow->drawTime(m_currentMove->currentTurn, m_currentMove->whiteCaptures,
+							m_currentMove->blackCaptures, m_turnTime, m_AI);
 	m_newWindow->endCycl();
 }
 
-void 			Render::renderConfigure(std::vector<vecInt *>	*gameField, eType *currentTurn,
+void 			Render::renderConfigure(t_move	*currentMove,
 											event *ev, int *ex, double *turnTime, int AI, windowCondition *condition)
 {
-	m_gameField = gameField;
-	m_currentTurn = currentTurn;
+	m_currentMove = currentMove;
+	// m_gameField = gameField;
+	// m_currentTurn = currentTurn;
 	m_event = ev;
 	m_exit = ex;
 	m_turnTime = turnTime;
@@ -124,7 +126,7 @@ void 			Render::drawStart()
 void 			Render::drawGame()
 {
 	m_windowCondition->gameCondition = 1;
-	drawField(m_gameField);
+	drawField(&m_currentMove->gameField);
 	eventHandling();
 }
 
