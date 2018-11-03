@@ -43,9 +43,9 @@ typedef struct  s_event
 
 typedef struct  s_pos
 {
-	EVENTS	event;
 	int 	x;
 	int		y;
+	eType	type;
 }				t_pos;
 
 typedef struct  s_windowCondition
@@ -59,14 +59,14 @@ typedef enum  	moveResult
 {
 	NO_RESULT,
 	NON_EMPTY,
-	FREE_TREE,
+	DOUBLE_FREE_TREE,
 	CAPTURE,
 	WIN,
 	LOSE,
 	DEF
 }				eMoveResult;
 
-
+typedef std::vector<t_pos>  posSet;
 typedef struct  			s_move
 {
 	eType					currentTurn;
@@ -74,6 +74,10 @@ typedef struct  			s_move
 	eMoveResult				moveResult;
 	int 					whiteCaptures;
 	int 					blackCaptures;
+	std::vector <posSet>	whiteFreeTree;
+	std::vector <posSet>	blackFreeTree;
+	t_pos					leftTop;
+	t_pos					rightBottom;
 }							t_move;
 
 class IWindow

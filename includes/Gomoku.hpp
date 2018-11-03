@@ -18,6 +18,8 @@
 # include <ctime>
 # include <cmath>
 # include <Render.hpp>
+#include <algorithm>
+#include <functional>
 
 
 
@@ -50,8 +52,13 @@ private:
 	int 								checkCaptureVertical(t_move* currentMove, int x, int y);
 	int 								checkCaptureDiagonalLeft(t_move* currentMove, int x, int y);
 	int 								checkCaptureDiagonalRight(t_move* currentMove, int x, int y);
-	int 								checkFreeTree(t_move* currentMove);
-
+	int 								checkFreeTree(t_move* currentMove, int x, int y);
+	int									checkDoubleFreeTree(t_move &currentMove);
+	int 								fillHorisontalFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end);
+	int 								checkFreeTreeHorizontal(t_move* currentMove, int x, int y);
+	int 								checkFreeTreeVertical(t_move* currentMove, int x, int y);
+	int 								checkFreeTreeDiagonalLeft(t_move* currentMove, int x, int y);
+	int 								checkFreeTreeDiagonalRight(t_move* currentMove, int x, int y);
 	void 								moveProcessing(t_move* currentMove);
 	void 								moveReset(t_move* currentMove);
 
