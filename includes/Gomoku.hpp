@@ -55,6 +55,10 @@ private:
 	int 								checkFreeTree(t_move* currentMove, int x, int y);
 	int									checkDoubleFreeTree(t_move &currentMove);
 	int 								fillHorisontalFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end);
+	int 								fillVerticalFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end);
+	int 								fillDiagonalLeftFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end);
+	int 								fillDiagonalRightFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end);
+	int 								validMatchFreeTreeSet(posSet const & left, posSet const & right);
 	int 								checkFreeTreeHorizontal(t_move* currentMove, int x, int y);
 	int 								checkFreeTreeVertical(t_move* currentMove, int x, int y);
 	int 								checkFreeTreeDiagonalLeft(t_move* currentMove, int x, int y);
