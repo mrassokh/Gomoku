@@ -183,17 +183,93 @@ int 			Gomoku::checkWin(t_move* currentMove, int x, int y)
 	return 0;
 }
 
+inline int 			Gomoku::checkPossibleCaptureHorizontalWin(t_move* currentMove, int startX, int endX, int y)
+{
+	if (y < 1 || y > 16)
+		return 1;
+	for (int i = startX; i < endX; ++i)
+	{
+		if (y + 2 <= 17
+			&& (*currentMove->gameField[y - 1])[i] == findOppositeType(currentMove->currentTurn)
+			&& (*currentMove->gameField[y + 1])[i] == currentMove->currentTurn
+			&& (*currentMove->gameField[y + 2])[i] == EMPTY){
+			printf("checkPossibleCaptureHorizontalWin for x =%d and y =%d \n", i, y);
+			return 0;
+		}
+		if (y - 2 >= 0
+			&& (*currentMove->gameField[y + 1])[i] == findOppositeType(currentMove->currentTurn)
+			&& (*currentMove->gameField[y - 1])[i] == currentMove->currentTurn
+			&& (*currentMove->gameField[y - 2])[i] == EMPTY){
+				printf("checkPossibleCaptureHorizontalWin for x =%d and y =%d \n", i, y);
+				return 0;
+		}
+	}
+	return 1;
+}
+
+inline int 			Gomoku::checkPossibleCaptureVerticalWin(t_move* currentMove, int startY, int endY, int x)
+{
+	if (x < 1 || x > 16)
+		return 1;
+	for (int i = startY; i < endY; ++i)
+	{
+		if (x + 2 <= 17
+			&& (*currentMove->gameField[i])[x - 1] == findOppositeType(currentMove->currentTurn)
+			&& (*currentMove->gameField[i])[x + 1] == currentMove->currentTurn
+			&& (*currentMove->gameField[i])[x + 2] == EMPTY){
+			printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
+			return 0;
+		}
+		if (x - 2 >= 0
+			&& (*currentMove->gameField[i])[x + 1] == findOppositeType(currentMove->currentTurn)
+			&& (*currentMove->gameField[i])[x - 1] == currentMove->currentTurn
+			&& (*currentMove->gameField[i])[x - 2] == EMPTY){
+				printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
+				return 0;
+		}
+	}
+	return 1;
+}
+
+// inline int 		Gomoku::checkPossibleCaptureDiagonalLeftWin(t_move* currentMove, t_pos const & start, t_pos const & end)
+// {
+// 	for (int i = start.x; i < end.x; ++i)
+// 	{
+// 		x = i;
+// 		y = start.y;
+// 		if (x + 2 <= 17
+// 			&& (*currentMove->gameField[i])[x - 1] == findOppositeType(currentMove->currentTurn)
+// 			&& (*currentMove->gameField[i])[x + 1] == currentMove->currentTurn
+// 			&& (*currentMove->gameField[i])[x + 2] == EMPTY){
+// 			printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
+// 			return 0;
+// 		}
+// 		if (x - 2 >= 0
+// 			&& (*currentMove->gameField[i])[x + 1] == findOppositeType(currentMove->currentTurn)
+// 			&& (*currentMove->gameField[i])[x - 1] == currentMove->currentTurn
+// 			&& (*currentMove->gameField[i])[x - 2] == EMPTY){
+// 				printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
+// 				return 0;
+// 		}
+// 	}
+// 	return 1;
+// }
+
 int 			Gomoku::checkWinHorizontal(t_move* currentMove, int x, int y)
 {
 		printf("checkWinHorizontalx =%d and y =%d to win\n", x, y );
 	int match = 1;
+	int startX = x;
+	int endX = x;
 	for (int i = 1; i < 5; ++i) {
 		int posX = x + i;
 		if (posX > 17 || (*currentMove->gameField[y])[posX] != currentMove->currentTurn)
 			break;
 		else if(++match == 5){
+			endX = posX;
 			printf("match for x =%d and y =%d is %d\n", x, y, match );
-			return 1;
+			return checkPossibleCaptureHorizontalWin(currentMove, startX, endX, y);
+		//	return 1;
 		}
 		printf("match for x =%d and y =%d is %d\n", x, y, match );
 	}
@@ -202,24 +278,32 @@ int 			Gomoku::checkWinHorizontal(t_move* currentMove, int x, int y)
 		if (posX < 0 || (*currentMove->gameField[y])[posX] != currentMove->currentTurn)
 			break;
 		else if(++match == 5){
+			startX = posX;
 			printf("match for x =%d and y =%d is %d\n", x, y, match );
-			return 1;
+			return checkPossibleCaptureHorizontalWin(currentMove, startX, endX, y);
+			//return 1;
 		}
 		printf("match for x =%d and y =%d is %d\n", x, y, match );
 	}
 	return 0;
 }
 
+
+
 int 			Gomoku::checkWinVertical(t_move* currentMove, int x, int y)
 {
 		printf("checkWinVertical x =%d and y =%d to win\n", x, y );
 	int match = 1;
+	int startY = y;
+	int endY = y;
 	for (int i = 1; i < 5; ++i) {
 		int posY = y + i;
 		if (posY > 17 || (*currentMove->gameField[posY])[x] != currentMove->currentTurn)
 			break;
 		else if(++match == 5) {
-			return 1;
+			endY = posY;
+			return checkPossibleCaptureVerticalWin(currentMove, startY,endY, x);
+			//return 1;
 		}
 	}
 	for (int i = 1; i < 5 ; ++i){
@@ -227,7 +311,9 @@ int 			Gomoku::checkWinVertical(t_move* currentMove, int x, int y)
 		if (posY < 0 || (*currentMove->gameField[posY])[x] != currentMove->currentTurn)
 			break;
 		else if (++match == 5){
-			return 1;
+			startY = posY;
+			//return 1;
+			return checkPossibleCaptureVerticalWin(currentMove, startY,endY, x);
 		}
 	}
 	return 0;
@@ -238,12 +324,21 @@ int 			Gomoku::checkWinDiagonalLeft(t_move* currentMove, int x, int y)
 {
 	printf("checkWinDiagonalLeft x =%d and y =%d to win\n", x, y );
 	int match = 1;
+	t_pos start;
+	start.x = x;
+	start.y = y;
+	t_pos end;
+	end.x = x;
+	end.y = y;
+
 	for (int i = 1; i < 5; ++i) {
 		int posX = x + i;
 		int posY = y + i;
 		if (posX > 17 || posY > 17 || (*currentMove->gameField[posY])[posX] != currentMove->currentTurn)
 			break;
 		else if (++match == 5) {
+			end.x = posX;
+			end.y = posY;
 			return 1;
 		}
 	}
@@ -253,6 +348,8 @@ int 			Gomoku::checkWinDiagonalLeft(t_move* currentMove, int x, int y)
 		if (posX < 0 || posY < 0 || (*currentMove->gameField[posY])[posX] != currentMove->currentTurn)
 			break;
 		else if (++match == 5){
+			start.x = posX;
+			start.y = posY;
 			return 1;
 		}
 	}
@@ -584,6 +681,7 @@ inline int		Gomoku::validFreeThreeHorisontal(t_move & currentMove, t_pos & start
 		{
 			start.x--;
 			end.x--;
+//			return checkFreeTreeHorizontal(& currentMove, start.x, y);
 		}
 		 else
 			return 0;

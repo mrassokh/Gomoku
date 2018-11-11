@@ -47,6 +47,9 @@ private:
 	int 								checkWinDiagonalLeft(t_move* currentMove, int x, int y);
 	int 								checkWinDiagonalRight(t_move* currentMove, int x, int y);
 
+	inline int 							checkPossibleCaptureHorizontalWin(t_move* currentMove, int startX, int endX, int y);
+	inline int 							checkPossibleCaptureVerticalWin(t_move* currentMove, int startY, int endY, int x);
+	inline int 							checkPossibleCaptureDiagonalLeftWin(t_move* currentMove, t_pos const & start, t_pos const & end);
 	int 								checkCapture(t_move* currentMove, int x, int y);
 	int 								checkCaptureHorizontal(t_move* currentMove, int x, int y);
 	int 								checkCaptureVertical(t_move* currentMove, int x, int y);
