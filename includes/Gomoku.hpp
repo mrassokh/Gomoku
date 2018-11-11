@@ -54,11 +54,16 @@ private:
 	int 								checkCaptureDiagonalRight(t_move* currentMove, int x, int y);
 	int 								checkFreeTree(t_move* currentMove, int x, int y);
 	int									checkDoubleFreeTree(t_move &currentMove);
+	inline int							fillThreeSet(t_move & currentMove, posSet const & examinedSet);
 	int 								fillHorisontalFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end);
 	int 								fillVerticalFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end);
 	int 								fillDiagonalLeftFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end);
 	int 								fillDiagonalRightFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end);
-	int 								validMatchFreeTreeSet(posSet const & left, posSet const & right);
+	inline int 							validMatchFreeTreeSet(posSet const & left, posSet const & right);
+	inline int							validFreeThreeHorisontal(t_move & currentMove, t_pos & start, t_pos & end, int y);
+	inline int							validFreeThreeVertical(t_move & currentMove, t_pos & start, t_pos & end, int x);
+	inline int							validFreeThreeDiagonalLeft(t_move & currentMove, t_pos & start, t_pos & end);
+	inline int							validFreeThreeDiagonalRight(t_move & currentMove, t_pos & start, t_pos & end);
 	int 								checkFreeTreeHorizontal(t_move* currentMove, int x, int y);
 	int 								checkFreeTreeVertical(t_move* currentMove, int x, int y);
 	int 								checkFreeTreeDiagonalLeft(t_move* currentMove, int x, int y);

@@ -548,9 +548,6 @@ printf("Chek free_tree x =%d and y =%d free_tree = %d\n", x, y, free_tree);
 		return checkDoubleFreeTree(*currentMove);
 	}
 	return 0;
-	//free_tree += checkFreeTreeVertical(currentMove);
-	// free_tree += checkFreeTreeDiagonalLeft(currentMove);
-	// free_tree += checkFreeTreeDiagonalRight(currentMove);
 }
 
 int			Gomoku::checkDoubleFreeTree(t_move &currentMove)
@@ -573,82 +570,95 @@ int			Gomoku::checkDoubleFreeTree(t_move &currentMove)
 	}
 	return 0;
 }
-
-int 			Gomoku::checkFreeTreeHorizontal(t_move* currentMove, int x, int y)
+inline int		Gomoku::validFreeThreeHorisontal(t_move & currentMove, t_pos & start, t_pos & end,
+													int y)
 {
-	int matchCurrentType = 1;
-	int matchEmpty = 0;
-	t_pos start;
-	// if (x > 0 && (*currentMove->gameField[y])[x - 1] == currentMove->currentTurn)
-	// 	x--;
-	start.x = x;
-	start.y = y;
-	start.type = currentMove->currentTurn;
-	t_pos end;
-	end.y = y;
-	end.x = x;
-
-	for (int i = 1; i < 4; ++i) {
-		int posX = x + i;
-		if (posX > 17 || (*currentMove->gameField[y])[posX] == findOppositeType(currentMove->currentTurn))
-			break;
-		if ((*currentMove->gameField[y])[posX] == currentMove->currentTurn) {
-			end.x = posX;
-			matchCurrentType++;
-		} else {
-			matchEmpty++;
+	if (end.x + 1 > 17 || start.x - 1 < 0 || end.x - start.x > 3)
+		return 0;
+	if ((*currentMove.gameField[y])[end.x + 1] != EMPTY)
+		return 0;
+	if  ((*currentMove.gameField[y])[start.x - 1] != EMPTY)
+	{
+		if  ((*currentMove.gameField[y])[start.x - 1] == currentMove.currentTurn
+				&& start.x - 2 >= 0 && (*currentMove.gameField[y])[start.x + 2] == EMPTY)
+		{
+			start.x--;
+			end.x--;
 		}
-		if (matchEmpty == 2){
-			break;
-		}
-		if(matchCurrentType == 3){
-			if (end.x + 1 > 17 || start.x - 1 < 0 || end.x - start.x > 3)
-				break;
-			if ((*currentMove->gameField[y])[end.x + 1] != EMPTY)
-				break;
-			if  ((*currentMove->gameField[y])[start.x - 1] != EMPTY){
-				if  ((*currentMove->gameField[y])[start.x - 1] == currentMove->currentTurn
-						&& start.x - 2 > 0
-							&& (*currentMove->gameField[y])[start.x + 2] == EMPTY){
-					start.x--;
-					end.x--;
-				}
-				 else
-					break;
-				}
-			return fillHorisontalFreeTreeSet(currentMove, x, y, start, end);
-		}
+		 else
+			return 0;
 	}
-	matchEmpty = 0;
-	for (int i = 1; i < 4 ; ++i) {
-		int posX = x - i;
-		if (posX < 0 ||  (*currentMove->gameField[y])[posX] == findOppositeType(currentMove->currentTurn))
-			break;
-
-			if ((*currentMove->gameField[y])[posX] == currentMove->currentTurn) {
-				matchCurrentType++;
-				start.x = posX;
-			} else {
-				matchEmpty++;
-			}
-			if (matchEmpty == 2){
-				break;
-			}
-
-		if (matchCurrentType == 3) {
-			if (end.x + 1 > 17 || start.x - 1 < 0 || end.x - start.x > 3)
-				break;
-			//if ((*currentMove->gameField[y])[end.x + 1] == findOppositeType(currentMove->currentTurn))
-			if ((*currentMove->gameField[y])[end.x + 1] != EMPTY)
-				break;
-			//if  ((*currentMove->gameField[y])[start.x - 1] == findOppositeType(currentMove->currentTurn))
-			if  ((*currentMove->gameField[y])[start.x - 1] != EMPTY)
-				break;
-			return fillHorisontalFreeTreeSet(currentMove, x, y, start, end);
-		}
-	}
-	return 0;
+	return 1;
 }
+
+inline int		Gomoku::validFreeThreeVertical(t_move & currentMove, t_pos & start, t_pos & end,
+													int x)
+{
+	if (end.y + 1 > 17 || start.y - 1 < 0 || end.y - start.y > 3)
+		return 0;
+	if ((*currentMove.gameField[end.y + 1])[x] != EMPTY)
+		return 0;
+	if  ((*currentMove.gameField[start.y - 1])[x] != EMPTY){
+		if  ((*currentMove.gameField[start.y - 1])[x] == currentMove.currentTurn
+				&& start.y - 2 >= 0
+					&& (*currentMove.gameField[start.y + 2])[x] == EMPTY){
+			start.y--;
+			end.y--;
+		}
+		 else
+			return 0;
+		}
+	return 1;
+}
+
+inline int		Gomoku::validFreeThreeDiagonalLeft(t_move & currentMove, t_pos & start, t_pos & end)
+{
+	if (end.y + 1 > 17 || start.y - 1 < 0 || end.y - start.y > 3)
+		return 0;
+	if (end.x + 1 > 17 || start.x - 1 < 0 || end.x - start.x > 3)
+		return 0;
+	if ((*currentMove.gameField[end.y + 1])[end.x + 1] != EMPTY)
+		return 0;
+	if  ((*currentMove.gameField[start.y - 1])[start.x - 1] != EMPTY)
+	{
+		if  ((*currentMove.gameField[start.y - 1])[start.x - 1] == currentMove.currentTurn
+				&& start.y - 2 > 0 && start.x - 2 > 0
+					&& (*currentMove.gameField[start.y + 2])[start.x + 2] == EMPTY){
+			start.y--;
+			end.y--;
+			start.x--;
+			end.x--;
+		}
+		 else
+			return 0;
+	}
+	return 1;
+}
+
+inline int			Gomoku::validFreeThreeDiagonalRight(t_move & currentMove, t_pos & start, t_pos & end)
+{
+	if (end.y + 1 > 17 || start.y - 1 < 0 || end.y - start.y > 3)
+		return 0;
+	if (end.x - 1 < 0 || start.x + 1 > 17 || end.x - start.x > 3)
+		return 0;
+	if ((*currentMove.gameField[end.y + 1])[end.x - 1] != EMPTY)
+		return 0;
+	if  ((*currentMove.gameField[start.y - 1])[start.x + 1] != EMPTY){
+		if  ((*currentMove.gameField[start.y - 1])[start.x + 1] == currentMove.currentTurn
+				&& start.y - 2 > 0 && start.x + 2 < 17
+					&& (*currentMove.gameField[start.y + 2])[start.x - 2] == EMPTY){
+			start.y--;
+			end.y--;
+			start.x++;
+			end.x++;
+		}
+		 else
+			return 0;
+	}
+	return 1;
+}
+
+
 
 std::function< bool (const t_pos & , const t_pos &) > comparator = [](const t_pos & left, const t_pos & right){
 	return (left.x == right.x && left.y == right.y && left.type == right.type);
@@ -658,21 +668,19 @@ std::function< bool (const t_pos & , const t_pos &) > comparator = [](const t_po
 										// 													});
 									};
 
-int 							Gomoku::validMatchFreeTreeSet(posSet const & left, posSet const & right)
+inline int 				Gomoku::validMatchFreeTreeSet(posSet const & left, posSet const & right)
 {
 	int match = 0;
 	eType matcType = BLACK;
 
 	for (size_t i = 0; i < left.size(); ++i){
 		if (match >= 2){
-			printf("MATCH  type =%u match = %d\n", matcType , match);
 			return 1;
 		}
 
 		for (size_t j = 0; j < right.size(); ++j)
 		{
 			if (left[i].x == right[j].x && left[i].y == right[j].y && left[i].type == right[j].type){
-				printf("MATCH found x = %d; y = %d  type =%u match = %d\n", left[i].x ,left[i].y, left[i].type, match);
 				matcType = left[i].type;
 				match++;
 			}
@@ -680,17 +688,31 @@ int 							Gomoku::validMatchFreeTreeSet(posSet const & left, posSet const & rig
 	}
 
 	if (match == 1 && matcType == EMPTY){
-		printf("MATCH  type =%u match = %d\n", matcType , match);
 		return 1;
 	}
-	printf("MATCH  type =%u match = %d\n", matcType , match);
 	return 0;
 }
+
+inline int				Gomoku::fillThreeSet(t_move & currentMove, posSet const & examinedSet)
+{
+	if (currentMove.currentTurn == BLACK) {
+		for (size_t i = 0; i < currentMove.blackFreeTree.size(); ++i){
+			return validMatchFreeTreeSet(currentMove.blackFreeTree[i],examinedSet) ? 0 : 1;
+		}
+		currentMove.blackFreeTree.push_back(examinedSet);
+	} else if (currentMove.currentTurn == WHITE){
+		for (size_t i = 0; i < currentMove.whiteFreeTree.size(); ++i){
+			return validMatchFreeTreeSet(currentMove.whiteFreeTree[i],examinedSet) ? 0 : 1;
+		}
+		currentMove.whiteFreeTree.push_back(examinedSet);
+	}
+	return 1;
+}
+
 
 int 				Gomoku::fillHorisontalFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end)
 {
 	posSet freeTreeSet;
-	//
 
 	for (int i = start.x - 1; i <= end.x + 1; ++i)
 	{
@@ -702,26 +724,13 @@ int 				Gomoku::fillHorisontalFreeTreeSet(t_move* currentMove, int x, int y, t_p
 		else
 			tile.type = (eType)(*currentMove->gameField[tile.y])[tile.x];
 		freeTreeSet.push_back(tile);
-
-		printf("pushTile start.x - 1 = %d; end.x + 1 = %d \n", start.x - 1 ,end.x + 1);
-		printf("pushTile tile->x = %d; tile->y = %d tile->type = %u\n", tile.x, tile.y, tile.type);
+		//
+		// printf("pushTile start.x - 1 = %d; end.x + 1 = %d \n", start.x - 1 ,end.x + 1);
+		// printf("pushTile tile->x = %d; tile->y = %d tile->type = %u\n", tile.x, tile.y, tile.type);
 	}
-	if (currentMove->currentTurn == BLACK) {
-		for (size_t i = 0; i < currentMove->blackFreeTree.size(); ++i){
-			return validMatchFreeTreeSet(currentMove->blackFreeTree[i],freeTreeSet) ? 0 : 1;
-		}
-		printf("VALID MATCH\n");
-		//if (freeTreeSet[0].type != EMPTY)
-			currentMove->blackFreeTree.push_back(freeTreeSet);
-	} else if (currentMove->currentTurn == WHITE){
-		for (size_t i = 0; i < currentMove->whiteFreeTree.size(); ++i){
-			return validMatchFreeTreeSet(currentMove->whiteFreeTree[i],freeTreeSet) ? 0 : 1;
-		}
-		if (freeTreeSet[0].type != EMPTY || freeTreeSet[freeTreeSet.size() - 1].type != EMPTY)
-			currentMove->whiteFreeTree.push_back(freeTreeSet);
-		}
-	return 1;
+	return fillThreeSet(*currentMove, freeTreeSet);
 }
+
 int 			Gomoku::fillVerticalFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end)
 {
 	posSet freeTreeSet;
@@ -735,22 +744,8 @@ int 			Gomoku::fillVerticalFreeTreeSet(t_move* currentMove, int x, int y, t_pos 
 		else
 			tile.type = (eType)(*currentMove->gameField[tile.y])[tile.x];
 		freeTreeSet.push_back(tile);
-
-		printf("pushTile start.x - 1 = %d; end.x + 1 = %d \n", start.x - 1 ,end.x + 1);
-		printf("pushTile tile->x = %d; tile->y = %d tile->type = %u\n", tile.x, tile.y, tile.type);
 	}
-	if (currentMove->currentTurn == BLACK) {
-		for (size_t i = 0; i < currentMove->blackFreeTree.size(); ++i){
-			return validMatchFreeTreeSet(currentMove->blackFreeTree[i],freeTreeSet) ? 0 : 1;
-		}
-		currentMove->blackFreeTree.push_back(freeTreeSet);
-	} else if (currentMove->currentTurn == WHITE){
-		for (size_t i = 0; i < currentMove->whiteFreeTree.size(); ++i){
-			return validMatchFreeTreeSet(currentMove->whiteFreeTree[i],freeTreeSet) ? 0 : 1;
-		}
-		currentMove->whiteFreeTree.push_back(freeTreeSet);
-		}
-	return 1;
+	return fillThreeSet(*currentMove, freeTreeSet);
 }
 
 int				Gomoku::fillDiagonalLeftFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end)
@@ -767,22 +762,8 @@ int				Gomoku::fillDiagonalLeftFreeTreeSet(t_move* currentMove, int x, int y, t_
 		else
 			tile.type = (eType)(*currentMove->gameField[tile.y])[tile.x];
 		freeTreeSet.push_back(tile);
-
-		printf("pushTile start.x - 1 = %d; end.x + 1 = %d \n", start.x - 1 ,end.x + 1);
-		printf("pushTile tile->x = %d; tile->y = %d tile->type = %u\n", tile.x, tile.y, tile.type);
 	}
-	if (currentMove->currentTurn == BLACK) {
-		for (size_t i = 0; i < currentMove->blackFreeTree.size(); ++i){
-			return validMatchFreeTreeSet(currentMove->blackFreeTree[i],freeTreeSet) ? 0 : 1;
-		}
-		currentMove->blackFreeTree.push_back(freeTreeSet);
-	} else if (currentMove->currentTurn == WHITE){
-		for (size_t i = 0; i < currentMove->whiteFreeTree.size(); ++i){
-			return validMatchFreeTreeSet(currentMove->whiteFreeTree[i],freeTreeSet) ? 0 : 1;
-		}
-		currentMove->whiteFreeTree.push_back(freeTreeSet);
-		}
-	return 1;
+	return fillThreeSet(*currentMove, freeTreeSet);
 }
 
 int 			Gomoku::fillDiagonalRightFreeTreeSet(t_move* currentMove, int x, int y, t_pos const & start, t_pos const & end)
@@ -799,22 +780,63 @@ int 			Gomoku::fillDiagonalRightFreeTreeSet(t_move* currentMove, int x, int y, t
 		else
 			tile.type = (eType)(*currentMove->gameField[tile.y])[tile.x];
 		freeTreeSet.push_back(tile);
-
-		printf("pushTile start.x - 1 = %d; end.x + 1 = %d \n", start.x - 1 ,end.x + 1);
-		printf("pushTile tile->x = %d; tile->y = %d tile->type = %u\n", tile.x, tile.y, tile.type);
 	}
-	if (currentMove->currentTurn == BLACK) {
-		for (size_t i = 0; i < currentMove->blackFreeTree.size(); ++i){
-			return validMatchFreeTreeSet(currentMove->blackFreeTree[i],freeTreeSet) ? 0 : 1;
+	return fillThreeSet(*currentMove, freeTreeSet);
+}
+
+int 			Gomoku::checkFreeTreeHorizontal(t_move* currentMove, int x, int y)
+{
+	int matchCurrentType = 1;
+	int matchEmpty = 0;
+	t_pos start;
+	t_pos end;
+	start.x = x;
+	start.y = y;
+	end.y = y;
+	end.x = x;
+
+	for (int i = 1; i < 4; ++i) {
+		int posX = x + i;
+		if (posX > 17 || (*currentMove->gameField[y])[posX] == findOppositeType(currentMove->currentTurn))
+			break;
+		if ((*currentMove->gameField[y])[posX] == currentMove->currentTurn) {
+			end.x = posX;
+			matchCurrentType++;
+		} else {
+			matchEmpty++;
 		}
-		currentMove->blackFreeTree.push_back(freeTreeSet);
-	} else if (currentMove->currentTurn == WHITE){
-		for (size_t i = 0; i < currentMove->whiteFreeTree.size(); ++i){
-			return validMatchFreeTreeSet(currentMove->whiteFreeTree[i],freeTreeSet) ? 0 : 1;
+		if (matchEmpty == 2) {
+			break;
 		}
-		currentMove->whiteFreeTree.push_back(freeTreeSet);
+		if(matchCurrentType == 3){
+			if (!validFreeThreeHorisontal(*currentMove, start, end, y))
+				break;
+			return fillHorisontalFreeTreeSet(currentMove, x, y, start, end);
 		}
-	return 1;
+	}
+	matchEmpty = 0;
+	for (int i = 1; i < 4 ; ++i) {
+		int posX = x - i;
+		if (posX < 0 ||  (*currentMove->gameField[y])[posX] == findOppositeType(currentMove->currentTurn))
+			break;
+
+			if ((*currentMove->gameField[y])[posX] == currentMove->currentTurn) {
+				matchCurrentType++;
+				start.x = posX;
+			} else {
+				matchEmpty++;
+			}
+			if (matchEmpty == 2) {
+				break;
+			}
+
+		if (matchCurrentType == 3) {
+			if (!validFreeThreeHorisontal(*currentMove, start, end, y))
+				break;
+			return fillHorisontalFreeTreeSet(currentMove, x, y, start, end);
+		}
+	}
+	return 0;
 }
 
 int 			Gomoku::checkFreeTreeVertical(t_move* currentMove, int x, int y)
@@ -824,7 +846,6 @@ int 			Gomoku::checkFreeTreeVertical(t_move* currentMove, int x, int y)
 	t_pos start;
 	start.x = x;
 	start.y = y;
-	start.type = currentMove->currentTurn;
 	t_pos end;
 	end.y = y;
 	end.x = x;
@@ -843,20 +864,8 @@ int 			Gomoku::checkFreeTreeVertical(t_move* currentMove, int x, int y)
 			break;
 		}
 		if(matchCurrentType == 3){
-			if (end.y + 1 > 17 || start.y - 1 < 0 || end.y - start.y > 3)
+			if (!validFreeThreeVertical(*currentMove, start, end, x))
 				break;
-			if ((*currentMove->gameField[end.y + 1])[x] != EMPTY)
-				break;
-			if  ((*currentMove->gameField[start.y - 1])[x] != EMPTY){
-				if  ((*currentMove->gameField[start.y - 1])[x] == currentMove->currentTurn
-						&& start.y - 2 > 0
-							&& (*currentMove->gameField[start.y + 2])[x] == EMPTY){
-					start.y--;
-					end.y--;
-				}
-				 else
-					break;
-				}
 			return fillVerticalFreeTreeSet(currentMove, x, y, start, end);
 		}
 	}
@@ -877,11 +886,7 @@ int 			Gomoku::checkFreeTreeVertical(t_move* currentMove, int x, int y)
 			}
 
 		if (matchCurrentType == 3) {
-			if (end.y + 1 > 17 || start.y - 1 < 0 || end.y - start.y > 3)
-				break;
-			if ((*currentMove->gameField[end.y + 1])[x] != EMPTY)
-				break;
-			if  ((*currentMove->gameField[start.y - 1])[x] != EMPTY)
+			if (!validFreeThreeVertical(*currentMove, start, end, x))
 				break;
 			return fillVerticalFreeTreeSet(currentMove, x, y, start, end);
 		}
@@ -896,7 +901,6 @@ int 			Gomoku::checkFreeTreeDiagonalLeft(t_move* currentMove, int x, int y)
 	t_pos start;
 	start.x = x;
 	start.y = y;
-	start.type = currentMove->currentTurn;
 	t_pos end;
 	end.y = y;
 	end.x = x;
@@ -917,26 +921,7 @@ int 			Gomoku::checkFreeTreeDiagonalLeft(t_move* currentMove, int x, int y)
 			break;
 		}
 		if(matchCurrentType == 3){
-			if (end.y + 1 > 17 || start.y - 1 < 0 || end.y - start.y > 3)
-				break;
-			if (end.x + 1 > 17 || start.x - 1 < 0 || end.x - start.x > 3)
-				break;
-			if ((*currentMove->gameField[end.y + 1])[end.x + 1] != EMPTY)
-				break;
-			if  ((*currentMove->gameField[start.y - 1])[start.x - 1] != EMPTY)
-			{
-				if  ((*currentMove->gameField[start.y - 1])[start.x - 1] == currentMove->currentTurn
-						&& start.y - 2 > 0 && start.x - 2 > 0
-							&& (*currentMove->gameField[start.y + 2])[start.x + 2] == EMPTY){
-					start.y--;
-					end.y--;
-					start.x--;
-					end.x--;
-				}
-				 else
-					break;
-			}
-			if  ((*currentMove->gameField[start.y - 1])[start.x - 1] == findOppositeType(currentMove->currentTurn))
+			if (!validFreeThreeDiagonalLeft(*currentMove, start, end))
 				break;
 			return fillDiagonalLeftFreeTreeSet(currentMove, x, y, start, end);
 		}
@@ -959,13 +944,7 @@ int 			Gomoku::checkFreeTreeDiagonalLeft(t_move* currentMove, int x, int y)
 			}
 
 		if (matchCurrentType == 3) {
-			if (end.y + 1 > 17 || start.y - 1 < 0 || end.y - start.y > 3)
-				break;
-			if (end.x + 1 > 17 || start.x - 1 < 0 || end.x - start.x > 3)
-				break;
-			if ((*currentMove->gameField[end.y + 1])[end.x + 1] != EMPTY)
-				break;
-			if ((*currentMove->gameField[start.y - 1])[start.x - 1] != EMPTY)
+			if (!validFreeThreeDiagonalLeft(*currentMove, start, end))
 				break;
 			return fillDiagonalLeftFreeTreeSet(currentMove, x, y, start, end);
 		}
@@ -980,7 +959,6 @@ int 			Gomoku::checkFreeTreeDiagonalRight(t_move* currentMove, int x, int y)
 	t_pos start;
 	start.x = x;
 	start.y = y;
-	start.type = currentMove->currentTurn;
 	t_pos end;
 	end.y = y;
 	end.x = x;
@@ -1001,24 +979,8 @@ int 			Gomoku::checkFreeTreeDiagonalRight(t_move* currentMove, int x, int y)
 			break;
 		}
 		if(matchCurrentType == 3){
-			if (end.y + 1 > 17 || start.y - 1 < 0 || end.y - start.y > 3)
+			if (!validFreeThreeDiagonalRight(*currentMove, start, end))
 				break;
-			if (end.x - 1 < 0 || start.x + 1 > 17 || end.x - start.x > 3)
-				break;
-			if ((*currentMove->gameField[end.y + 1])[end.x - 1] != EMPTY)
-				break;
-			if  ((*currentMove->gameField[start.y - 1])[start.x + 1] != EMPTY){
-				if  ((*currentMove->gameField[start.y - 1])[start.x + 1] == currentMove->currentTurn
-						&& start.y - 2 > 0 && start.x + 2 < 17
-							&& (*currentMove->gameField[start.y + 2])[start.x - 2] == EMPTY){
-					start.y--;
-					end.y--;
-					start.x++;
-					end.x++;
-				}
-				 else
-					break;
-			}
 			return fillDiagonalRightFreeTreeSet(currentMove, x, y, start, end);
 		}
 	}
@@ -1040,13 +1002,7 @@ int 			Gomoku::checkFreeTreeDiagonalRight(t_move* currentMove, int x, int y)
 			}
 
 		if (matchCurrentType == 3) {
-			if (end.y + 1 > 17 || start.y - 1 < 0 || end.y - start.y > 3)
-				break;
-			if (end.x - 1 < 0 || start.x + 1 > 17 || end.x - start.x > 3)
-				break;
-			if ((*currentMove->gameField[end.y + 1])[end.x - 1] != EMPTY)
-				break;
-			if  ((*currentMove->gameField[start.y - 1])[start.x + 1] != EMPTY)
+			if (!validFreeThreeDiagonalRight(*currentMove, start, end))
 				break;
 			return fillDiagonalRightFreeTreeSet(currentMove, x, y, start, end);
 		}
