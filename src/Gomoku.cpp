@@ -231,29 +231,59 @@ inline int 			Gomoku::checkPossibleCaptureVerticalWin(t_move* currentMove, int s
 	return 1;
 }
 
-// inline int 		Gomoku::checkPossibleCaptureDiagonalLeftWin(t_move* currentMove, t_pos const & start, t_pos const & end)
-// {
-// 	for (int i = start.x; i < end.x; ++i)
-// 	{
-// 		x = i;
-// 		y = start.y;
-// 		if (x + 2 <= 17
-// 			&& (*currentMove->gameField[i])[x - 1] == findOppositeType(currentMove->currentTurn)
-// 			&& (*currentMove->gameField[i])[x + 1] == currentMove->currentTurn
-// 			&& (*currentMove->gameField[i])[x + 2] == EMPTY){
-// 			printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
-// 			return 0;
-// 		}
-// 		if (x - 2 >= 0
-// 			&& (*currentMove->gameField[i])[x + 1] == findOppositeType(currentMove->currentTurn)
-// 			&& (*currentMove->gameField[i])[x - 1] == currentMove->currentTurn
-// 			&& (*currentMove->gameField[i])[x - 2] == EMPTY){
-// 				printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
-// 				return 0;
-// 		}
-// 	}
-// 	return 1;
-// }
+inline int 		Gomoku::checkPossibleCaptureDiagonalLeftWin(t_move* currentMove, t_pos const & start)
+{
+	int posX = start.x;
+	int posY = start.y;
+	for (int i = 0; i < 5; ++i)
+	{
+		if (posX + 2 <= 17 && posY - 2 >= 0 && posX - 1 >=0 && posY + 1 <= 17
+			&& (*currentMove->gameField[posY + 1])[posX - 1] == findOppositeType(currentMove->currentTurn)
+			&& (*currentMove->gameField[posY - 1])[posX + 1] == currentMove->currentTurn
+			&& (*currentMove->gameField[posY - 2])[posX + 2] == EMPTY) {
+			printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+			return 0;
+		}
+
+		if (posX + 1 <= 17 && posY - 1 >= 0 && posX - 2 >=0  && posY + 2 <= 17
+			&& (*currentMove->gameField[posY - 1])[posX + 1] == findOppositeType(currentMove->currentTurn)
+			&& (*currentMove->gameField[posY + 1])[posX - 1] == currentMove->currentTurn
+			&& (*currentMove->gameField[posY + 2])[posX - 2] == EMPTY) {
+			printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+			return 0;
+		}
+		posX++;
+		posY++;
+	}
+ 	return 1;
+}
+
+inline int 		Gomoku::checkPossibleCaptureDiagonalRightWin(t_move* currentMove, t_pos const & start)
+{
+	int posX = start.x;
+	int posY = start.y;
+	for (int i = 0; i < 5; ++i)
+	{
+		if (posX + 2 <= 17 && posY + 2 <= 17 && posX - 1 >=0 && posY - 1 >= 0
+			&& (*currentMove->gameField[posY - 1])[posX - 1] == findOppositeType(currentMove->currentTurn)
+			&& (*currentMove->gameField[posY + 1])[posX + 1] == currentMove->currentTurn
+			&& (*currentMove->gameField[posY + 2])[posX + 2] == EMPTY) {
+			printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+			return 0;
+		}
+		if (posX + 1 <= 17 && posY + 1 <= 17 && posX - 2 >=0 && posY - 2 >= 0
+			&& (*currentMove->gameField[posY + 1])[posX + 1] == findOppositeType(currentMove->currentTurn)
+			&& (*currentMove->gameField[posY - 1])[posX - 1] == currentMove->currentTurn
+			&& (*currentMove->gameField[posY - 2])[posX - 2] == EMPTY) {
+			printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+			return 0;
+		}
+		posX--;
+		posY++;
+	}
+ 	return 1;
+}
+
 
 int 			Gomoku::checkWinHorizontal(t_move* currentMove, int x, int y)
 {
@@ -327,9 +357,6 @@ int 			Gomoku::checkWinDiagonalLeft(t_move* currentMove, int x, int y)
 	t_pos start;
 	start.x = x;
 	start.y = y;
-	t_pos end;
-	end.x = x;
-	end.y = y;
 
 	for (int i = 1; i < 5; ++i) {
 		int posX = x + i;
@@ -337,9 +364,7 @@ int 			Gomoku::checkWinDiagonalLeft(t_move* currentMove, int x, int y)
 		if (posX > 17 || posY > 17 || (*currentMove->gameField[posY])[posX] != currentMove->currentTurn)
 			break;
 		else if (++match == 5) {
-			end.x = posX;
-			end.y = posY;
-			return 1;
+			return checkPossibleCaptureDiagonalLeftWin(currentMove, start);//1;
 		}
 	}
 	for (int i = 1; i < 5 ; ++i){
@@ -350,7 +375,7 @@ int 			Gomoku::checkWinDiagonalLeft(t_move* currentMove, int x, int y)
 		else if (++match == 5){
 			start.x = posX;
 			start.y = posY;
-			return 1;
+			return checkPossibleCaptureDiagonalLeftWin(currentMove, start);
 		}
 	}
 	return 0;
@@ -360,13 +385,16 @@ int 			Gomoku::checkWinDiagonalRight(t_move* currentMove, int x, int y)
 {
 	printf("checkWinDiagonalRight x =%d and y =%d to win\n", x, y );
 	int match = 1;
+	t_pos start;
+	start.x = x;
+	start.y = y;
 	for (int i = 1; i < 5; ++i) {
 		int posX = x - i;
 		int posY = y + i;
 		if (posX < 0 || posY > 17 || (*currentMove->gameField[posY])[posX] != currentMove->currentTurn)
 			break;
 		else if(++match == 5) {
-			return 1;
+			return checkPossibleCaptureDiagonalRightWin(currentMove, start);
 		}
 	}
 	for (int i = 1; i < 5 ; ++i){
@@ -375,7 +403,9 @@ int 			Gomoku::checkWinDiagonalRight(t_move* currentMove, int x, int y)
 		if (posX > 17 || posY < 0 || (*currentMove->gameField[posY])[posX] != currentMove->currentTurn)
 			break;
 		else if (++match == 5){
-			return 1;
+			start.x = posX;
+			start.y = posY;
+			return  checkPossibleCaptureDiagonalRightWin(currentMove, start);
 		}
 	}
 	return 0;
