@@ -707,11 +707,11 @@ inline int		Gomoku::validFreeThreeHorisontal(t_move & currentMove, t_pos & start
 	if  ((*currentMove.gameField[y])[start.x - 1] != EMPTY)
 	{
 		if  ((*currentMove.gameField[y])[start.x - 1] == currentMove.currentTurn
-				&& start.x - 2 >= 0 && (*currentMove.gameField[y])[start.x + 2] == EMPTY)
+				&& start.x - 2 >= 0
+				&& ((*currentMove.gameField[y])[start.x + 2] == EMPTY || (*currentMove.gameField[y])[start.x + 1] == EMPTY))
 		{
 			start.x--;
 			end.x--;
-//			return checkFreeTreeHorizontal(& currentMove, start.x, y);
 		}
 		 else
 			return 0;
@@ -729,7 +729,7 @@ inline int		Gomoku::validFreeThreeVertical(t_move & currentMove, t_pos & start, 
 	if  ((*currentMove.gameField[start.y - 1])[x] != EMPTY){
 		if  ((*currentMove.gameField[start.y - 1])[x] == currentMove.currentTurn
 				&& start.y - 2 >= 0
-					&& (*currentMove.gameField[start.y + 2])[x] == EMPTY){
+					&& ((*currentMove.gameField[start.y + 2])[x] == EMPTY || (*currentMove.gameField[start.y + 1])[x] == EMPTY)) {
 			start.y--;
 			end.y--;
 		}
@@ -751,7 +751,7 @@ inline int		Gomoku::validFreeThreeDiagonalLeft(t_move & currentMove, t_pos & sta
 	{
 		if  ((*currentMove.gameField[start.y - 1])[start.x - 1] == currentMove.currentTurn
 				&& start.y - 2 > 0 && start.x - 2 > 0
-					&& (*currentMove.gameField[start.y + 2])[start.x + 2] == EMPTY){
+					&& ((*currentMove.gameField[start.y + 2])[start.x + 2] == EMPTY || (*currentMove.gameField[start.y + 1])[start.x + 1] == EMPTY)){
 			start.y--;
 			end.y--;
 			start.x--;
@@ -774,7 +774,7 @@ inline int			Gomoku::validFreeThreeDiagonalRight(t_move & currentMove, t_pos & s
 	if  ((*currentMove.gameField[start.y - 1])[start.x + 1] != EMPTY){
 		if  ((*currentMove.gameField[start.y - 1])[start.x + 1] == currentMove.currentTurn
 				&& start.y - 2 > 0 && start.x + 2 < 17
-					&& (*currentMove.gameField[start.y + 2])[start.x - 2] == EMPTY){
+					&& ((*currentMove.gameField[start.y + 2])[start.x - 2] == EMPTY || (*currentMove.gameField[start.y + 1])[start.x - 1] == EMPTY)){
 			start.y--;
 			end.y--;
 			start.x++;
