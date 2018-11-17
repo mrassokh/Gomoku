@@ -22,7 +22,7 @@ Gomoku::Gomoku(std::string input):m_N(18), m_exit(0)
 	m_render->attachSharedLibrary("lib1_sdl.so", m_N + 1, m_N + 1);
 	m_event.event = DEFAULT;
 	m_event.x = -100;
-	m_event.x = -100;
+	m_event.y = -100;
 	m_render->init();
 	m_AI = input == "AI" ? 1 : 0;
 	// if (input == "AI"){
@@ -64,7 +64,7 @@ void 		Gomoku::moveReset(t_move* currentMove)
 		currentMove->currentTurn = BLACK;
 	m_event.event = DEFAULT;
 	m_event.x = -100;
-	m_event.x = -100;
+	m_event.y = -100;
 	currentMove->whiteFreeTree.clear();
 	currentMove->blackFreeTree.clear();
 }
@@ -88,6 +88,8 @@ void 	Gomoku::render()
 	m_start = clock();
 	while (!m_exit) {
 		m_render->mainLoop();
+		if (m_AI && m_currentMove.currentTurn == WHITE)
+			AI_Move(&m_currentMove);
 
 		if (m_event.event == PUSH_SQUARE){
 			//start = clock();
@@ -121,26 +123,45 @@ void 	Gomoku::render()
 
 void 		Gomoku::moving(t_move* currentMove)
 {
-	moveChecking(currentMove);
+	moveChecking(currentMove, m_event.x, m_event.y);
 	moveProcessing(currentMove);
 }
 
-void 		Gomoku::moveChecking(t_move* currentMove)
+void 		Gomoku::AI_Move(t_move* currentMove)
 {
-	if ((*currentMove->gameField[m_event.y])[m_event.x] != EMPTY){
+
+	m_turnTime =  0.0;//timeFromLastTurn;
+	m_start = clock();
+	for (int i = 0; i < 1000000; i++){
+		double x = pow(sqrt(0.56789) / sqrt(1.234), 2);
+		printf("%f\n", x);
+		x = 0;
+	}
+	m_turnTime = static_cast<double>((clock() - m_start ))/ CLOCKS_PER_SEC;
+	if (currentMove->currentTurn == BLACK)
+		currentMove->currentTurn = WHITE;
+	else
+		currentMove->currentTurn = BLACK;
+	(*currentMove->gameField[0])[0] = WHITE;
+
+}
+
+void 		Gomoku::moveChecking(t_move* currentMove, int x, int y)
+{
+	if ((*currentMove->gameField[y])[x] != EMPTY){
 		currentMove->moveResult = NON_EMPTY;
-		printf("Push point with x =%d and y =%d denied - qquare is not empty\n", m_event.x, m_event.y);
-	} else if (checkWin(currentMove, m_event.x, m_event.y)){
-		printf("Push point with x =%d and y =%d and win!\n", m_event.x, m_event.y);
-		(*currentMove->gameField[m_event.y])[m_event.x] = m_currentMove.currentTurn;
+		printf("Push point with x =%d and y =%d denied - qquare is not empty\n", x, y);
+	} else if (checkWin(currentMove, x, y)){
+		printf("Push point with x =%d and y =%d and win!\n", x, y);
+		(*currentMove->gameField[y])[x] = m_currentMove.currentTurn;
 		currentMove->moveResult = WIN;
-	} else 	if (checkCapture(currentMove, m_event.x, m_event.y)){
-		(*currentMove->gameField[m_event.y])[m_event.x] = m_currentMove.currentTurn;
+	} else 	if (checkCapture(currentMove, x, y)){
+		(*currentMove->gameField[y])[x] = m_currentMove.currentTurn;
 		currentMove->moveResult = (currentMove->whiteCaptures >= 5 || currentMove->blackCaptures >= 5) ? WIN : CAPTURE;
-	} else if (checkFreeTree(currentMove, m_event.x, m_event.y)){
+	} else if (checkFreeTree(currentMove, x, y)){
 		currentMove->moveResult = DOUBLE_FREE_TREE;
 	} else {
-		(*currentMove->gameField[m_event.y])[m_event.x] = m_currentMove.currentTurn;
+		(*currentMove->gameField[y])[x] = m_currentMove.currentTurn;
 		currentMove->moveResult = DEF;
 	}
 }
@@ -161,6 +182,7 @@ void 		Gomoku::moveProcessing(t_move* currentMove)
 		// m_windowCondition.gameOverCondition = 1;
 		std::string result = currentMove->currentTurn == BLACK ? "BLACK WIN!!!" : "WHITE WIN!!!";
 		clearGameField(m_N);
+		m_currentMove.currentTurn = BLACK;
 		//moveReset(currentMove);
 		m_render->GameOver(result);
 
@@ -299,7 +321,6 @@ int 			Gomoku::checkWinHorizontal(t_move* currentMove, int x, int y)
 			endX = posX;
 			printf("match for x =%d and y =%d is %d\n", x, y, match );
 			return checkPossibleCaptureHorizontalWin(currentMove, startX, endX, y);
-		//	return 1;
 		}
 		printf("match for x =%d and y =%d is %d\n", x, y, match );
 	}
@@ -311,7 +332,6 @@ int 			Gomoku::checkWinHorizontal(t_move* currentMove, int x, int y)
 			startX = posX;
 			printf("match for x =%d and y =%d is %d\n", x, y, match );
 			return checkPossibleCaptureHorizontalWin(currentMove, startX, endX, y);
-			//return 1;
 		}
 		printf("match for x =%d and y =%d is %d\n", x, y, match );
 	}
@@ -333,7 +353,6 @@ int 			Gomoku::checkWinVertical(t_move* currentMove, int x, int y)
 		else if(++match == 5) {
 			endY = posY;
 			return checkPossibleCaptureVerticalWin(currentMove, startY,endY, x);
-			//return 1;
 		}
 	}
 	for (int i = 1; i < 5 ; ++i){
@@ -342,7 +361,6 @@ int 			Gomoku::checkWinVertical(t_move* currentMove, int x, int y)
 			break;
 		else if (++match == 5){
 			startY = posY;
-			//return 1;
 			return checkPossibleCaptureVerticalWin(currentMove, startY,endY, x);
 		}
 	}
@@ -469,17 +487,6 @@ int 			Gomoku::checkCapture(t_move* currentMove, int x, int y)
 		currentMove->whiteCaptures += captures;
 	else
 	 	currentMove->blackCaptures += captures;
-	// if (checkCaptureHorizontal(currentMove, x, y)){
-	// 	printf("Chek capture x =%d and y =%d\n", m_event.x, m_event.y );
-	// 			return 1;
-	// }
-
-	// else if (checkCaptureVertical(currentMove, x, y))
-	// 	return 1;
-	// else if (checkCaptureDiagonalLeft(currentMove, x, y))
-	// 	return 1;
-	// else if (checkCaptureDiagonalRight(currentMove, x, y))
-	// 	return 1;
 	return captures;
 }
 

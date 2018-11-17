@@ -78,6 +78,7 @@ typedef struct  			s_move
 	std::vector <posSet>	blackFreeTree;
 	t_pos					leftTop;
 	t_pos					rightBottom;
+	event					currEvent;
 }							t_move;
 
 class IWindow

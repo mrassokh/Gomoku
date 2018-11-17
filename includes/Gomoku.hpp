@@ -40,7 +40,9 @@ private:
 	eType								findOppositeType(eType type);
 	void								eraseTiles(std::vector<vecInt *>	*gameField, int startX, int startY, int endX, int endY);
 	void 								moving(t_move* currentMove);
-	void 								moveChecking(t_move* currentMove);
+	void 								AI_Move(t_move* currentMove);
+	// void 								moveChecking(t_move* currentMove);
+	void 								moveChecking(t_move* currentMove, int x, int y);
 	int 								checkWin(t_move* currentMove, int x, int y);
 	int 								checkWinHorizontal(t_move* currentMove, int x, int y);
 	int 								checkWinVertical(t_move* currentMove, int x, int y);
