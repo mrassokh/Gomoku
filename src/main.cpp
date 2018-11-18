@@ -21,8 +21,39 @@ int main(int ac, char **av)
 	else
 	 	gomoku = new Gomoku("none");
 	// while (1){
-	printf(" print %d \n", 2);
-		gomoku->render();
+	// printf(" print %d \n", 2);
+	// Move m;
+	// printf(" print first m\n");
+	// for (int i = 0; i < N; ++i){
+	// 	for (int j = 0; j < N; ++j) {
+	// 		printf("move x = %d y =%d type = %d\n", j, i, (int)m.getGameField()[i][j]);
+	// 	}
+	// }
+	// m.setMove(0,0);
+	// printf(" print second m\n");
+	// for (int i = 0; i < N; ++i){
+	// 	for (int j = 0; j < N; ++j) {
+	// 		printf("move x = %d y =%d type = %d\n", j, i, (int)m.getGameField()[i][j]);
+	// 	}
+	// }
+	// Move m1 = m;
+	// printf(" print  m1!!!\n\n");
+	// for (int i = 0; i < N; ++i){
+	// 	for (int j = 0; j < N; ++j) {
+	// 		printf("move x = %d y =%d type = %d\n", j, i, (int)m1.getGameField()[i][j]);
+	// 	}
+	// }
+	// m.setMove(0,1);
+	// Move m2;
+	// m2 = m;
+	// printf(" print  m!!!\n\n");
+	// for (int i = 0; i < N; ++i){
+	// 	for (int j = 0; j < N; ++j) {
+	// 		printf("move x = %d y =%d type = %d\n", j, i, (int)m2.getGameField()[i][j]);
+	// 	}
+	// }
+	gomoku->render();
+
 		printf(" print %d \n", 3);
 	//}
 

@@ -17,6 +17,7 @@
 # include <array>
 # include <dlfcn.h>
 # include <ctime>
+# include "Move.hpp"
 
 typedef	enum windowState
 {
@@ -30,9 +31,9 @@ class Render
 {
 public:
 	static Render	&Instance();
-	void 			renderConfigure(t_move	*currentMove,
+	void 			renderConfigure(Move *currentMove,
 		 									event *ev, int *ex, double *turnTime, int AI, windowCondition *condition);
-	void 			drawField(std::vector<vecInt *>  *gamefield) const;
+	void 			drawField(std::array<typeArr, N> const & gameField) const;
 	void 			init() const;
 	void 			attachSharedLibrary(const char* sharedLibrary, int height, int weight);
 	void 			deAttachSharedLibrary();
@@ -70,7 +71,7 @@ private:
 	void 			handlePushSquare();
 	void 			handleNewGame();
 
-	t_move			*m_currentMove;
+	Move			*m_currentMove;
 
 	windowCondition *m_windowCondition;
 	event 			*m_event;

@@ -36,7 +36,7 @@ SRC_PATH 	= ./src/
 
 ROOT = main.cpp
 
-CLASSES = Gomoku.cpp Render.cpp
+CLASSES = Gomoku.cpp Render.cpp Move.cpp
 
 
 SRC = $(ROOT) $(CLASSES)

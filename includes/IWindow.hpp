@@ -16,6 +16,10 @@
 # include <sstream>
 # include <ctime>
 # include <vector>
+#include <array>
+//# include "Move.hpp"
+
+static const int N = 18;
 
 typedef std::vector<int> vecInt;
 
@@ -25,6 +29,8 @@ typedef enum  	type
 	BLACK,
 	WHITE
 }				eType;
+
+typedef std::array<eType, N> typeArr;
 
 enum EVENTS
 {
@@ -43,6 +49,7 @@ typedef struct  s_event
 
 typedef struct  s_pos
 {
+	s_pos() {x = 0; y = 0; type = EMPTY;}
 	int 	x;
 	int		y;
 	eType	type;
@@ -70,12 +77,15 @@ typedef std::vector<t_pos>  posSet;
 typedef struct  			s_move
 {
 	eType					currentTurn;
-	std::vector<vecInt *>	gameField;
+	//std::vector<vecInt>		gameField;
+	std::array<typeArr, N>	gameField;
 	eMoveResult				moveResult;
 	int 					whiteCaptures;
 	int 					blackCaptures;
-	std::vector <posSet>	whiteFreeTree;
-	std::vector <posSet>	blackFreeTree;
+	// std::vector <posSet>	whiteFreeTree;
+	// std::vector <posSet>	blackFreeTree;
+	posSet					whiteFreeTree;
+	posSet					blackFreeTree;
 	t_pos					leftTop;
 	t_pos					rightBottom;
 	event					currEvent;

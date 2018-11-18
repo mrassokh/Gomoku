@@ -72,11 +72,12 @@ void 		Render::deAttachSharedLibrary()
 }
 
 
-void 			Render::drawField(std::vector<vecInt *> 	*gamefield) const
+void 			Render::drawField(std::array<typeArr, N> const	&gameField) const
 {
 	 m_newWindow->startCycl();
 
-	 std::vector<vecInt *> game = *(gamefield);
+	 //std::vector<vecInt *> game = *(gamefield);
+	 //std::array<typeArr, N>	game = *(gameField);
 	  int k;
 	for (int i = 0; i < 19; i++){
 		m_newWindow->drawLine(i, 0);
@@ -84,17 +85,17 @@ void 			Render::drawField(std::vector<vecInt *> 	*gamefield) const
 	}
 	for (int i = 0; i < 18; i++){
 		for (int j = 0; j < 18; j++){
-			k = (*game[j])[i];
+			k = (gameField[j])[i];
 			m_newWindow->drawTile(i, j, static_cast<eType>(k));
 		}
 	}
 
-	m_newWindow->drawTime(m_currentMove->currentTurn, m_currentMove->whiteCaptures,
-							m_currentMove->blackCaptures, m_turnTime, m_AI);
+	m_newWindow->drawTime(m_currentMove->getCurrentType(), m_currentMove->getWhiteCapture(),
+							m_currentMove->getBlackCapture(), m_turnTime, m_AI);
 	m_newWindow->endCycl();
 }
 
-void 			Render::renderConfigure(t_move	*currentMove,
+void 			Render::renderConfigure(Move *currentMove,
 											event *ev, int *ex, double *turnTime, int AI, windowCondition *condition)
 {
 	m_currentMove = currentMove;
@@ -126,7 +127,8 @@ void 			Render::drawStart()
 void 			Render::drawGame()
 {
 	m_windowCondition->gameCondition = 1;
-	drawField(&m_currentMove->gameField);
+//	std::array<typeArr, N> & gamefield = const_cast<std::array<typeArr, N> &>(currentMove->getGameField());
+	drawField(m_currentMove->getGameField());
 	eventHandling();
 }
 
