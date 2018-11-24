@@ -14,11 +14,6 @@
 
 Gomoku::Gomoku(std::string input):m_N(18), m_exit(0)
 {
-	//initGameField(m_N);
-	//emptyGameField(m_currentMove.gameField);
-	//m_currentMove.currentTurn = BLACK;
-	//m_currentMove.whiteCaptures = 0;
-	//m_currentMove.blackCaptures = 0;
 	m_render = &Render::Instance();
 	m_render->attachSharedLibrary("lib1_sdl.so", m_N + 1, m_N + 1);
 	m_event.event = DEFAULT;
@@ -43,25 +38,6 @@ Gomoku::~Gomoku()
 
 }
 
-// void 	Gomoku::emptyGameField(std::array<typeArr, N> &	gamefield)
-// {
-// 	for (int i = 0; i < N; i++){
-// 		gamefield[i].fill(EMPTY);
-// 	}
-// }
-
-// void 	Gomoku::initGameField(int N)
-// {
-// 	vecInt* row;
-// 	//m_gameField = new std::vector<vecInt>;
-// 	for (int i = 0; i < N; i++){
-// 		row = new vecInt();
-// 		for (int j = 0; j < N; j++) {
-// 			row->push_back(0);
-// 		}
-// 		m_currentMove.gameField.push_back(row);
-// 	}
-// }
 
 void 		Gomoku::moveReset(Move* currentMove)
 {
@@ -75,16 +51,6 @@ void 		Gomoku::moveReset(Move* currentMove)
 	m_event.y = -100;
 	currentMove->clearFreeThree();
 }
-// void 	Gomoku::clearGameField(int N)
-// {
-// 	// vecInt* row;
-// 	//m_gameField = new std::vector<vecInt>;
-// 	for (int i = 0; i < N; i++){
-// 		for (int j = 0; j < N; j++) {
-// 			(*m_currentMove.gameField[i])[j] = EMPTY;
-// 		}
-// 	}
-// }
 
 void 	Gomoku::render()
 {
@@ -140,38 +106,102 @@ void 		Gomoku::AI_Move(Move* currentMove)
 
 	m_turnTime =  0.0;//timeFromLastTurn;
 	m_start = clock();
-	for (int i = 0; i < 1000000; i++){
-		double x = pow(sqrt(0.56789) / sqrt(1.234), 2);
-		printf("%f\n", x);
-		x = 0;
+	int lextX = currentMove->getLeftTop().x;
+	int topY = currentMove->getLeftTop().y;
+	int rightX = currentMove->getRightBottom().x;
+	int bottomY = currentMove->getRightBottom().y;
+	movePriorityQueue movingOptions;
+	//std::array<typeArr, N> & gamefield = const_cast<std::array<typeArr, N> &>(currentMove->getGameField());
+	for (int y =  topY; y <= bottomY; ++y) {
+		for (int x = lextX; x <= rightX; ++x){
+			printf("Checked x = %d; y = %d;\n\n", x, y);
+			fillMoveOptions(currentMove, x, y, movingOptions);
+		}
 	}
+	moveProcessing(movingOptions.top());
+	m_currentMove = *movingOptions.top();
+	//movingOptions.clear();
+	// for (int i = 0; i < 1000000; i++){
+	// 	double x = pow(sqrt(0.56789) / sqrt(1.234), 2);
+	// 	//printf("%f\n", x);
+	// 	printf("Left top x = %d; y = %d; Right bottom x = %d; y = %d\n\n\n", currentMove->getLeftTop().x, currentMove->getLeftTop().y, currentMove->getRightBottom().x, currentMove->getRightBottom().y);
+	// 	x = 0;
+	// }
 	m_turnTime = static_cast<double>((clock() - m_start ))/ CLOCKS_PER_SEC;
-	if (currentMove->getCurrentType() == BLACK)
-		currentMove->setCurrentType(WHITE);
-	else
-		currentMove->setCurrentType(BLACK);
-	currentMove->setMove(0,0);
+
+	// if (currentMove->getCurrentType() == BLACK)
+	// 	currentMove->setCurrentType(WHITE);
+	// else
+	// 	currentMove->setCurrentType(BLACK);
+	// currentMove->setMove(0,0);
+}
+
+void 		Gomoku::fillMoveOptions(MovePtr currentMove, int x_center, int y_center, movePriorityQueue & movingOptions)
+{
+	for (int y = y_center - 1; y <= y_center + 1; ++y) {
+		if (y < 0 || y > 17)
+			continue;
+		for (int x = x_center - 1; x <= x_center + 1; ++x) {
+			if (x < 0 || x > 17 || (y == y_center && x == x_center))
+				continue;
+			MovePtr newMove = new Move(*currentMove);
+			moveChecking(newMove, x, y);
+			moveAI_Processing(newMove, movingOptions);
+		}
+	}
 }
 
 void 		Gomoku::moveChecking(Move* currentMove, int x, int y)
 {
 	std::array<typeArr, N> & gamefield = const_cast<std::array<typeArr, N> &>(currentMove->getGameField());
+	// t_pos & leftTop = const_cast<t_pos &>(currentMove->getLeftTop());
+	// t_pos & rightBottom = const_cast<t_pos &>(currentMove->getRightBottom());
 	if (gamefield[y][x] != EMPTY){
 		currentMove->setResult(NON_EMPTY);
 		printf("Push point with x =%d and y =%d denied - qquare is not empty\n", x, y);
 	} else if (checkWin(currentMove, x, y)){
 		printf("Push point with x =%d and y =%d and win!\n", x, y);
-		gamefield[y][x] = m_currentMove.getCurrentType();
+		//gamefield[y][x] = m_currentMove.getCurrentType();
+		redefineGameArea(currentMove, gamefield, x ,y);
+		//redefineGameArea(x,y,gamefield,leftTop,rightBottom);
 		currentMove->setResult(WIN);
 	} else 	if (checkCapture(currentMove, x, y)){
-		gamefield[y][x] = m_currentMove.getCurrentType();
+		// gamefield[y][x] = m_currentMove.getCurrentType();
+
+		redefineGameArea(currentMove, gamefield, x, y);
 		currentMove->setResult((currentMove->getWhiteCapture() >= 5 || currentMove->getBlackCapture() >= 5) ? WIN : CAPTURE);
 	} else if (checkFreeTree(currentMove, x, y)){
 		currentMove->setResult(DOUBLE_FREE_TREE);
 	} else {
-		gamefield[y][x] = m_currentMove.getCurrentType();
+		// gamefield[y][x] = m_currentMove.getCurrentType();
+		// t_pos & leftTop = const_cast<t_pos &>(currentMove->getLeftTop());
+		// t_pos & rightBottom = const_cast<t_pos &>(currentMove->getRightBottom());
+		redefineGameArea(currentMove, gamefield, x, y);
 		currentMove->setResult(DEF);
 	}
+}
+
+void 					Gomoku::redefineGameArea(Move* currentMove, std::array<typeArr, N> & gamefield, int x, int y)
+{
+	t_pos & leftTop = const_cast<t_pos &>(currentMove->getLeftTop());
+	t_pos & rightBottom = const_cast<t_pos &>(currentMove->getRightBottom());
+	if (leftTop.x == -1) {
+		leftTop.x = x;
+		leftTop.y = y;
+		rightBottom.x = x;
+		rightBottom.y = y;
+	} else {
+		if (x < leftTop.x)
+			leftTop.x = x;
+		if (y < leftTop.y)
+			leftTop.y = y;
+		if (x > rightBottom.x)
+			rightBottom.x = x;
+		if (y > rightBottom.y)
+			rightBottom.y = y;
+	}
+	printf("Left top x = %d; y = %d; Right bottom x = %d; y = %d\n\n\n", currentMove->getLeftTop().x, currentMove->getLeftTop().y, currentMove->getRightBottom().x, currentMove->getRightBottom().y);
+	gamefield[y][x] = currentMove->getCurrentType();
 }
 
 void 		Gomoku::moveProcessing(Move* currentMove)
@@ -192,6 +222,26 @@ void 		Gomoku::moveProcessing(Move* currentMove)
 		m_currentMove.setCurrentType(BLACK);
 		m_render->GameOver(result_str);
 	}
+}
+
+void 		Gomoku::moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingOptions)
+{
+	eMoveResult	const & result = optionMove->getResult();
+	if (result == NON_EMPTY || result == DOUBLE_FREE_TREE){
+		delete optionMove;
+		return ;
+	}
+	if (result == DEF)
+		//optionMove->defineHeuristic();
+		optionMove->setHeuristic(optionMove->getCurrentType() == BLACK ? 2 : -2);
+	else if (result == CAPTURE)
+		//optionMove->defineHeuristic();
+		optionMove->setHeuristic(optionMove->getCurrentType() == BLACK ? 10000 : -10000);
+	else if (result == WIN) {
+		int heur = optionMove->getCurrentType() == BLACK ? winHeuristic : -winHeuristic;
+		optionMove->setHeuristic(heur);
+	}
+	movingOptions.push(optionMove);
 }
 
 int 			Gomoku::checkWin(Move* currentMove, int x, int y)
@@ -439,39 +489,6 @@ eType			Gomoku::findOppositeType(eType type)
 {
 	return type == BLACK ? WHITE : (type == WHITE ? BLACK : EMPTY);
 }
-
-// void			Gomoku::eraseTiles(std::array<typeArr, N> *gameField, int startX, int startY, int endX, int endY)
-// {
-// 	printf("ERASE TILE x =%d and y =%d x2 =%d and y2 =%d\n", startX, startY,  endX, endY);
-// 	if (startX < 0 || startX > 17 || endX > 17
-// 		|| startY < 0 || startY > 17 || endY > 17 )
-// 		return;
-// 	if (startX == endX){
-// 		for (int i = startY; i <= endY; ++i) {
-// 			printf("ERASE TILE x =%d and y =%d\n", startX, i );
-// 			(*(*gameField)[i])[startX] = EMPTY;
-// 		}
-// 		return;
-// 	}
-//
-// 	if (startY == endY){
-// 		for (int i = startX; i <= endX; ++i) {
-// 			printf("ERASE TILE x =%d and y =%d\n", i, startY );
-// 			(*(*gameField)[startY])[i] = EMPTY;
-// 		}
-// 		return;
-// 	}
-// 	int j = startX;
-// 	for (int i = startY; i <= endY; ++i) {
-// 			printf("ERASE TILE x =%d and y =%d\n", j, i );
-// 			(*(*gameField)[i])[j] = EMPTY;
-// 			if (startX < endX)
-// 				j++;
-// 			else
-// 				j--;
-// 	}
-// }
-
 
 void			Gomoku::eraseTiles(std::array<typeArr, N> *gameField, int startX, int startY, int endX, int endY)
 {

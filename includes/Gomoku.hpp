@@ -20,9 +20,11 @@
 # include <Render.hpp>
 # include <algorithm>
 # include <functional>
+# include <queue>
 
+static const int winHeuristic = 1000000;
 
-
+typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQueue;
 
 class Gomoku
 {
@@ -45,7 +47,11 @@ private:
 	//void 								moving(Move* currentMove);
 	void 								moving(Move *currentMove);
 	void 								AI_Move(Move* currentMove);
+
+	void 								redefineGameArea(Move* currentMove, std::array<typeArr, N> & gamefield, int x, int y);
+	//void 								checkNewMove(currentMove,gamefield,x,y);
 	// void 								moveChecking(Move* currentMove);
+	void 								fillMoveOptions(MovePtr currentMove, int x_center, int y_center, movePriorityQueue & movingOptions);
 	void 								moveChecking(Move* currentMove, int x, int y);
 	int 								checkWin(Move* currentMove, int x, int y);
 	int 								checkWinHorizontal(Move* currentMove, int x, int y);
@@ -79,6 +85,7 @@ private:
 	int 								checkFreeTreeDiagonalLeft(Move* currentMove, int x, int y);
 	int 								checkFreeTreeDiagonalRight(Move* currentMove, int x, int y);
 	void 								moveProcessing(Move* currentMove);
+	void 								moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingOptions);
 	void 								moveReset(Move* currentMove);
 
 	Render								*m_render;

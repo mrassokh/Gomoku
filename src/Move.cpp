@@ -13,9 +13,14 @@
 #include "Move.hpp"
 
 Move::Move() : m_currentTurn(BLACK), m_moveResult(NO_RESULT),
-				m_whiteCaptures(0), m_blackCaptures(0)
+				m_whiteCaptures(0), m_blackCaptures(0), m_heuristic(0)
 {
 	emptyGameField();
+	m_leftTop.x = -1;
+	m_leftTop.y = -1;
+	m_rightBottom.x = -1;
+	m_rightBottom.y = -1;
+
 }
 
 Move::Move(Move const & rhs) : m_currentTurn(rhs.getCurrentType()),
@@ -24,7 +29,8 @@ Move::Move(Move const & rhs) : m_currentTurn(rhs.getCurrentType()),
 								m_whiteCaptures(rhs.getWhiteCapture()),
 								m_blackCaptures(rhs.getBlackCapture()),
 								m_leftTop(rhs.getLeftTop()),
-								m_rightBottom(rhs.getRightBottom()) { printf("Copy!!\n\n\n");}
+								m_rightBottom(rhs.getRightBottom()),
+								m_heuristic(0) { printf("Copy!!\n\n\n");}
 
 Move & Move::operator = (Move const & rhs)
 {
