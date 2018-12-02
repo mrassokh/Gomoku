@@ -23,8 +23,13 @@
 # include <queue>
 
 static const int winHeuristic = 1000000;
+static const int fourTwoOpenHeuristic = 100000;
+static const int fourOneOpenHeuristic = 10000;
+static const int threeTwoOpenHeuristic = 10000;
+static const int threeOneOpenHeuristic = 1000;
 
 typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQueue;
+
 
 class Gomoku
 {
@@ -52,6 +57,20 @@ private:
 	//void 								checkNewMove(currentMove,gamefield,x,y);
 	// void 								moveChecking(Move* currentMove);
 	void 								fillMoveOptions(MovePtr currentMove, int x_center, int y_center, movePriorityQueue & movingOptions);
+	void 								defineHeuristic(MovePtr optionMove, eMoveResult result);
+	int 								defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn);
+
+	inline int 							findTwoOpenHorizontal(std::array<eType, 6> const & sampleFourTwoOpen, std::array<typeArr, N> & gamefield);
+	inline int 							findOneOpenHorizontal(std::array<eType, 5> const & sampleFourTwoOpen, std::array<typeArr, N> & gamefield);
+	inline int 							defineTwoOpenHorizontalHeuristic(std::array<eType, 6> const & blackSample, std::array<eType, 6> const & whiteSample, std::array<typeArr, N> & gamefield, const int heuristic, eType currentTurn);
+
+	inline int 								defineOneOpenHorizontalHeuristic(std::array<eType, 5> const & blackSample,
+		 													std::array<eType, 5> const & whiteSample, std::array<typeArr, N> & gamefield, const int heuristic, eType currentTurn);
+
+
+
+
+
 	void 								moveChecking(Move* currentMove, int x, int y);
 	int 								checkWin(Move* currentMove, int x, int y);
 	int 								checkWinHorizontal(Move* currentMove, int x, int y);

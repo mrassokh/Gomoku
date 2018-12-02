@@ -18,6 +18,7 @@ class Move final
 public:
 	Move();
 	Move(Move const & rhs);
+	//Move(Move const & rhs, int);
 	Move & operator = (Move const & rhs);
 	~Move(){};
 
