@@ -20,6 +20,7 @@ Gomoku::Gomoku(std::string input):m_N(18), m_exit(0)
 	m_event.x = -100;
 	m_event.y = -100;
 	m_render->init();
+	//emptyGameField(m_heuristicField);
 	m_AI = input == "AI" ? 1 : 0;
 	// if (input == "AI"){
 	// 	m_AI = 1;
@@ -94,6 +95,12 @@ void 	Gomoku::render()
 	m_render->deAttachSharedLibrary();
 }
 
+// void 	Gomoku::emptyGameField(std::array<typeArr, N> & gamefield)
+// {
+// 	for (int i = 0; i < N; i++){
+// 		gameField[i].fill(EMPTY);
+// 	}
+// }
 //void 		Gomoku::moving(Move* currentMove)
 void 		Gomoku::moving(Move *currentMove)
 {
@@ -252,108 +259,52 @@ void 		Gomoku::moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingO
 	movingOptions.push(optionMove);
 }
 
-int 		Gomoku::defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn)
+int 		Gomoku::defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
+													t_pos const & leftTop, t_pos const & rightBottom)
 {
-	std::array<eType, 6> blackFourTwoOpen = {{EMPTY,BLACK,BLACK,BLACK,BLACK,EMPTY}};
-	std::array<eType, 5> blackFourOneOpenLeft = {{EMPTY,BLACK,BLACK,BLACK,BLACK}};
-	std::array<eType, 5> blackFourOneOpenRight = {{BLACK,BLACK,BLACK,BLACK,EMPTY}};
-	std::array<eType, 5> blackFourOneOpenCenter_1 = {{BLACK,BLACK,EMPTY,BLACK,BLACK}};
-	std::array<eType, 5> blackFourOneOpenCenter_2 = {{BLACK,EMPTY,BLACK,BLACK,BLACK}};
-	std::array<eType, 5> blackFourOneOpenCenter_3 = {{BLACK,BLACK,BLACK,EMPTY,BLACK}};
-	//
-	 std::array<eType, 6> blackThreeTwoOpen_1 = {{EMPTY,BLACK,BLACK,BLACK,EMPTY,EMPTY}};
-	 std::array<eType, 6> blackThreeTwoOpen_2 = {{EMPTY,EMPTY,BLACK,BLACK,BLACK,EMPTY}};
-	std::array<eType, 5> blackThreeOneOpenRight = {{BLACK,BLACK,BLACK,EMPTY,EMPTY}};
-	std::array<eType, 5> blackThreeOneOpenLeft = {{EMPTY,EMPTY,BLACK,BLACK,BLACK}};
-	std::array<eType, 5> blackThreeOneOpenCenter_1 = {{EMPTY,BLACK,EMPTY,BLACK,BLACK}};
-	std::array<eType, 5> blackThreeOneOpenCenter_2 = {{EMPTY,BLACK,BLACK,EMPTY,BLACK}};
-	std::array<eType, 5> blackThreeOneOpenCenter_3 = {{BLACK,EMPTY,BLACK,BLACK,EMPTY}};
-	std::array<eType, 5> blackThreeOneOpenCenter_4 = {{BLACK,BLACK,EMPTY,BLACK,EMPTY}};
-	//
-	std::array<eType, 6> blackTwoTwoOpen_1 = {{EMPTY,BLACK,BLACK,EMPTY,EMPTY,EMPTY}};
-	std::array<eType, 6> blackTwoTwoOpen_2 = {{EMPTY,EMPTY,BLACK,BLACK,EMPTY,EMPTY}};
-	std::array<eType, 6> blackTwoTwoOpen_3 = {{EMPTY,EMPTY,EMPTY,BLACK,BLACK,EMPTY}};
-	//
-	std::array<eType, 5> blackTwoOneOpenRight = {{BLACK,BLACK,EMPTY,EMPTY,EMPTY}};
-	std::array<eType, 5> blackTwoOneOpenLeft = {{EMPTY,EMPTY,EMPTY,BLACK,BLACK}};
-	//
-	// std::array<eType, 6> blackOneTwoOpen_1 = {{EMPTY,BLACK,EMPTY,EMPTY,EMPTY,EMPTY}};
-	// std::array<eType, 6> blackOneTwoOpen_2 = {{EMPTY,EMPTY,BLACK,EMPTY,EMPTY,EMPTY}};
-	// std::array<eType, 6> blackOneTwoOpen_3 = {{EMPTY,EMPTY,EMPTY,BLACK,EMPTY,EMPTY}};
-	// std::array<eType, 6> blackOneTwoOpen_4 = {{EMPTY,EMPTY,EMPTY,EMPTY,BLACK,EMPTY}};
-	//
-	// std::array<eType, 5> blackOneOneOpenRight = {{BLACK,EMPTY,EMPTY,EMPTY,EMPTY}};
-	// std::array<eType, 5> blackOneOneOpenLeft = {{EMPTY,EMPTY,EMPTY,EMPTY,BLACK}};
-
-
-
-
-	std::array<eType, 6> whiteFourTwoOpen= {{EMPTY,WHITE,WHITE,WHITE,WHITE,EMPTY}};
-	std::array<eType, 5> whiteFourOneOpenLeft = {{EMPTY,WHITE,WHITE,WHITE,WHITE}};
-	std::array<eType, 5> whiteFourOneOpenRight = {{WHITE,WHITE,WHITE,WHITE,EMPTY}};
-	std::array<eType, 5> whiteFourOneOpenCenter_1 = {{WHITE,WHITE,EMPTY,WHITE,WHITE}};
-	std::array<eType, 5> whiteFourOneOpenCenter_2 = {{WHITE,EMPTY,WHITE,WHITE,WHITE}};
-	std::array<eType, 5> whiteFourOneOpenCenter_3 = {{WHITE,WHITE,WHITE,EMPTY,WHITE}};
-
-	std::array<eType, 6> whiteThreeTwoOpen_1 = {{EMPTY,WHITE,WHITE,WHITE,EMPTY,EMPTY}};
-	std::array<eType, 6> whiteThreeTwoOpen_2 = {{EMPTY,EMPTY,WHITE,WHITE,WHITE,EMPTY}};
-
-	std::array<eType, 5> whiteThreeOneOpenRight = {{WHITE,WHITE,WHITE,EMPTY,EMPTY}};
-	std::array<eType, 5> whiteThreeOneOpenLeft = {{EMPTY,EMPTY,WHITE,WHITE,WHITE}};
-	std::array<eType, 5> whiteThreeOneOpenCenter_1 = {{EMPTY,WHITE,EMPTY,WHITE,WHITE}};
-	std::array<eType, 5> whiteThreeOneOpenCenter_2 = {{EMPTY,WHITE,WHITE,EMPTY,WHITE}};
-	std::array<eType, 5> whiteThreeOneOpenCenter_3 = {{WHITE,EMPTY,WHITE,WHITE,EMPTY}};
-	std::array<eType, 5> whiteThreeOneOpenCenter_4 = {{WHITE,WHITE,EMPTY,WHITE,EMPTY}};
-
-	std::array<eType, 6> whiteTwoTwoOpen_1 = {{EMPTY,WHITE,WHITE,EMPTY,EMPTY,EMPTY}};
-	std::array<eType, 6> whiteTwoTwoOpen_2 = {{EMPTY,EMPTY,WHITE,WHITE,EMPTY,EMPTY}};
-	std::array<eType, 6> whiteTwoTwoOpen_3 = {{EMPTY,EMPTY,EMPTY,WHITE,WHITE,EMPTY}};
-	//
-	std::array<eType, 5> whiteTwoOneOpenRight = {{WHITE,WHITE,EMPTY,EMPTY,EMPTY}};
-	std::array<eType, 5> whiteTwoOneOpenLeft = {{EMPTY,EMPTY,EMPTY,WHITE,WHITE}};
 	int horizontalHeur = 0;
 	//FIND FOUR ALLIGNMENT
-	if ((horizontalHeur = defineTwoOpenHorizontalHeuristic(blackFourTwoOpen, whiteFourTwoOpen, gamefield, fourTwoOpenHeuristic, currentTurn))){
+	if ((horizontalHeur = defineTwoOpenHorizontalHeuristic(blackFourTwoOpen, whiteFourTwoOpen, gamefield, fourTwoOpenHeuristic, currentTurn, leftTop, rightBottom))){
 		printf("FourTwoOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
-	if ((horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenLeft, whiteFourOneOpenLeft, gamefield, fourOneOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenRight, whiteFourOneOpenRight, gamefield, fourOneOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenCenter_1, whiteFourOneOpenCenter_1, gamefield, fourOneOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenCenter_2, whiteFourOneOpenCenter_2, gamefield, fourOneOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenCenter_3, whiteFourOneOpenCenter_3, gamefield, fourOneOpenHeuristic, currentTurn))) {
+	if ((horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenLeft, whiteFourOneOpenLeft, gamefield, fourOneOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenRight, whiteFourOneOpenRight, gamefield, fourOneOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenCenter_1, whiteFourOneOpenCenter_1, gamefield, fourOneOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenCenter_2, whiteFourOneOpenCenter_2, gamefield, fourOneOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenCenter_3, whiteFourOneOpenCenter_3, gamefield, fourOneOpenHeuristic, currentTurn, leftTop, rightBottom))) {
 		printf("FourOneOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
 	//FIND THREE ALLIGNMENT
-	if ((horizontalHeur = defineTwoOpenHorizontalHeuristic(blackThreeTwoOpen_1, whiteThreeTwoOpen_1, gamefield, threeTwoOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackThreeTwoOpen_2, whiteThreeTwoOpen_2, gamefield, threeTwoOpenHeuristic, currentTurn))){
+	if ((horizontalHeur = defineTwoOpenHorizontalHeuristic(blackThreeTwoOpen_1, whiteThreeTwoOpen_1, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackThreeTwoOpen_2, whiteThreeTwoOpen_2, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))){
 		printf("ThreeTwoOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
 
 
-	if ((horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenRight, whiteThreeOneOpenRight, gamefield, threeOneOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenLeft, whiteThreeOneOpenLeft, gamefield, threeOneOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenCenter_1, whiteThreeOneOpenCenter_1, gamefield, threeOneOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenCenter_2, whiteThreeOneOpenCenter_2, gamefield, threeOneOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenCenter_3, whiteThreeOneOpenCenter_3, gamefield, threeOneOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenCenter_4, whiteThreeOneOpenCenter_4, gamefield, threeOneOpenHeuristic, currentTurn))) {
+	if ((horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenRight, whiteThreeOneOpenRight, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenLeft, whiteThreeOneOpenLeft, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenCenter_1, whiteThreeOneOpenCenter_1, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenCenter_2, whiteThreeOneOpenCenter_2, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenCenter_3, whiteThreeOneOpenCenter_3, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenCenter_4, whiteThreeOneOpenCenter_4, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))) {
 		printf("ThreeOneOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
 
 	//FIND TWO ALLIGNMENT
-	if ((horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, gamefield, threeTwoOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, gamefield, threeTwoOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, gamefield, threeTwoOpenHeuristic, currentTurn))){
+	if ((horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))){
 		printf("TwoTwoOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
 
 
-	if ((horizontalHeur = defineOneOpenHorizontalHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, gamefield, threeOneOpenHeuristic, currentTurn))
-		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, gamefield, threeOneOpenHeuristic, currentTurn))
+	if ((horizontalHeur = defineOneOpenHorizontalHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
 	) {
 		printf("TwoOneOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
@@ -362,33 +313,355 @@ int 		Gomoku::defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eTyp
 	return 0;
 }
 
-int 		Gomoku::defineTwoOpenHorizontalHeuristic(std::array<eType, 6> const & blackSample,
-	 													std::array<eType, 6> const & whiteSample, std::array<typeArr, N> & gamefield, const int heuristic, eType currentTurn)
+
+int 							Gomoku::defineVerticalHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
+																		t_pos const & leftTop, t_pos const & rightBottom)
+{
+	int verticalHeur = 0;
+	m_heuristicField.clear();
+	int start = leftTop.x > 0 ? leftTop.x - 1 : 0;
+	int end = rightBottom.x < 17 ? rightBottom.x + 1 : 17;
+	for (int x = start; x < end; ++x) {
+		std::vector<eType> column;
+		for (int y = 0; y < 18; ++y) {
+			column.push_back(gamefield[y][x]);
+		}
+		m_heuristicField.push_back(column);
+	}
+	//m_heuristicField
+	//FIND FOUR ALLIGNMENT
+	if ((verticalHeur = defineTwoOpenHeuristic(blackFourTwoOpen, whiteFourTwoOpen, m_heuristicField, fourTwoOpenHeuristic, currentTurn))){
+		printf("FourTwoOpen heuristic = %d\n\n\n\n", verticalHeur);
+		return verticalHeur;
+	}
+	if ((verticalHeur = defineOneOpenHeuristic(blackFourOneOpenLeft, whiteFourOneOpenLeft, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineOneOpenHeuristic(blackFourOneOpenRight, whiteFourOneOpenRight, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_1, whiteFourOneOpenCenter_1, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_2, whiteFourOneOpenCenter_2, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_3, whiteFourOneOpenCenter_3, m_heuristicField, fourOneOpenHeuristic, currentTurn))) {
+		printf("FourOneOpen heuristic = %d\n\n\n\n", verticalHeur);
+		return verticalHeur;
+	}
+	//FIND THREE ALLIGNMENT
+	if ((verticalHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_1, whiteThreeTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_2, whiteThreeTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
+		printf("ThreeTwoOpen heuristic = %d\n\n\n\n", verticalHeur);
+		return verticalHeur;
+	}
+
+
+	if ((verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenRight, whiteThreeOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenLeft, whiteThreeOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_1, whiteThreeOneOpenCenter_1, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_2, whiteThreeOneOpenCenter_2, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_3, whiteThreeOneOpenCenter_3, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_4, whiteThreeOneOpenCenter_4, m_heuristicField, threeOneOpenHeuristic, currentTurn))) {
+		printf("ThreeOneOpen heuristic = %d\n\n\n\n", verticalHeur);
+		return verticalHeur;
+	}
+
+	//FIND TWO ALLIGNMENT
+	if ((verticalHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
+		printf("TwoTwoOpen heuristic = %d\n\n\n\n", verticalHeur);
+		return verticalHeur;
+	}
+
+
+	if ((verticalHeur = defineOneOpenHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (verticalHeur = defineOneOpenHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+	) {
+		printf("TwoOneOpen heuristic = %d\n\n\n\n", verticalHeur);
+		return verticalHeur;
+	}
+
+	return 0;
+}
+
+int 							Gomoku::defineDiagonalLeftHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
+																		t_pos const & leftTop, t_pos const & rightBottom)
+{
+	int diagonalLeftHeur = 0;
+	m_heuristicField.clear();
+	int diagonalX;
+	int diagonalY;
+	printf("defineDiagonalLeftHeuristic left top x = %d y = %d rightBottom x = %d y = %d:\n", leftTop.x, leftTop.y, rightBottom.x, rightBottom.y);
+	for (int i = leftTop.x; i <= rightBottom.x; ++i) {
+		if (i < leftTop.y) {
+			diagonalX = 0;
+			diagonalY = leftTop.y - i;
+		} else {
+			diagonalX = i - leftTop.y;
+			diagonalY = 0;
+		}
+		printf("i = %d top diagonalX = %d diagonalY = %d :\n", i,diagonalX, diagonalY);
+		std::vector<eType> diagonal;
+		while (diagonalX < 18 && diagonalY < 18) {
+			printf("top diagonalX = %d diagonalY = %d elem = %d:\n", diagonalX, diagonalY, gamefield[diagonalY][diagonalX]);
+			diagonal.push_back(gamefield[diagonalY][diagonalX]);
+			diagonalX++;
+			diagonalY++;
+		}
+		m_heuristicField.push_back(diagonal);
+	}
+
+	for (int i = leftTop.y + 1; i <= rightBottom.y; ++i) {
+		if (i < leftTop.x) {
+			diagonalX = leftTop.x - i;
+			diagonalY = 0;
+		} else {
+			diagonalX = 0;
+			diagonalY = i - leftTop.x;
+		}
+		std::vector<eType> diagonal;
+		while (diagonalX < 18 && diagonalY < 18) {
+			diagonal.push_back(gamefield[diagonalY][diagonalX]);
+			diagonalX++;
+			diagonalY++;
+		}
+		m_heuristicField.push_back(diagonal);
+	}
+	printf("m_heuristicField:\n");
+	for (auto && row : m_heuristicField) {
+		for (auto && element : row) {
+			printf("%d ",  element);
+		}
+		printf(";\n ");
+	}
+
+	//FIND FOUR ALLIGNMENT
+	if ((diagonalLeftHeur = defineTwoOpenHeuristic(blackFourTwoOpen, whiteFourTwoOpen, m_heuristicField, fourTwoOpenHeuristic, currentTurn))){
+		printf("FourTwoOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
+		return diagonalLeftHeur;
+	}
+	if ((diagonalLeftHeur = defineOneOpenHeuristic(blackFourOneOpenLeft, whiteFourOneOpenLeft, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackFourOneOpenRight, whiteFourOneOpenRight, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_1, whiteFourOneOpenCenter_1, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_2, whiteFourOneOpenCenter_2, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_3, whiteFourOneOpenCenter_3, m_heuristicField, fourOneOpenHeuristic, currentTurn))) {
+		printf("FourOneOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
+		return diagonalLeftHeur;
+	}
+	//FIND THREE ALLIGNMENT
+	if ((diagonalLeftHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_1, whiteThreeTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_2, whiteThreeTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
+		printf("ThreeTwoOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
+		return diagonalLeftHeur;
+	}
+
+
+	if ((diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenRight, whiteThreeOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenLeft, whiteThreeOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_1, whiteThreeOneOpenCenter_1, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_2, whiteThreeOneOpenCenter_2, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_3, whiteThreeOneOpenCenter_3, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_4, whiteThreeOneOpenCenter_4, m_heuristicField, threeOneOpenHeuristic, currentTurn))) {
+		printf("ThreeOneOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
+		return diagonalLeftHeur;
+	}
+
+	//FIND TWO ALLIGNMENT
+	if ((diagonalLeftHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
+		printf("TwoTwoOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
+		return diagonalLeftHeur;
+	}
+
+
+	if ((diagonalLeftHeur = defineOneOpenHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+	) {
+		printf("TwoOneOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
+		return diagonalLeftHeur;
+	}
+
+	return 0;
+}
+
+int 							Gomoku::defineDiagonalRightHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
+																		t_pos const & leftTop, t_pos const & rightBottom)
+{
+	int diagonalRightHeur = 0;
+	m_heuristicField.clear();
+	int diagonalX;
+	int diagonalY;
+	printf("definediagonalRightHeuristic left top x = %d y = %d rightBottom x = %d y = %d:\n", leftTop.x, leftTop.y, rightBottom.x, rightBottom.y);
+	for (int i = leftTop.x; i <= rightBottom.x; ++i) {
+		if (i < leftTop.y) {
+			diagonalX = 17;
+			diagonalY = 0; //leftTop.y - i;
+		} else {
+			diagonalX = leftTop.y + i < 18 ? leftTop.y + i : 17;
+			diagonalY = 0; //leftTop.y - i;
+		}
+		printf("i = %d top diagonalX = %d diagonalY = %d :\n", i,diagonalX, diagonalY);
+		std::vector<eType> diagonal;
+		while (diagonalX < 18 && diagonalY < 18) {
+			printf("top diagonalX = %d diagonalY = %d elem = %d:\n", diagonalX, diagonalY, gamefield[diagonalY][diagonalX]);
+			diagonal.push_back(gamefield[diagonalY][diagonalX]);
+			diagonalX++;
+			diagonalY++;
+		}
+		m_heuristicField.push_back(diagonal);
+	}
+
+	for (int i = leftTop.y + 1; i <= rightBottom.y; ++i) {
+		if (i < leftTop.x) {
+			diagonalX = leftTop.x - i;
+			diagonalY = 0;
+		} else {
+			diagonalX = 0;
+			diagonalY = i - leftTop.x;
+		}
+		std::vector<eType> diagonal;
+		while (diagonalX < 18 && diagonalY < 18) {
+			diagonal.push_back(gamefield[diagonalY][diagonalX]);
+			diagonalX++;
+			diagonalY++;
+		}
+		m_heuristicField.push_back(diagonal);
+	}
+	printf("m_heuristicField:\n");
+	for (auto && row : m_heuristicField) {
+		for (auto && element : row) {
+			printf("%d ",  element);
+		}
+		printf(";\n ");
+	}
+
+	//FIND FOUR ALLIGNMENT
+	if ((diagonalRightHeur = defineTwoOpenHeuristic(blackFourTwoOpen, whiteFourTwoOpen, m_heuristicField, fourTwoOpenHeuristic, currentTurn))){
+		printf("FourTwoOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
+		return diagonalRightHeur;
+	}
+	if ((diagonalRightHeur = defineOneOpenHeuristic(blackFourOneOpenLeft, whiteFourOneOpenLeft, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineOneOpenHeuristic(blackFourOneOpenRight, whiteFourOneOpenRight, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_1, whiteFourOneOpenCenter_1, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_2, whiteFourOneOpenCenter_2, m_heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_3, whiteFourOneOpenCenter_3, m_heuristicField, fourOneOpenHeuristic, currentTurn))) {
+		printf("FourOneOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
+		return diagonalRightHeur;
+	}
+	//FIND THREE ALLIGNMENT
+	if ((diagonalRightHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_1, whiteThreeTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_2, whiteThreeTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
+		printf("ThreeTwoOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
+		return diagonalRightHeur;
+	}
+
+
+	if ((diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenRight, whiteThreeOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenLeft, whiteThreeOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_1, whiteThreeOneOpenCenter_1, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_2, whiteThreeOneOpenCenter_2, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_3, whiteThreeOneOpenCenter_3, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_4, whiteThreeOneOpenCenter_4, m_heuristicField, threeOneOpenHeuristic, currentTurn))) {
+		printf("ThreeOneOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
+		return diagonalRightHeur;
+	}
+
+	//FIND TWO ALLIGNMENT
+	if ((diagonalRightHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
+		printf("TwoTwoOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
+		return diagonalRightHeur;
+	}
+
+
+	if ((diagonalRightHeur = defineOneOpenHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (diagonalRightHeur = defineOneOpenHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+	) {
+		printf("TwoOneOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
+		return diagonalRightHeur;
+	}
+
+	return 0;
+}
+
+int 							Gomoku::defineTwoOpenHeuristic(twoOpenSample const & blackSample, twoOpenSample const & whiteSample, std::vector<std::vector<eType>> const & gamefield,
+																		const int heuristic, eType currentTurn)
+{
+	int returnHeur = 0;
+	if (findTwoOpen(blackSample, gamefield))
+		returnHeur += currentTurn == BLACK ? heuristic / 2 : heuristic;
+	if (findTwoOpen(whiteSample, gamefield))
+		returnHeur -= currentTurn == BLACK ? heuristic  : heuristic / 2;
+	return returnHeur;
+}
+
+int 							Gomoku::defineOneOpenHeuristic( oneOpenSample const & blackSample, oneOpenSample const & whiteSample, std::vector<std::vector<eType>> const & gamefield,
+														  const int heuristic, eType currentTurn)
+{
+	int returnHeur = 0;
+	if (findOneOpen(blackSample, gamefield))
+		returnHeur += currentTurn == BLACK ? heuristic / 2 : heuristic;
+	if (findOneOpen(whiteSample, gamefield))
+		returnHeur -= currentTurn == BLACK ? heuristic  : heuristic / 2;
+	return returnHeur;
+}
+
+
+
+int 		Gomoku::defineTwoOpenHorizontalHeuristic(std::array<eType, 6> const & blackSample, std::array<eType, 6> const & whiteSample,
+														std::array<typeArr, N> & gamefield, const int heuristic, eType currentTurn, t_pos const & leftTop, t_pos const & rightBottom)
 {
 	int horizontalHeur = 0;
-	if (findTwoOpenHorizontal(blackSample, gamefield))
+	if (findTwoOpenHorizontal(blackSample, gamefield, leftTop, rightBottom))
 		horizontalHeur += currentTurn == BLACK ? heuristic / 2 : heuristic;
-	if (findTwoOpenHorizontal(whiteSample, gamefield))
+	if (findTwoOpenHorizontal(whiteSample, gamefield, leftTop, rightBottom))
 		horizontalHeur -= currentTurn == BLACK ? heuristic  : heuristic / 2;
 	return horizontalHeur;
 }
 
 
-int 		Gomoku::defineOneOpenHorizontalHeuristic(std::array<eType, 5> const & blackSample,
-	 													std::array<eType, 5> const & whiteSample, std::array<typeArr, N> & gamefield, const int heuristic, eType currentTurn)
+int 		Gomoku::defineOneOpenHorizontalHeuristic(std::array<eType, 5> const & blackSample, std::array<eType, 5> const & whiteSample, std::array<typeArr, N> & gamefield,
+															const int heuristic, eType currentTurn, t_pos const & leftTop, t_pos const & rightBottom)
 {
 	int horizontalHeur = 0;
-	if (findOneOpenHorizontal(blackSample, gamefield))
+	if (findOneOpenHorizontal(blackSample, gamefield, leftTop, rightBottom))
 		horizontalHeur += currentTurn == BLACK ? heuristic / 2 : heuristic;
-	if (findOneOpenHorizontal(whiteSample, gamefield))
+	if (findOneOpenHorizontal(whiteSample, gamefield, leftTop, rightBottom))
 		horizontalHeur -= currentTurn == BLACK ? heuristic  : heuristic / 2;
 	return horizontalHeur;
 }
 
-int 		Gomoku::findTwoOpenHorizontal(std::array<eType, 6> const & sampleFourTwoOpen, std::array<typeArr, N> & gamefield)
+int 		Gomoku::findTwoOpen(twoOpenSample const & sampleTwoOpen, std::vector<std::vector<eType>> const & gamefield)
+{
+	//std::vector<eType>::iterator it;
+	for (auto && column : gamefield) {
+		auto it = std::search(column.begin(), column.end(), sampleTwoOpen.begin(), sampleTwoOpen.end());
+		if (it != column.end())
+		{
+			printf("TwoOpen find in  and y = %ld\n\n\n\n", it - column.begin());
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int 		Gomoku::findOneOpen(oneOpenSample const & sampleOneOpen, std::vector<std::vector<eType>> const & gamefield)
+{
+	//std::vector<eType>::iterator it;
+	for (auto && column : gamefield) {
+		auto it = std::search(column.begin(), column.end(), sampleOneOpen.begin(), sampleOneOpen.end());
+		if (it != column.end())
+		{
+			printf("OneOpen find in  and y = %ld\n\n\n\n", it - column.begin());
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int 		Gomoku::findTwoOpenHorizontal(std::array<eType, 6> const & sampleFourTwoOpen, std::array<typeArr, N> & gamefield, t_pos const & leftTop, t_pos const & rightBottom)
 {
 	std::array<eType,18>::iterator it;
-	for (int i = 0; i < 18; ++i) {
+	int start = leftTop.y > 0 ? leftTop.y - 1 : 0;
+	int end = rightBottom.y < 17 ? rightBottom.y + 1 : 17;
+	for (int i = start; i < end; ++i) {
 		it = std::search(gamefield[i].begin(),gamefield[i].end(), sampleFourTwoOpen.begin(), sampleFourTwoOpen.end());
 		if (it != gamefield[i].end()){
 			printf("blackTwoOpen find in x = %ld and y = %d\n\n\n\n", it - gamefield[i].begin(), i);
@@ -398,10 +671,12 @@ int 		Gomoku::findTwoOpenHorizontal(std::array<eType, 6> const & sampleFourTwoOp
 	return 0;
 }
 
-int 		Gomoku::findOneOpenHorizontal(std::array<eType, 5> const & sampleFourTwoOpen, std::array<typeArr, N> & gamefield)
+int 		Gomoku::findOneOpenHorizontal(std::array<eType, 5> const & sampleFourTwoOpen, std::array<typeArr, N> & gamefield, t_pos const & leftTop, t_pos const & rightBottom)
 {
 	std::array<eType,18>::iterator it;
-	for (int i = 0; i < 18; ++i) {
+	int start = leftTop.y > 0 ? leftTop.y - 1 : 0;
+	int end = rightBottom.y < 17 ? rightBottom.y + 1 : 17;
+	for (int i = start; i < end; ++i) {
 		it = std::search(gamefield[i].begin(),gamefield[i].end(), sampleFourTwoOpen.begin(), sampleFourTwoOpen.end());
 		if (it != gamefield[i].end()){
 			printf("blackOneOpen find in x = %ld and y = %d\n\n\n\n", it - gamefield[i].begin(), i);
@@ -419,17 +694,52 @@ void 		Gomoku::defineHeuristic(MovePtr optionMove, eMoveResult result)
 	}
 	std::array<typeArr, N> & gamefield = const_cast<std::array<typeArr, N> &>(optionMove->getGameField());
 	int heur = 0;
-	heur +=	defineHorizontalHeuristic(gamefield, optionMove->getCurrentType());
+	heur +=	defineHorizontalHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
+	heur +=	defineVerticalHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
+	heur +=	defineDiagonalLeftHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
+	heur +=	defineDigonalRightHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
 	if (heur)
 		printf("defineHorizontalHeuristic = %d\n\n\n\n", heur);
 	// int heur +=	defineVerticalHeuristic(gamefield, optionMove->getCurrentType());
-	// int heur +=	defineDiagonalLeftHeuristic(gamefield, optionMove->getCurrentType());
-	// int heur +=	defineDigonalRightHeuristic(gamefield, optionMove->getCurrentType());
+
+	//int heur +=	defineDigonalRightHeuristic(gamefield, optionMove->getCurrentType());
 	if (result == CAPTURE) {
 		heur += BLACK ? -10000 : 10000;
 	}
 	optionMove->setHeuristic(heur);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 int 			Gomoku::checkWin(Move* currentMove, int x, int y)
 {

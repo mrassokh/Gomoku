@@ -22,11 +22,67 @@
 # include <functional>
 # include <queue>
 
+typedef std::array<eType, 6> twoOpenSample;
+typedef std::array<eType, 5> oneOpenSample;
+
+// BLACK SAMPLES
+static const twoOpenSample blackFourTwoOpen = {{EMPTY,BLACK,BLACK,BLACK,BLACK,EMPTY}};
+static const oneOpenSample blackFourOneOpenLeft = {{EMPTY,BLACK,BLACK,BLACK,BLACK}};
+static const oneOpenSample blackFourOneOpenRight = {{BLACK,BLACK,BLACK,BLACK,EMPTY}};
+static const oneOpenSample blackFourOneOpenCenter_1 = {{BLACK,BLACK,EMPTY,BLACK,BLACK}};
+static const oneOpenSample blackFourOneOpenCenter_2 = {{BLACK,EMPTY,BLACK,BLACK,BLACK}};
+static const oneOpenSample blackFourOneOpenCenter_3 = {{BLACK,BLACK,BLACK,EMPTY,BLACK}};
+//
+static const twoOpenSample blackThreeTwoOpen_1 = {{EMPTY,BLACK,BLACK,BLACK,EMPTY,EMPTY}};
+static const twoOpenSample blackThreeTwoOpen_2 = {{EMPTY,EMPTY,BLACK,BLACK,BLACK,EMPTY}};
+static const oneOpenSample blackThreeOneOpenRight = {{BLACK,BLACK,BLACK,EMPTY,EMPTY}};
+static const oneOpenSample blackThreeOneOpenLeft = {{EMPTY,EMPTY,BLACK,BLACK,BLACK}};
+static const oneOpenSample blackThreeOneOpenCenter_1 = {{EMPTY,BLACK,EMPTY,BLACK,BLACK}};
+static const oneOpenSample blackThreeOneOpenCenter_2 = {{EMPTY,BLACK,BLACK,EMPTY,BLACK}};
+static const oneOpenSample blackThreeOneOpenCenter_3 = {{BLACK,EMPTY,BLACK,BLACK,EMPTY}};
+static const oneOpenSample blackThreeOneOpenCenter_4 = {{BLACK,BLACK,EMPTY,BLACK,EMPTY}};
+//
+static const twoOpenSample blackTwoTwoOpen_1 = {{EMPTY,BLACK,BLACK,EMPTY,EMPTY,EMPTY}};
+static const twoOpenSample blackTwoTwoOpen_2 = {{EMPTY,EMPTY,BLACK,BLACK,EMPTY,EMPTY}};
+static const twoOpenSample blackTwoTwoOpen_3 = {{EMPTY,EMPTY,EMPTY,BLACK,BLACK,EMPTY}};
+//
+static const oneOpenSample blackTwoOneOpenRight = {{BLACK,BLACK,EMPTY,EMPTY,EMPTY}};
+static const oneOpenSample blackTwoOneOpenLeft = {{EMPTY,EMPTY,EMPTY,BLACK,BLACK}};
+
+
+// WHITE SAMPLES
+static const twoOpenSample whiteFourTwoOpen= {{EMPTY,WHITE,WHITE,WHITE,WHITE,EMPTY}};
+static const oneOpenSample whiteFourOneOpenLeft = {{EMPTY,WHITE,WHITE,WHITE,WHITE}};
+static const oneOpenSample whiteFourOneOpenRight = {{WHITE,WHITE,WHITE,WHITE,EMPTY}};
+static const oneOpenSample whiteFourOneOpenCenter_1 = {{WHITE,WHITE,EMPTY,WHITE,WHITE}};
+static const oneOpenSample whiteFourOneOpenCenter_2 = {{WHITE,EMPTY,WHITE,WHITE,WHITE}};
+static const oneOpenSample whiteFourOneOpenCenter_3 = {{WHITE,WHITE,WHITE,EMPTY,WHITE}};
+
+static const twoOpenSample whiteThreeTwoOpen_1 = {{EMPTY,WHITE,WHITE,WHITE,EMPTY,EMPTY}};
+static const twoOpenSample whiteThreeTwoOpen_2 = {{EMPTY,EMPTY,WHITE,WHITE,WHITE,EMPTY}};
+
+static const oneOpenSample whiteThreeOneOpenRight = {{WHITE,WHITE,WHITE,EMPTY,EMPTY}};
+static const oneOpenSample whiteThreeOneOpenLeft = {{EMPTY,EMPTY,WHITE,WHITE,WHITE}};
+static const oneOpenSample whiteThreeOneOpenCenter_1 = {{EMPTY,WHITE,EMPTY,WHITE,WHITE}};
+static const oneOpenSample whiteThreeOneOpenCenter_2 = {{EMPTY,WHITE,WHITE,EMPTY,WHITE}};
+static const oneOpenSample whiteThreeOneOpenCenter_3 = {{WHITE,EMPTY,WHITE,WHITE,EMPTY}};
+static const oneOpenSample whiteThreeOneOpenCenter_4 = {{WHITE,WHITE,EMPTY,WHITE,EMPTY}};
+
+static const twoOpenSample whiteTwoTwoOpen_1 = {{EMPTY,WHITE,WHITE,EMPTY,EMPTY,EMPTY}};
+static const twoOpenSample whiteTwoTwoOpen_2 = {{EMPTY,EMPTY,WHITE,WHITE,EMPTY,EMPTY}};
+static const twoOpenSample whiteTwoTwoOpen_3 = {{EMPTY,EMPTY,EMPTY,WHITE,WHITE,EMPTY}};
+//
+static const oneOpenSample whiteTwoOneOpenRight = {{WHITE,WHITE,EMPTY,EMPTY,EMPTY}};
+static const oneOpenSample whiteTwoOneOpenLeft = {{EMPTY,EMPTY,EMPTY,WHITE,WHITE}};
+
+
 static const int winHeuristic = 1000000;
 static const int fourTwoOpenHeuristic = 100000;
 static const int fourOneOpenHeuristic = 10000;
 static const int threeTwoOpenHeuristic = 10000;
 static const int threeOneOpenHeuristic = 1000;
+static const int twoTwoOpenHeuristic = 1000;
+static const int oneTwoOpenHeuristic = 100;
 
 typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQueue;
 
@@ -58,15 +114,36 @@ private:
 	// void 								moveChecking(Move* currentMove);
 	void 								fillMoveOptions(MovePtr currentMove, int x_center, int y_center, movePriorityQueue & movingOptions);
 	void 								defineHeuristic(MovePtr optionMove, eMoveResult result);
-	int 								defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn);
+	int 								defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
+																		t_pos const & leftTop, t_pos const & rightBottom);
+    int 								defineVerticalHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
+																			t_pos const & leftTop, t_pos const & rightBottom);
+	int 								defineDiagonalLeftHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
+																			t_pos const & leftTop, t_pos const & rightBottom);
+	int 								defineDiagonalRightHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
+																			t_pos const & leftTop, t_pos const & rightBottom);
 
-	inline int 							findTwoOpenHorizontal(std::array<eType, 6> const & sampleFourTwoOpen, std::array<typeArr, N> & gamefield);
-	inline int 							findOneOpenHorizontal(std::array<eType, 5> const & sampleFourTwoOpen, std::array<typeArr, N> & gamefield);
-	inline int 							defineTwoOpenHorizontalHeuristic(std::array<eType, 6> const & blackSample, std::array<eType, 6> const & whiteSample, std::array<typeArr, N> & gamefield, const int heuristic, eType currentTurn);
+	inline int 							findTwoOpenHorizontal(twoOpenSample const & sampleFourTwoOpen, std::array<typeArr, N> & gamefield,
+																	t_pos const & leftTop, t_pos const & rightBottom);
+	inline int 							findOneOpenHorizontal(oneOpenSample const & sampleFourTwoOpen, std::array<typeArr, N> & gamefield,
+																	t_pos const & leftTop, t_pos const & rightBottom);
+	inline int 							defineTwoOpenHorizontalHeuristic(twoOpenSample const & blackSample, twoOpenSample const & whiteSample, std::array<typeArr, N> & gamefield,
+																			const int heuristic, eType currentTurn, t_pos const & leftTop, t_pos const & rightBottom);
 
-	inline int 								defineOneOpenHorizontalHeuristic(std::array<eType, 5> const & blackSample,
-		 													std::array<eType, 5> const & whiteSample, std::array<typeArr, N> & gamefield, const int heuristic, eType currentTurn);
+	inline int 								defineOneOpenHorizontalHeuristic( oneOpenSample const & blackSample,
+		 													 oneOpenSample const & whiteSample, std::array<typeArr, N> & gamefield,
+															  const int heuristic, eType currentTurn, t_pos const & leftTop, t_pos const & rightBottom);
 
+
+	inline int 							defineTwoOpenHeuristic(twoOpenSample const & blackSample, twoOpenSample const & whiteSample, std::vector<std::vector<eType>> const & gamefield,
+  																			const int heuristic, eType currentTurn);
+
+  	inline int 							defineOneOpenHeuristic( oneOpenSample const & blackSample, oneOpenSample const & whiteSample, std::vector<std::vector<eType>> const & gamefield,
+  															  const int heuristic, eType currentTurn);
+
+
+  inline int 							findTwoOpen(twoOpenSample const & sampleTwoOpen, std::vector<std::vector<eType>> const & gamefield);
+  inline int 							findOneOpen(oneOpenSample const & sampleOneOpen, std::vector<std::vector<eType>> const & gamefield);
 
 
 
@@ -107,7 +184,11 @@ private:
 	void 								moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingOptions);
 	void 								moveReset(Move* currentMove);
 
+	//void 								emptyGameField(std::array<typeArr, N> & gamefield)
+
 	Render								*m_render;
+	//std::array<typeArr, N>				m_heuristicField;
+	std::vector<std::vector<eType>>		m_heuristicField;
 	//std::vector<vecInt *>				m_gameField;
 	int 								m_N;
 	//int 								m_AI_play;
