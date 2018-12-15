@@ -84,6 +84,9 @@ static const int threeOneOpenHeuristic = 1000;
 static const int twoTwoOpenHeuristic = 1000;
 static const int oneTwoOpenHeuristic = 100;
 
+static const int maximumDepth = 5;
+static const int moveChoseCount = 3;
+
 typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQueue;
 
 
@@ -112,6 +115,7 @@ private:
 	void 								redefineGameArea(Move* currentMove, std::array<typeArr, N> & gamefield, int x, int y);
 	//void 								checkNewMove(currentMove,gamefield,x,y);
 	// void 								moveChecking(Move* currentMove);
+	inline void 						generateMoveOptions(MovePtr currentMove, movePriorityQueue & movingOptions);
 	void 								fillMoveOptions(MovePtr currentMove, int x_center, int y_center, movePriorityQueue & movingOptions);
 	void 								defineHeuristic(MovePtr optionMove, eMoveResult result);
 	int 								defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
@@ -122,6 +126,8 @@ private:
 																			t_pos const & leftTop, t_pos const & rightBottom);
 	int 								defineDiagonalRightHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
 																			t_pos const & leftTop, t_pos const & rightBottom);
+
+   inline int							resolveHeuristicFromField(std::vector<std::vector<eType>> const & heuristicField, eType currentTurn);
 
 	inline int 							findTwoOpenHorizontal(twoOpenSample const & sampleFourTwoOpen, std::array<typeArr, N> & gamefield,
 																	t_pos const & leftTop, t_pos const & rightBottom);
@@ -183,6 +189,8 @@ private:
 	void 								moveProcessing(Move* currentMove);
 	void 								moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingOptions);
 	void 								moveReset(Move* currentMove);
+
+	MovePtr 								algorithmMiniMax(MovePtr currentMove, int & depth, int maxDepth);
 
 	//void 								emptyGameField(std::array<typeArr, N> & gamefield)
 

@@ -95,6 +95,56 @@ void 	Gomoku::render()
 	m_render->deAttachSharedLibrary();
 }
 
+
+
+MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int & depth, int maxDepth)
+{
+	movePriorityQueue movingOptions;
+
+	MovePtr findedMove;
+	generateMoveOptions(currentMove,movingOptions);
+	if (depth == maxDepth) {
+		moveProcessing(movingOptions.top());
+		findedMove = new Move(*movingOptions.top());
+	} else {
+		int moveCounter = 0;
+		MovePtr checkingMove;
+		movePriorityQueue checkMovingOptions;
+		depth++;
+		while (moveCounter < moveChoseCount && !movingOptions.empty()) {
+			checkingMove = movingOptions.top();
+			moveProcessing(checkingMove);
+			delete movingOptions.top();
+			movingOptions.pop();
+			checkMovingOptions.push(algorithmMiniMax(checkingMove,depth,maximumDepth));
+
+		}
+		findedMove = new Move(*checkMovingOptions.top());
+		while (!checkMovingOptions.empty()) {
+			delete checkMovingOptions.top();
+			checkMovingOptions.pop();
+		}
+		// for (auto & move : movingOptions) {
+		// 	if (move->getResult() == WIN) {
+		// 		findedMove
+		// 	}
+		// }
+
+	}
+
+	// } else {
+	//
+	// }
+
+	while (!movingOptions.empty()) {
+		//printf(" heuristic of deletenig move is = %d\n\n\n\n", movingOptions.top()->getHeuristic());
+		delete movingOptions.top();
+		movingOptions.pop();
+	}
+	return findedMove;
+}
+
+
 // void 	Gomoku::emptyGameField(std::array<typeArr, N> & gamefield)
 // {
 // 	for (int i = 0; i < N; i++){
@@ -113,11 +163,52 @@ void 		Gomoku::AI_Move(Move* currentMove)
 
 	m_turnTime =  0.0;//timeFromLastTurn;
 	m_start = clock();
+	int depth = 0;
+	MovePtr bestMove = algorithmMiniMax(currentMove, depth, maximumDepth);
+	m_currentMove = *bestMove;
+	delete bestMove;
+
+	// int lextX = currentMove->getLeftTop().x;
+	// int topY = currentMove->getLeftTop().y;
+	// int rightX = currentMove->getRightBottom().x;
+	// int bottomY = currentMove->getRightBottom().y;
+	// movePriorityQueue movingOptions;
+	// std::array<typeArr, N> & gamefield = const_cast<std::array<typeArr, N> &>(currentMove->getGameField());
+	// for (int y =  topY; y <= bottomY; ++y) {
+	// 	for (int x = lextX; x <= rightX; ++x){
+	// 		printf("Checked x = %d; y = %d;\n\n", x, y);
+	// 		if (gamefield[y][x] != EMPTY)
+	// 			fillMoveOptions(currentMove, x, y, movingOptions);
+	// 	}
+	// }
+	// //printf(" heuristic of movingOptions.top() before processing is = %d\n", movingOptions.top()->getHeuristic());
+	// moveProcessing(movingOptions.top());
+	// //printf(" heuristic of movingOptions.top() after processing is = %d\n", movingOptions.top()->getHeuristic());
+	// m_currentMove = *movingOptions.top();
+	// //printf(" heuristic of chosen move is = %d\n\n\n\n", m_currentMove.getHeuristic());
+	// while (!movingOptions.empty()) {
+	// 	//printf(" heuristic of deletenig move is = %d\n\n\n\n", movingOptions.top()->getHeuristic());
+	// 	delete movingOptions.top();
+	// 	movingOptions.pop();
+	// }
+	// //movingOptions.clear();
+	// // for (int i = 0; i < 1000000; i++){
+	// // 	double x = pow(sqrt(0.56789) / sqrt(1.234), 2);
+	// // 	//printf("%f\n", x);
+	// // 	printf("Left top x = %d; y = %d; Right bottom x = %d; y = %d\n\n\n", currentMove->getLeftTop().x, currentMove->getLeftTop().y, currentMove->getRightBottom().x, currentMove->getRightBottom().y);
+	// // 	x = 0;
+	// // }
+	m_turnTime = static_cast<double>((clock() - m_start ))/ CLOCKS_PER_SEC;
+
+}
+
+void 		Gomoku::generateMoveOptions(MovePtr currentMove, movePriorityQueue & movingOptions)
+{
 	int lextX = currentMove->getLeftTop().x;
 	int topY = currentMove->getLeftTop().y;
 	int rightX = currentMove->getRightBottom().x;
 	int bottomY = currentMove->getRightBottom().y;
-	movePriorityQueue movingOptions;
+	//movePriorityQueue movingOptions;
 	std::array<typeArr, N> & gamefield = const_cast<std::array<typeArr, N> &>(currentMove->getGameField());
 	for (int y =  topY; y <= bottomY; ++y) {
 		for (int x = lextX; x <= rightX; ++x){
@@ -126,30 +217,6 @@ void 		Gomoku::AI_Move(Move* currentMove)
 				fillMoveOptions(currentMove, x, y, movingOptions);
 		}
 	}
-	printf(" heuristic of movingOptions.top() before processing is = %d\n", movingOptions.top()->getHeuristic());
-	moveProcessing(movingOptions.top());
-	printf(" heuristic of movingOptions.top() after processing is = %d\n", movingOptions.top()->getHeuristic());
-	m_currentMove = *movingOptions.top();
-	printf(" heuristic of chosen move is = %d\n\n\n\n", m_currentMove.getHeuristic());
-	while (!movingOptions.empty()) {
-		printf(" heuristic of deletenig move is = %d\n\n\n\n", movingOptions.top()->getHeuristic());
-		delete movingOptions.top();
-		movingOptions.pop();
-	}
-	//movingOptions.clear();
-	// for (int i = 0; i < 1000000; i++){
-	// 	double x = pow(sqrt(0.56789) / sqrt(1.234), 2);
-	// 	//printf("%f\n", x);
-	// 	printf("Left top x = %d; y = %d; Right bottom x = %d; y = %d\n\n\n", currentMove->getLeftTop().x, currentMove->getLeftTop().y, currentMove->getRightBottom().x, currentMove->getRightBottom().y);
-	// 	x = 0;
-	// }
-	m_turnTime = static_cast<double>((clock() - m_start ))/ CLOCKS_PER_SEC;
-
-	// if (currentMove->getCurrentType() == BLACK)
-	// 	currentMove->setCurrentType(WHITE);
-	// else
-	// 	currentMove->setCurrentType(BLACK);
-	// currentMove->setMove(0,0);
 }
 
 void 		Gomoku::fillMoveOptions(MovePtr currentMove, int x_center, int y_center, movePriorityQueue & movingOptions)
@@ -263,9 +330,10 @@ int 		Gomoku::defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eTyp
 													t_pos const & leftTop, t_pos const & rightBottom)
 {
 	int horizontalHeur = 0;
+	//return resolveHeuristicFromField(gamefield, currentTurn);
 	//FIND FOUR ALLIGNMENT
 	if ((horizontalHeur = defineTwoOpenHorizontalHeuristic(blackFourTwoOpen, whiteFourTwoOpen, gamefield, fourTwoOpenHeuristic, currentTurn, leftTop, rightBottom))){
-		printf("FourTwoOpen heuristic = %d\n\n\n\n", horizontalHeur);
+		//printf("FourTwoOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
 	if ((horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenLeft, whiteFourOneOpenLeft, gamefield, fourOneOpenHeuristic, currentTurn, leftTop, rightBottom))
@@ -273,13 +341,13 @@ int 		Gomoku::defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eTyp
 		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenCenter_1, whiteFourOneOpenCenter_1, gamefield, fourOneOpenHeuristic, currentTurn, leftTop, rightBottom))
 		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenCenter_2, whiteFourOneOpenCenter_2, gamefield, fourOneOpenHeuristic, currentTurn, leftTop, rightBottom))
 		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackFourOneOpenCenter_3, whiteFourOneOpenCenter_3, gamefield, fourOneOpenHeuristic, currentTurn, leftTop, rightBottom))) {
-		printf("FourOneOpen heuristic = %d\n\n\n\n", horizontalHeur);
+		//printf("FourOneOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
 	//FIND THREE ALLIGNMENT
 	if ((horizontalHeur = defineTwoOpenHorizontalHeuristic(blackThreeTwoOpen_1, whiteThreeTwoOpen_1, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
 		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackThreeTwoOpen_2, whiteThreeTwoOpen_2, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))){
-		printf("ThreeTwoOpen heuristic = %d\n\n\n\n", horizontalHeur);
+		//printf("ThreeTwoOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
 
@@ -290,7 +358,7 @@ int 		Gomoku::defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eTyp
 		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenCenter_2, whiteThreeOneOpenCenter_2, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
 		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenCenter_3, whiteThreeOneOpenCenter_3, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
 		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackThreeOneOpenCenter_4, whiteThreeOneOpenCenter_4, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))) {
-		printf("ThreeOneOpen heuristic = %d\n\n\n\n", horizontalHeur);
+		//printf("ThreeOneOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
 
@@ -298,7 +366,7 @@ int 		Gomoku::defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eTyp
 	if ((horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
 		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
 		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))){
-		printf("TwoTwoOpen heuristic = %d\n\n\n\n", horizontalHeur);
+		//printf("TwoTwoOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
 
@@ -306,7 +374,7 @@ int 		Gomoku::defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eTyp
 	if ((horizontalHeur = defineOneOpenHorizontalHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
 		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
 	) {
-		printf("TwoOneOpen heuristic = %d\n\n\n\n", horizontalHeur);
+	//	printf("TwoOneOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
 
@@ -317,7 +385,6 @@ int 		Gomoku::defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eTyp
 int 							Gomoku::defineVerticalHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
 																		t_pos const & leftTop, t_pos const & rightBottom)
 {
-	int verticalHeur = 0;
 	m_heuristicField.clear();
 	int start = leftTop.x > 0 ? leftTop.x - 1 : 0;
 	int end = rightBottom.x < 17 ? rightBottom.x + 1 : 17;
@@ -328,65 +395,16 @@ int 							Gomoku::defineVerticalHeuristic(std::array<typeArr, N> & gamefield, e
 		}
 		m_heuristicField.push_back(column);
 	}
-	//m_heuristicField
-	//FIND FOUR ALLIGNMENT
-	if ((verticalHeur = defineTwoOpenHeuristic(blackFourTwoOpen, whiteFourTwoOpen, m_heuristicField, fourTwoOpenHeuristic, currentTurn))){
-		printf("FourTwoOpen heuristic = %d\n\n\n\n", verticalHeur);
-		return verticalHeur;
-	}
-	if ((verticalHeur = defineOneOpenHeuristic(blackFourOneOpenLeft, whiteFourOneOpenLeft, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineOneOpenHeuristic(blackFourOneOpenRight, whiteFourOneOpenRight, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_1, whiteFourOneOpenCenter_1, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_2, whiteFourOneOpenCenter_2, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_3, whiteFourOneOpenCenter_3, m_heuristicField, fourOneOpenHeuristic, currentTurn))) {
-		printf("FourOneOpen heuristic = %d\n\n\n\n", verticalHeur);
-		return verticalHeur;
-	}
-	//FIND THREE ALLIGNMENT
-	if ((verticalHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_1, whiteThreeTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_2, whiteThreeTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
-		printf("ThreeTwoOpen heuristic = %d\n\n\n\n", verticalHeur);
-		return verticalHeur;
-	}
-
-
-	if ((verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenRight, whiteThreeOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenLeft, whiteThreeOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_1, whiteThreeOneOpenCenter_1, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_2, whiteThreeOneOpenCenter_2, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_3, whiteThreeOneOpenCenter_3, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_4, whiteThreeOneOpenCenter_4, m_heuristicField, threeOneOpenHeuristic, currentTurn))) {
-		printf("ThreeOneOpen heuristic = %d\n\n\n\n", verticalHeur);
-		return verticalHeur;
-	}
-
-	//FIND TWO ALLIGNMENT
-	if ((verticalHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
-		printf("TwoTwoOpen heuristic = %d\n\n\n\n", verticalHeur);
-		return verticalHeur;
-	}
-
-
-	if ((verticalHeur = defineOneOpenHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (verticalHeur = defineOneOpenHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-	) {
-		printf("TwoOneOpen heuristic = %d\n\n\n\n", verticalHeur);
-		return verticalHeur;
-	}
-
-	return 0;
+	return resolveHeuristicFromField(m_heuristicField, currentTurn);
 }
 
 int 							Gomoku::defineDiagonalLeftHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
 																		t_pos const & leftTop, t_pos const & rightBottom)
 {
-	int diagonalLeftHeur = 0;
 	m_heuristicField.clear();
 	int diagonalX;
 	int diagonalY;
-	printf("defineDiagonalLeftHeuristic left top x = %d y = %d rightBottom x = %d y = %d:\n", leftTop.x, leftTop.y, rightBottom.x, rightBottom.y);
+	//printf("defineDiagonalLeftHeuristic left top x = %d y = %d rightBottom x = %d y = %d:\n", leftTop.x, leftTop.y, rightBottom.x, rightBottom.y);
 	for (int i = leftTop.x; i <= rightBottom.x; ++i) {
 		if (i < leftTop.y) {
 			diagonalX = 0;
@@ -395,10 +413,10 @@ int 							Gomoku::defineDiagonalLeftHeuristic(std::array<typeArr, N> & gamefiel
 			diagonalX = i - leftTop.y;
 			diagonalY = 0;
 		}
-		printf("i = %d top diagonalX = %d diagonalY = %d :\n", i,diagonalX, diagonalY);
+		//printf("i = %d top diagonalX = %d diagonalY = %d :\n", i,diagonalX, diagonalY);
 		std::vector<eType> diagonal;
 		while (diagonalX < 18 && diagonalY < 18) {
-			printf("top diagonalX = %d diagonalY = %d elem = %d:\n", diagonalX, diagonalY, gamefield[diagonalY][diagonalX]);
+		//	printf("top diagonalX = %d diagonalY = %d elem = %d:\n", diagonalX, diagonalY, gamefield[diagonalY][diagonalX]);
 			diagonal.push_back(gamefield[diagonalY][diagonalX]);
 			diagonalX++;
 			diagonalY++;
@@ -422,160 +440,119 @@ int 							Gomoku::defineDiagonalLeftHeuristic(std::array<typeArr, N> & gamefiel
 		}
 		m_heuristicField.push_back(diagonal);
 	}
-	printf("m_heuristicField:\n");
-	for (auto && row : m_heuristicField) {
-		for (auto && element : row) {
-			printf("%d ",  element);
-		}
-		printf(";\n ");
-	}
-
-	//FIND FOUR ALLIGNMENT
-	if ((diagonalLeftHeur = defineTwoOpenHeuristic(blackFourTwoOpen, whiteFourTwoOpen, m_heuristicField, fourTwoOpenHeuristic, currentTurn))){
-		printf("FourTwoOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
-		return diagonalLeftHeur;
-	}
-	if ((diagonalLeftHeur = defineOneOpenHeuristic(blackFourOneOpenLeft, whiteFourOneOpenLeft, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackFourOneOpenRight, whiteFourOneOpenRight, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_1, whiteFourOneOpenCenter_1, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_2, whiteFourOneOpenCenter_2, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_3, whiteFourOneOpenCenter_3, m_heuristicField, fourOneOpenHeuristic, currentTurn))) {
-		printf("FourOneOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
-		return diagonalLeftHeur;
-	}
-	//FIND THREE ALLIGNMENT
-	if ((diagonalLeftHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_1, whiteThreeTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_2, whiteThreeTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
-		printf("ThreeTwoOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
-		return diagonalLeftHeur;
-	}
-
-
-	if ((diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenRight, whiteThreeOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenLeft, whiteThreeOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_1, whiteThreeOneOpenCenter_1, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_2, whiteThreeOneOpenCenter_2, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_3, whiteThreeOneOpenCenter_3, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_4, whiteThreeOneOpenCenter_4, m_heuristicField, threeOneOpenHeuristic, currentTurn))) {
-		printf("ThreeOneOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
-		return diagonalLeftHeur;
-	}
-
-	//FIND TWO ALLIGNMENT
-	if ((diagonalLeftHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
-		printf("TwoTwoOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
-		return diagonalLeftHeur;
-	}
-
-
-	if ((diagonalLeftHeur = defineOneOpenHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalLeftHeur = defineOneOpenHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-	) {
-		printf("TwoOneOpen heuristic = %d\n\n\n\n", diagonalLeftHeur);
-		return diagonalLeftHeur;
-	}
-
-	return 0;
+	//printf("m_heuristicField:\n");
+	// for (auto && row : m_heuristicField) {
+	// 	for (auto && element : row) {
+	// 		printf("%d ",  element);
+	// 	}
+	// 	printf(";\n ");
+	// }
+	return resolveHeuristicFromField(m_heuristicField, currentTurn);
 }
 
 int 							Gomoku::defineDiagonalRightHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
 																		t_pos const & leftTop, t_pos const & rightBottom)
 {
-	int diagonalRightHeur = 0;
 	m_heuristicField.clear();
 	int diagonalX;
 	int diagonalY;
-	printf("definediagonalRightHeuristic left top x = %d y = %d rightBottom x = %d y = %d:\n", leftTop.x, leftTop.y, rightBottom.x, rightBottom.y);
+	int rightX = 17 - leftTop.y;
+	//printf("definediagonalRightHeuristic left top x = %d y = %d rightBottom x = %d y = %d:\n", leftTop.x, leftTop.y, rightBottom.x, rightBottom.y);
 	for (int i = leftTop.x; i <= rightBottom.x; ++i) {
-		if (i < leftTop.y) {
-			diagonalX = 17;
-			diagonalY = 0; //leftTop.y - i;
-		} else {
+		if (i < rightX) {
 			diagonalX = leftTop.y + i < 18 ? leftTop.y + i : 17;
 			diagonalY = 0; //leftTop.y - i;
+		} else {
+			diagonalX = 17;
+			diagonalY = leftTop.y - (17 - i);//leftTop.y - i > 0 ? leftTop.y - i : 0; //leftTop.y - i;
 		}
-		printf("i = %d top diagonalX = %d diagonalY = %d :\n", i,diagonalX, diagonalY);
+	//	printf("i = %d top diagonalX = %d diagonalY = %d :\n", i,diagonalX, diagonalY);
 		std::vector<eType> diagonal;
-		while (diagonalX < 18 && diagonalY < 18) {
-			printf("top diagonalX = %d diagonalY = %d elem = %d:\n", diagonalX, diagonalY, gamefield[diagonalY][diagonalX]);
+		while (diagonalX >= 0 && diagonalY < 18) {
+		//	printf("top diagonalX = %d diagonalY = %d elem = %d:\n", diagonalX, diagonalY, gamefield[diagonalY][diagonalX]);
 			diagonal.push_back(gamefield[diagonalY][diagonalX]);
-			diagonalX++;
+			diagonalX--;
 			diagonalY++;
 		}
 		m_heuristicField.push_back(diagonal);
 	}
 
 	for (int i = leftTop.y + 1; i <= rightBottom.y; ++i) {
-		if (i < leftTop.x) {
-			diagonalX = leftTop.x - i;
+		rightX = 17 - i;
+		if (rightBottom.x < rightX) {
+			diagonalX = rightBottom.x + i;
 			diagonalY = 0;
 		} else {
-			diagonalX = 0;
-			diagonalY = i - leftTop.x;
+			diagonalX = 17;
+			diagonalY = i - (17 - rightBottom.x);//i - leftTop.x;
 		}
+		//printf("i = %d top diagonalX = %d diagonalY = %d :\n", i,diagonalX, diagonalY);
 		std::vector<eType> diagonal;
-		while (diagonalX < 18 && diagonalY < 18) {
+		while (diagonalX >= 0 && diagonalY < 18) {
+			//printf("top diagonalX = %d diagonalY = %d elem = %d:\n", diagonalX, diagonalY, gamefield[diagonalY][diagonalX]);
 			diagonal.push_back(gamefield[diagonalY][diagonalX]);
-			diagonalX++;
+			diagonalX--;
 			diagonalY++;
 		}
 		m_heuristicField.push_back(diagonal);
 	}
-	printf("m_heuristicField:\n");
-	for (auto && row : m_heuristicField) {
-		for (auto && element : row) {
-			printf("%d ",  element);
-		}
-		printf(";\n ");
+	//printf("m_heuristicField:\n");
+	// for (auto && row : m_heuristicField) {
+	// 	for (auto && element : row) {
+	// 		printf("%d ",  element);
+	// 	}
+	// 	printf(";\n ");
+	// }
+	return resolveHeuristicFromField(m_heuristicField, currentTurn);
+}
+
+int						Gomoku::resolveHeuristicFromField(std::vector<std::vector<eType>> const & heuristicField, eType currentTurn)
+{
+	int heuristic = 0;
+
+	if ((heuristic = defineTwoOpenHeuristic(blackFourTwoOpen, whiteFourTwoOpen, heuristicField, fourTwoOpenHeuristic, currentTurn))){
+		//printf("FourTwoOpen heuristic = %d\n\n\n\n", heuristic);
+		return heuristic;
 	}
 
-	//FIND FOUR ALLIGNMENT
-	if ((diagonalRightHeur = defineTwoOpenHeuristic(blackFourTwoOpen, whiteFourTwoOpen, m_heuristicField, fourTwoOpenHeuristic, currentTurn))){
-		printf("FourTwoOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
-		return diagonalRightHeur;
-	}
-	if ((diagonalRightHeur = defineOneOpenHeuristic(blackFourOneOpenLeft, whiteFourOneOpenLeft, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineOneOpenHeuristic(blackFourOneOpenRight, whiteFourOneOpenRight, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_1, whiteFourOneOpenCenter_1, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_2, whiteFourOneOpenCenter_2, m_heuristicField, fourOneOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineOneOpenHeuristic(blackFourOneOpenCenter_3, whiteFourOneOpenCenter_3, m_heuristicField, fourOneOpenHeuristic, currentTurn))) {
-		printf("FourOneOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
-		return diagonalRightHeur;
+	if ((heuristic = defineOneOpenHeuristic(blackFourOneOpenLeft, whiteFourOneOpenLeft, heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (heuristic = defineOneOpenHeuristic(blackFourOneOpenRight, whiteFourOneOpenRight, heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (heuristic = defineOneOpenHeuristic(blackFourOneOpenCenter_1, whiteFourOneOpenCenter_1, heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (heuristic = defineOneOpenHeuristic(blackFourOneOpenCenter_2, whiteFourOneOpenCenter_2, heuristicField, fourOneOpenHeuristic, currentTurn))
+		|| (heuristic = defineOneOpenHeuristic(blackFourOneOpenCenter_3, whiteFourOneOpenCenter_3, heuristicField, fourOneOpenHeuristic, currentTurn))) {
+		//printf("FourOneOpen heuristic = %d\n\n\n\n", heuristic);
+		return heuristic;
 	}
 	//FIND THREE ALLIGNMENT
-	if ((diagonalRightHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_1, whiteThreeTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineTwoOpenHeuristic(blackThreeTwoOpen_2, whiteThreeTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
-		printf("ThreeTwoOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
-		return diagonalRightHeur;
+	if ((heuristic = defineTwoOpenHeuristic(blackThreeTwoOpen_1, whiteThreeTwoOpen_1, heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (heuristic = defineTwoOpenHeuristic(blackThreeTwoOpen_2, whiteThreeTwoOpen_2, heuristicField, threeTwoOpenHeuristic, currentTurn))){
+		//printf("ThreeTwoOpen heuristic = %d\n\n\n\n", heuristic);
+		return heuristic;
 	}
 
-
-	if ((diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenRight, whiteThreeOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenLeft, whiteThreeOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_1, whiteThreeOneOpenCenter_1, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_2, whiteThreeOneOpenCenter_2, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_3, whiteThreeOneOpenCenter_3, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineOneOpenHeuristic(blackThreeOneOpenCenter_4, whiteThreeOneOpenCenter_4, m_heuristicField, threeOneOpenHeuristic, currentTurn))) {
-		printf("ThreeOneOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
-		return diagonalRightHeur;
+	if ((heuristic = defineOneOpenHeuristic(blackThreeOneOpenRight, whiteThreeOneOpenRight, heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (heuristic = defineOneOpenHeuristic(blackThreeOneOpenLeft, whiteThreeOneOpenLeft, heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (heuristic = defineOneOpenHeuristic(blackThreeOneOpenCenter_1, whiteThreeOneOpenCenter_1, heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (heuristic = defineOneOpenHeuristic(blackThreeOneOpenCenter_2, whiteThreeOneOpenCenter_2, heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (heuristic = defineOneOpenHeuristic(blackThreeOneOpenCenter_3, whiteThreeOneOpenCenter_3, heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (heuristic = defineOneOpenHeuristic(blackThreeOneOpenCenter_4, whiteThreeOneOpenCenter_4, heuristicField, threeOneOpenHeuristic, currentTurn))) {
+		//printf("ThreeOneOpen heuristic = %d\n\n\n\n", heuristic);
+		return heuristic;
 	}
 
 	//FIND TWO ALLIGNMENT
-	if ((diagonalRightHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, m_heuristicField, threeTwoOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineTwoOpenHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, m_heuristicField, threeTwoOpenHeuristic, currentTurn))){
-		printf("TwoTwoOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
-		return diagonalRightHeur;
+	if ((heuristic = defineTwoOpenHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (heuristic = defineTwoOpenHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, heuristicField, threeTwoOpenHeuristic, currentTurn))
+		|| (heuristic = defineTwoOpenHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, heuristicField, threeTwoOpenHeuristic, currentTurn))){
+		//printf("TwoTwoOpen heuristic = %d\n\n\n\n", heuristic);
+		return heuristic;
 	}
 
-
-	if ((diagonalRightHeur = defineOneOpenHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, m_heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (diagonalRightHeur = defineOneOpenHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, m_heuristicField, threeOneOpenHeuristic, currentTurn))
+	if ((heuristic = defineOneOpenHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, heuristicField, threeOneOpenHeuristic, currentTurn))
+		|| (heuristic = defineOneOpenHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, heuristicField, threeOneOpenHeuristic, currentTurn))
 	) {
-		printf("TwoOneOpen heuristic = %d\n\n\n\n", diagonalRightHeur);
-		return diagonalRightHeur;
+		//printf("TwoOneOpen heuristic = %d\n\n\n\n", heuristic);
+		return heuristic;
 	}
 
 	return 0;
@@ -697,15 +674,16 @@ void 		Gomoku::defineHeuristic(MovePtr optionMove, eMoveResult result)
 	heur +=	defineHorizontalHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
 	heur +=	defineVerticalHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
 	heur +=	defineDiagonalLeftHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
-	heur +=	defineDigonalRightHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
+	heur +=	defineDiagonalRightHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
 	if (heur)
 		printf("defineHorizontalHeuristic = %d\n\n\n\n", heur);
 	// int heur +=	defineVerticalHeuristic(gamefield, optionMove->getCurrentType());
 
 	//int heur +=	defineDigonalRightHeuristic(gamefield, optionMove->getCurrentType());
-	if (result == CAPTURE) {
-		heur += BLACK ? -10000 : 10000;
-	}
+	// if (result == CAPTURE) {
+	// 	heur += BLACK ? -10000 : 10000;
+	// }
+	heur += optionMove->getWhiteCapture() * (-10000) + optionMove->getBlackCapture() * 10000;
 	optionMove->setHeuristic(heur);
 }
 
