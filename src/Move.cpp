@@ -30,7 +30,7 @@ Move::Move(Move const & rhs) : m_currentTurn(rhs.getCurrentType()),
 								m_blackCaptures(rhs.getBlackCapture()),
 								m_leftTop(rhs.getLeftTop()),
 								m_rightBottom(rhs.getRightBottom()),
-								m_heuristic(rhs.getHeuristic()) { printf("Copy!!\n\n\n");}
+								m_heuristic(rhs.getHeuristic()) { ;}
 
 Move & Move::operator = (Move const & rhs)
 {
@@ -44,7 +44,7 @@ Move & Move::operator = (Move const & rhs)
 	m_leftTop = rhs.getLeftTop();
 	m_rightBottom = rhs.getRightBottom();
 	m_heuristic = rhs.getHeuristic();
-	printf("Assignment!!\n\n\n");
+	//printf("Assignment!!\n\n\n");
 	return *this;
 }
 //Move::~Move() {}

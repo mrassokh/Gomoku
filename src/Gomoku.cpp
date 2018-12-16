@@ -12,6 +12,17 @@
 
 #include "Gomoku.hpp"
 
+// static void printMove(MovePtr currentMove) {
+// 	std::array<typeArr, N>const & gamefield = currentMove->getGameField();
+// 	for (auto const & row : gamefield) {
+// 		for (auto const &cell : row) {
+// 			std::cout << cell << " ";
+// 		}
+// 		std::cout << "\n";
+// 	}
+// 	std::cout << "Move heuristic = " << currentMove->getHeuristic() << std::endl;
+// }
+
 Gomoku::Gomoku(std::string input):m_N(18), m_exit(0)
 {
 	m_render = &Render::Instance();
@@ -97,30 +108,64 @@ void 	Gomoku::render()
 
 
 
-MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int & depth, int maxDepth)
+MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth)
 {
 	movePriorityQueue movingOptions;
 
 	MovePtr findedMove;
 	generateMoveOptions(currentMove,movingOptions);
+	int counter = 0;
 	if (depth == maxDepth) {
+		//printf("depth = %d; maxDepth = %d\n", depth, maxDepth);
 		moveProcessing(movingOptions.top());
 		findedMove = new Move(*movingOptions.top());
+		//printMove(findedMove);
+		counter++;
 	} else {
 		int moveCounter = 0;
+		//int currentDepth = ++depth;
+		++depth;
 		MovePtr checkingMove;
+		MovePtr furtherMove;
+		MovePtr returnedMove;
 		movePriorityQueue checkMovingOptions;
-		depth++;
+		//printf("depth = %d; maxDepth = %d\n", depth, maxDepth);
+		//depth++;
 		while (moveCounter < moveChoseCount && !movingOptions.empty()) {
-			checkingMove = movingOptions.top();
-			moveProcessing(checkingMove);
-			delete movingOptions.top();
-			movingOptions.pop();
-			checkMovingOptions.push(algorithmMiniMax(checkingMove,depth,maximumDepth));
 
+			checkingMove = movingOptions.top();
+			counter++;
+			if (checkingMove->getResult() == WIN) {
+				checkMovingOptions.push(checkingMove);
+				movingOptions.pop();
+				break;
+			}
+			furtherMove = new Move(*checkingMove);
+			moveProcessing(furtherMove);
+			//printf("moveCounter = %d; print processed furtherMove \n", moveCounter);
+			//printMove(furtherMove);
+			//printf("print returnedMove \n");
+			returnedMove = algorithmMiniMax(furtherMove, depth, maxDepth);
+			//printMove(returnedMove);
+			//furtherMove->setHeuristic(returnedMove->getHeuristic());
+			checkingMove->setHeuristic(returnedMove->getHeuristic());
+			//checkMovingOptions.push(furtherMove);
+			checkMovingOptions.push(checkingMove);
+			movingOptions.pop();
+		//	printf("delete returnedMove");
+			delete returnedMove;
+			delete furtherMove;
+			//printf("movingOptions.top()");
+			//delete movingOptions.top();
+			//movingOptions.pop();
+			moveCounter++;
 		}
 		findedMove = new Move(*checkMovingOptions.top());
+		moveProcessing(findedMove);
+		//printf("print findedMove in depth =  %d counter = %d\n", depth - 1, counter);
+		//printMove(findedMove);
 		while (!checkMovingOptions.empty()) {
+			//printf("delete checkMovingOptions.top()");
 			delete checkMovingOptions.top();
 			checkMovingOptions.pop();
 		}
@@ -131,12 +176,14 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int & depth, int maxDep
 		// }
 
 	}
+	//printf("counter = %d\n\n\n", counter);
 
 	// } else {
 	//
 	// }
 
 	while (!movingOptions.empty()) {
+			//printf("delete movingOptions.empty()");
 		//printf(" heuristic of deletenig move is = %d\n\n\n\n", movingOptions.top()->getHeuristic());
 		delete movingOptions.top();
 		movingOptions.pop();
@@ -156,6 +203,23 @@ void 		Gomoku::moving(Move *currentMove)
 {
 	moveChecking(currentMove, m_event.x, m_event.y);
 	moveProcessing(currentMove);
+	if (currentMove->getResult() == WIN) {
+		std::string result_str =  currentMove->getCurrentType() == BLACK ? "BLACK WIN!!!" : "WHITE WIN!!!";
+		currentMove->emptyGameField();
+		std::cout << result_str << std::endl;
+		//printf()
+		//emptyGameField(m_currentMove.gameField);
+		currentMove->setCurrentType(BLACK);
+		t_pos & leftTop = const_cast<t_pos &>(currentMove->getLeftTop());
+		t_pos & rightBottom = const_cast<t_pos &>(currentMove->getRightBottom());
+		leftTop.x = -1;
+		leftTop.y = -1;
+		rightBottom.x = -1;
+		rightBottom.y = -1;
+		currentMove->setWhiteCapture(0);
+		currentMove->setBlackCapture(0);
+		m_render->GameOver(result_str);
+	}
 }
 
 void 		Gomoku::AI_Move(Move* currentMove)
@@ -164,7 +228,24 @@ void 		Gomoku::AI_Move(Move* currentMove)
 	m_turnTime =  0.0;//timeFromLastTurn;
 	m_start = clock();
 	int depth = 0;
-	MovePtr bestMove = algorithmMiniMax(currentMove, depth, maximumDepth);
+	MovePtr bestMove = algorithmMiniMax(currentMove, depth, 5);
+	if (bestMove->getResult() == WIN) {
+		std::string result_str =  bestMove->getCurrentType() == BLACK ? "BLACK WIN!!!" : "WHITE WIN!!!";
+		bestMove->emptyGameField();
+		std::cout << result_str << std::endl;
+		//printf()
+		//emptyGameField(m_currentMove.gameField);
+		bestMove->setCurrentType(BLACK);
+		t_pos & leftTop = const_cast<t_pos &>(bestMove->getLeftTop());
+		t_pos & rightBottom = const_cast<t_pos &>(bestMove->getRightBottom());
+		leftTop.x = -1;
+		leftTop.y = -1;
+		rightBottom.x = -1;
+		rightBottom.y = -1;
+		bestMove->setWhiteCapture(0);
+		bestMove->setBlackCapture(0);
+		m_render->GameOver(result_str);
+	}
 	m_currentMove = *bestMove;
 	delete bestMove;
 
@@ -212,7 +293,7 @@ void 		Gomoku::generateMoveOptions(MovePtr currentMove, movePriorityQueue & movi
 	std::array<typeArr, N> & gamefield = const_cast<std::array<typeArr, N> &>(currentMove->getGameField());
 	for (int y =  topY; y <= bottomY; ++y) {
 		for (int x = lextX; x <= rightX; ++x){
-			printf("Checked x = %d; y = %d;\n\n", x, y);
+		//	printf("Checked x = %d; y = %d;\n\n", x, y);
 			if (gamefield[y][x] != EMPTY)
 				fillMoveOptions(currentMove, x, y, movingOptions);
 		}
@@ -241,9 +322,9 @@ void 		Gomoku::moveChecking(Move* currentMove, int x, int y)
 	// t_pos & rightBottom = const_cast<t_pos &>(currentMove->getRightBottom());
 	if (gamefield[y][x] != EMPTY){
 		currentMove->setResult(NON_EMPTY);
-		printf("Push point with x =%d and y =%d denied - qquare is not empty\n", x, y);
+		//printf("Push point with x =%d and y =%d denied - qquare is not empty\n", x, y);
 	} else if (checkWin(currentMove, x, y)){
-		printf("Push point with x =%d and y =%d and win!\n", x, y);
+		//printf("Push point with x =%d and y =%d and win!\n", x, y);
 		//gamefield[y][x] = m_currentMove.getCurrentType();
 		redefineGameArea(currentMove, gamefield, x ,y);
 		//redefineGameArea(x,y,gamefield,leftTop,rightBottom);
@@ -283,7 +364,7 @@ void 					Gomoku::redefineGameArea(Move* currentMove, std::array<typeArr, N> & g
 		if (y > rightBottom.y)
 			rightBottom.y = y;
 	}
-	printf("Left top x = %d; y = %d; Right bottom x = %d; y = %d\n\n\n", currentMove->getLeftTop().x, currentMove->getLeftTop().y, currentMove->getRightBottom().x, currentMove->getRightBottom().y);
+	//printf("Left top x = %d; y = %d; Right bottom x = %d; y = %d\n\n\n", currentMove->getLeftTop().x, currentMove->getLeftTop().y, currentMove->getRightBottom().x, currentMove->getRightBottom().y);
 	gamefield[y][x] = currentMove->getCurrentType();
 }
 
@@ -298,21 +379,23 @@ void 		Gomoku::moveProcessing(Move* currentMove)
 	} else if (result == DOUBLE_FREE_TREE){
 		currentMove->clearFreeThree();
 	}
-	else if (result == WIN) {
-		std::string result_str =  currentMove->getCurrentType() == BLACK ? "BLACK WIN!!!" : "WHITE WIN!!!";
-		currentMove->emptyGameField();
-		//emptyGameField(m_currentMove.gameField);
-		currentMove->setCurrentType(BLACK);
-		t_pos & leftTop = const_cast<t_pos &>(currentMove->getLeftTop());
-		t_pos & rightBottom = const_cast<t_pos &>(currentMove->getRightBottom());
-		leftTop.x = -1;
-		leftTop.y = -1;
-		rightBottom.x = -1;
-		rightBottom.y = -1;
-		currentMove->setWhiteCapture(0);
-		currentMove->setBlackCapture(0);
-		m_render->GameOver(result_str);
-	}
+	// else if (result == WIN && !forAI) {
+	// 	std::string result_str =  currentMove->getCurrentType() == BLACK ? "BLACK WIN!!!" : "WHITE WIN!!!";
+	// 	currentMove->emptyGameField();
+	// 	std::cout << result_str << std::endl;
+	// 	//printf()
+	// 	//emptyGameField(m_currentMove.gameField);
+	// 	currentMove->setCurrentType(BLACK);
+	// 	t_pos & leftTop = const_cast<t_pos &>(currentMove->getLeftTop());
+	// 	t_pos & rightBottom = const_cast<t_pos &>(currentMove->getRightBottom());
+	// 	leftTop.x = -1;
+	// 	leftTop.y = -1;
+	// 	rightBottom.x = -1;
+	// 	rightBottom.y = -1;
+	// 	currentMove->setWhiteCapture(0);
+	// 	currentMove->setBlackCapture(0);
+	// 	m_render->GameOver(result_str);
+	// }
 }
 
 void 		Gomoku::moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingOptions)
@@ -323,6 +406,8 @@ void 		Gomoku::moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingO
 		return ;
 	}
 	defineHeuristic(optionMove, result);
+	// printf("push move option \n");
+	// printMove(optionMove);
 	movingOptions.push(optionMove);
 }
 
@@ -612,7 +697,7 @@ int 		Gomoku::findTwoOpen(twoOpenSample const & sampleTwoOpen, std::vector<std::
 		auto it = std::search(column.begin(), column.end(), sampleTwoOpen.begin(), sampleTwoOpen.end());
 		if (it != column.end())
 		{
-			printf("TwoOpen find in  and y = %ld\n\n\n\n", it - column.begin());
+			//printf("TwoOpen find in  and y = %ld\n\n\n\n", it - column.begin());
 			return 1;
 		}
 	}
@@ -626,7 +711,7 @@ int 		Gomoku::findOneOpen(oneOpenSample const & sampleOneOpen, std::vector<std::
 		auto it = std::search(column.begin(), column.end(), sampleOneOpen.begin(), sampleOneOpen.end());
 		if (it != column.end())
 		{
-			printf("OneOpen find in  and y = %ld\n\n\n\n", it - column.begin());
+			//printf("OneOpen find in  and y = %ld\n\n\n\n", it - column.begin());
 			return 1;
 		}
 	}
@@ -641,7 +726,7 @@ int 		Gomoku::findTwoOpenHorizontal(std::array<eType, 6> const & sampleFourTwoOp
 	for (int i = start; i < end; ++i) {
 		it = std::search(gamefield[i].begin(),gamefield[i].end(), sampleFourTwoOpen.begin(), sampleFourTwoOpen.end());
 		if (it != gamefield[i].end()){
-			printf("blackTwoOpen find in x = %ld and y = %d\n\n\n\n", it - gamefield[i].begin(), i);
+			//printf("blackTwoOpen find in x = %ld and y = %d\n\n\n\n", it - gamefield[i].begin(), i);
 			return 1;
 		}
 	}
@@ -656,7 +741,7 @@ int 		Gomoku::findOneOpenHorizontal(std::array<eType, 5> const & sampleFourTwoOp
 	for (int i = start; i < end; ++i) {
 		it = std::search(gamefield[i].begin(),gamefield[i].end(), sampleFourTwoOpen.begin(), sampleFourTwoOpen.end());
 		if (it != gamefield[i].end()){
-			printf("blackOneOpen find in x = %ld and y = %d\n\n\n\n", it - gamefield[i].begin(), i);
+			//printf("blackOneOpen find in x = %ld and y = %d\n\n\n\n", it - gamefield[i].begin(), i);
 			return 1;
 		}
 	}
@@ -675,15 +760,15 @@ void 		Gomoku::defineHeuristic(MovePtr optionMove, eMoveResult result)
 	heur +=	defineVerticalHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
 	heur +=	defineDiagonalLeftHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
 	heur +=	defineDiagonalRightHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
-	if (heur)
-		printf("defineHorizontalHeuristic = %d\n\n\n\n", heur);
+	// if (heur)
+	// 	printf("defineHorizontalHeuristic = %d\n\n\n\n", heur);
 	// int heur +=	defineVerticalHeuristic(gamefield, optionMove->getCurrentType());
 
 	//int heur +=	defineDigonalRightHeuristic(gamefield, optionMove->getCurrentType());
 	// if (result == CAPTURE) {
 	// 	heur += BLACK ? -10000 : 10000;
 	// }
-	heur += optionMove->getWhiteCapture() * (-10000) + optionMove->getBlackCapture() * 10000;
+	heur += optionMove->getWhiteCapture() * (-15000) + optionMove->getBlackCapture() * 15000;
 	optionMove->setHeuristic(heur);
 }
 
@@ -721,7 +806,7 @@ void 		Gomoku::defineHeuristic(MovePtr optionMove, eMoveResult result)
 
 int 			Gomoku::checkWin(Move* currentMove, int x, int y)
 {
-	printf("Chek x =%d and y =%d to win\n", m_event.x, m_event.y );
+	//printf("Chek x =%d and y =%d to win\n", m_event.x, m_event.y );
 
 	if (checkWinHorizontal(currentMove, x, y))
 		return 1;
@@ -731,7 +816,7 @@ int 			Gomoku::checkWin(Move* currentMove, int x, int y)
 		return 1;
 	else if (checkWinDiagonalRight(currentMove, x, y))
 		return 1;
-	printf("Chek x =%d and y =%d to win return 0\n", m_event.x, m_event.y );
+	//printf("Chek x =%d and y =%d to win return 0\n", m_event.x, m_event.y );
 	return 0;
 }
 
@@ -746,14 +831,14 @@ inline int 			Gomoku::checkPossibleCaptureHorizontalWin(Move* currentMove, int s
 			&& (currentMove->getGameField()[y - 1])[i] == findOppositeType(currType)
 			&& (currentMove->getGameField()[y + 1])[i] == currType
 			&& (currentMove->getGameField()[y + 2])[i] == EMPTY){
-			printf("checkPossibleCaptureHorizontalWin for x =%d and y =%d \n", i, y);
+			//printf("checkPossibleCaptureHorizontalWin for x =%d and y =%d \n", i, y);
 			return 0;
 		}
 		if (y - 2 >= 0
 			&& (currentMove->getGameField()[y + 1])[i] == findOppositeType(currType)
 			&& (currentMove->getGameField()[y - 1])[i] == currType
 			&& (currentMove->getGameField()[y - 2])[i] == EMPTY){
-				printf("checkPossibleCaptureHorizontalWin for x =%d and y =%d \n", i, y);
+				//printf("checkPossibleCaptureHorizontalWin for x =%d and y =%d \n", i, y);
 				return 0;
 		}
 	}
@@ -770,14 +855,14 @@ inline int 			Gomoku::checkPossibleCaptureVerticalWin(Move* currentMove, int sta
 			&& (currentMove->getGameField()[i])[x - 1] == findOppositeType(currentMove->getCurrentType())
 			&& (currentMove->getGameField()[i])[x + 1] == currentMove->getCurrentType()
 			&& (currentMove->getGameField()[i])[x + 2] == EMPTY){
-			printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
+			//printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
 			return 0;
 		}
 		if (x - 2 >= 0
 			&& (currentMove->getGameField()[i])[x + 1] == findOppositeType(currentMove->getCurrentType())
 			&& (currentMove->getGameField()[i])[x - 1] == currentMove->getCurrentType()
 			&& (currentMove->getGameField()[i])[x - 2] == EMPTY){
-				printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
+				//printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
 				return 0;
 		}
 	}
@@ -794,7 +879,7 @@ inline int 		Gomoku::checkPossibleCaptureDiagonalLeftWin(Move* currentMove, t_po
 			&& (currentMove->getGameField()[posY + 1])[posX - 1] == findOppositeType(currentMove->getCurrentType())
 			&& (currentMove->getGameField()[posY - 1])[posX + 1] == currentMove->getCurrentType()
 			&& (currentMove->getGameField()[posY - 2])[posX + 2] == EMPTY) {
-			printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
 			return 0;
 		}
 
@@ -802,7 +887,7 @@ inline int 		Gomoku::checkPossibleCaptureDiagonalLeftWin(Move* currentMove, t_po
 			&& (currentMove->getGameField()[posY - 1])[posX + 1] == findOppositeType(currentMove->getCurrentType())
 			&& (currentMove->getGameField()[posY + 1])[posX - 1] == currentMove->getCurrentType()
 			&& (currentMove->getGameField()[posY + 2])[posX - 2] == EMPTY) {
-			printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
 			return 0;
 		}
 		posX++;
@@ -821,14 +906,14 @@ inline int 		Gomoku::checkPossibleCaptureDiagonalRightWin(Move* currentMove, t_p
 			&& (currentMove->getGameField()[posY - 1])[posX - 1] == findOppositeType(currentMove->getCurrentType())
 			&& (currentMove->getGameField()[posY + 1])[posX + 1] == currentMove->getCurrentType()
 			&& (currentMove->getGameField()[posY + 2])[posX + 2] == EMPTY) {
-			printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
 			return 0;
 		}
 		if (posX + 1 <= 17 && posY + 1 <= 17 && posX - 2 >=0 && posY - 2 >= 0
 			&& (currentMove->getGameField()[posY + 1])[posX + 1] == findOppositeType(currentMove->getCurrentType())
 			&& (currentMove->getGameField()[posY - 1])[posX - 1] == currentMove->getCurrentType()
 			&& (currentMove->getGameField()[posY - 2])[posX - 2] == EMPTY) {
-			printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
 			return 0;
 		}
 		posX--;
@@ -840,7 +925,7 @@ inline int 		Gomoku::checkPossibleCaptureDiagonalRightWin(Move* currentMove, t_p
 
 int 			Gomoku::checkWinHorizontal(Move* currentMove, int x, int y)
 {
-		printf("checkWinHorizontalx =%d and y =%d to win\n", x, y );
+		//printf("checkWinHorizontalx =%d and y =%d to win\n", x, y );
 	int match = 1;
 	int startX = x;
 	int endX = x;
@@ -850,10 +935,10 @@ int 			Gomoku::checkWinHorizontal(Move* currentMove, int x, int y)
 			break;
 		else if(++match == 5){
 			endX = posX;
-			printf("match for x =%d and y =%d is %d\n", x, y, match );
+			//printf("match for x =%d and y =%d is %d\n", x, y, match );
 			return checkPossibleCaptureHorizontalWin(currentMove, startX, endX, y);
 		}
-		printf("match for x =%d and y =%d is %d\n", x, y, match );
+		//printf("match for x =%d and y =%d is %d\n", x, y, match );
 	}
 	for (int i = 1; i < 5 ; ++i) {
 		int posX = x - i;
@@ -861,10 +946,10 @@ int 			Gomoku::checkWinHorizontal(Move* currentMove, int x, int y)
 			break;
 		else if(++match == 5){
 			startX = posX;
-			printf("match for x =%d and y =%d is %d\n", x, y, match );
+			//printf("match for x =%d and y =%d is %d\n", x, y, match );
 			return checkPossibleCaptureHorizontalWin(currentMove, startX, endX, y);
 		}
-		printf("match for x =%d and y =%d is %d\n", x, y, match );
+		//printf("match for x =%d and y =%d is %d\n", x, y, match );
 	}
 	return 0;
 }
@@ -873,7 +958,7 @@ int 			Gomoku::checkWinHorizontal(Move* currentMove, int x, int y)
 
 int 			Gomoku::checkWinVertical(Move* currentMove, int x, int y)
 {
-		printf("checkWinVertical x =%d and y =%d to win\n", x, y );
+		//printf("checkWinVertical x =%d and y =%d to win\n", x, y );
 	int match = 1;
 	int startY = y;
 	int endY = y;
@@ -901,7 +986,7 @@ int 			Gomoku::checkWinVertical(Move* currentMove, int x, int y)
 
 int 			Gomoku::checkWinDiagonalLeft(Move* currentMove, int x, int y)
 {
-	printf("checkWinDiagonalLeft x =%d and y =%d to win\n", x, y );
+	//printf("checkWinDiagonalLeft x =%d and y =%d to win\n", x, y );
 	int match = 1;
 	t_pos start;
 	start.x = x;
@@ -932,7 +1017,7 @@ int 			Gomoku::checkWinDiagonalLeft(Move* currentMove, int x, int y)
 
 int 			Gomoku::checkWinDiagonalRight(Move* currentMove, int x, int y)
 {
-	printf("checkWinDiagonalRight x =%d and y =%d to win\n", x, y );
+	//printf("checkWinDiagonalRight x =%d and y =%d to win\n", x, y );
 	int match = 1;
 	t_pos start;
 	start.x = x;
@@ -967,13 +1052,13 @@ eType			Gomoku::findOppositeType(eType type)
 
 void			Gomoku::eraseTiles(std::array<typeArr, N> *gameField, int startX, int startY, int endX, int endY)
 {
-	printf("ERASE TILE x =%d and y =%d x2 =%d and y2 =%d\n", startX, startY,  endX, endY);
+	//printf("ERASE TILE x =%d and y =%d x2 =%d and y2 =%d\n", startX, startY,  endX, endY);
 	if (startX < 0 || startX > 17 || endX > 17
 		|| startY < 0 || startY > 17 || endY > 17 )
 		return;
 	if (startX == endX){
 		for (int i = startY; i <= endY; ++i) {
-			printf("ERASE TILE x =%d and y =%d\n", startX, i );
+			//printf("ERASE TILE x =%d and y =%d\n", startX, i );
 			(*gameField)[i][startX] = EMPTY;
 		}
 		return;
@@ -981,14 +1066,14 @@ void			Gomoku::eraseTiles(std::array<typeArr, N> *gameField, int startX, int sta
 
 	if (startY == endY){
 		for (int i = startX; i <= endX; ++i) {
-			printf("ERASE TILE x =%d and y =%d\n", i, startY );
+			//printf("ERASE TILE x =%d and y =%d\n", i, startY );
 			(*gameField)[startY][i] = EMPTY;
 		}
 		return;
 	}
 	int j = startX;
 	for (int i = startY; i <= endY; ++i) {
-			printf("ERASE TILE x =%d and y =%d\n", j, i );
+			//printf("ERASE TILE x =%d and y =%d\n", j, i );
 			(*gameField)[i][j] = EMPTY;
 			if (startX < endX)
 				j++;
@@ -999,17 +1084,17 @@ void			Gomoku::eraseTiles(std::array<typeArr, N> *gameField, int startX, int sta
 
 int 			Gomoku::checkCapture(Move* currentMove, int x, int y)
 {
-	printf("checkCapture x =%d and y =%d to win\n", x, y );
+	//printf("checkCapture x =%d and y =%d to win\n", x, y );
 	int captures = 0;
-	printf("checkCaptureHorizontal x =%d and y =%d captures = %d\n", x, y, captures );
+	//printf("checkCaptureHorizontal x =%d and y =%d captures = %d\n", x, y, captures );
 	captures += checkCaptureHorizontal(currentMove, x, y);
-	printf("checkCaptureVertical x =%d and y =%d captures = %d\n", x, y, captures );
+	//printf("checkCaptureVertical x =%d and y =%d captures = %d\n", x, y, captures );
 	captures += checkCaptureVertical(currentMove, x, y);
-	printf("checkCaptureDiagonalLeft x =%d and y =%d captures = %d\n", x, y, captures );
+	//printf("checkCaptureDiagonalLeft x =%d and y =%d captures = %d\n", x, y, captures );
 	captures += checkCaptureDiagonalLeft(currentMove, x, y);
-	printf("checkCaptureDiagonalRight x =%d and y =%d captures = %d\n", x, y, captures );
+	//printf("checkCaptureDiagonalRight x =%d and y =%d captures = %d\n", x, y, captures );
 	captures += checkCaptureDiagonalRight(currentMove, x, y);
-	printf("checkCapture x =%d and y =%d captures = %d\n", x, y, captures );
+	//printf("checkCapture x =%d and y =%d captures = %d\n", x, y, captures );
 	if (currentMove->getCurrentType() == WHITE)
 		currentMove->setWhiteCapture(currentMove->getWhiteCapture() + captures);
 	else
@@ -1110,7 +1195,7 @@ int 			Gomoku::checkCaptureDiagonalLeft(Move* currentMove, int x, int y)
 	}
 	if (cursor == 4){
 		//cursor = 0;
-		printf("Chek capture x =%d and y =%d\n", x, y );
+		//printf("Chek capture x =%d and y =%d\n", x, y );
 		eraseTiles(&(const_cast<std::array<typeArr, N>  &>(currentMove->getGameField())), x + 1 , y + 1, x + 2 , y + 2);
 		capture++;
 	}
@@ -1126,7 +1211,7 @@ int 			Gomoku::checkCaptureDiagonalLeft(Move* currentMove, int x, int y)
 				break;
 	}
 	if (cursor == 4){
-		printf("Chek capture x =%d and y =%d\n", x, y );
+		//printf("Chek capture x =%d and y =%d\n", x, y );
 		eraseTiles(&(const_cast<std::array<typeArr, N>  &>(currentMove->getGameField())), x - 2 , y - 2, x - 1, y - 1);
 		capture++;
 	}
@@ -1150,7 +1235,7 @@ int 			Gomoku::checkCaptureDiagonalRight(Move* currentMove, int x, int y)
 	}
 	if (cursor == 4){
 		//cursor = 0;
-		printf("Chek capture x =%d and y =%d\n", x, y );
+		//printf("Chek capture x =%d and y =%d\n", x, y );
 		eraseTiles(&(const_cast<std::array<typeArr, N>  &>(currentMove->getGameField())), x - 1 , y + 1, x - 2 , y + 2);
 		capture++;
 	}
@@ -1166,7 +1251,7 @@ int 			Gomoku::checkCaptureDiagonalRight(Move* currentMove, int x, int y)
 				break;
 	}
 	if (cursor == 4){
-		printf("Chek capture x =%d and y =%d\n", x, y );
+		//printf("Chek capture x =%d and y =%d\n", x, y );
 		eraseTiles(&(const_cast<std::array<typeArr, N>  &>(currentMove->getGameField())), x + 2 , y - 2, x  + 1, y - 1);
 		capture++;
 	}
@@ -1176,12 +1261,12 @@ int 			Gomoku::checkCaptureDiagonalRight(Move* currentMove, int x, int y)
 int 			Gomoku::checkFreeTree(Move* currentMove, int x, int y)
 {
 	int free_tree = 0;
-printf("Chek free_tree x =%d and y =%d free_tree = %d\n", x, y, free_tree);
+//printf("Chek free_tree x =%d and y =%d free_tree = %d\n", x, y, free_tree);
 	free_tree += checkFreeTreeHorizontal(currentMove, x, y);
 	free_tree += checkFreeTreeVertical(currentMove, x, y);
 	free_tree += checkFreeTreeDiagonalLeft(currentMove, x, y);
 	free_tree +=checkFreeTreeDiagonalRight(currentMove, x, y);
-	printf("Chek free_tree x =%d and y =%d free_tree = %d\n", x, y, free_tree);
+	//printf("Chek free_tree x =%d and y =%d free_tree = %d\n", x, y, free_tree);
 	//printf("currentMove->whiteFreeTree.size() %lu\n", currentMove->whiteFreeTree.size());
 	// for (size_t i = 0; i < currentMove->whiteFreeTree.size(); ++i) {
 	// 	posSet set1 = (currentMove->whiteFreeTree)[i];
@@ -1205,7 +1290,7 @@ printf("Chek free_tree x =%d and y =%d free_tree = %d\n", x, y, free_tree);
 	if (free_tree > 1) {
 		return 1;
 	}  else if (free_tree == 1) {
-		printf ("checkcheckDoubleFreeTree current turn is %d\n", currentMove->getCurrentType());
+		//printf ("checkcheckDoubleFreeTree current turn is %d\n", currentMove->getCurrentType());
 		return checkDoubleFreeTree(*currentMove);
 	}
 	return 0;
@@ -1223,9 +1308,9 @@ int			Gomoku::checkDoubleFreeTree(Move &currentMove)
 			doubleFreeThree += checkFreeTreeVertical(&currentMove, x, y);
 			doubleFreeThree += checkFreeTreeDiagonalLeft(&currentMove, x, y);
 			doubleFreeThree += checkFreeTreeDiagonalRight(&currentMove, x, y);
-			printf ("x = %d y = %d doubleFreeThree = %d\n", x, y, doubleFreeThree);
+			//printf ("x = %d y = %d doubleFreeThree = %d\n", x, y, doubleFreeThree);
 			if (doubleFreeThree){
-				printf ("Double FREE THREE!!!!!\n");
+				//printf ("Double FREE THREE!!!!!\n");
 				return 1;
 			}
 		}

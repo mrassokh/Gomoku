@@ -186,11 +186,12 @@ private:
 	int 								checkFreeTreeVertical(Move* currentMove, int x, int y);
 	int 								checkFreeTreeDiagonalLeft(Move* currentMove, int x, int y);
 	int 								checkFreeTreeDiagonalRight(Move* currentMove, int x, int y);
+//	void 								moveProcessing(Move* currentMove, int forAI);
 	void 								moveProcessing(Move* currentMove);
 	void 								moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingOptions);
 	void 								moveReset(Move* currentMove);
 
-	MovePtr 								algorithmMiniMax(MovePtr currentMove, int & depth, int maxDepth);
+	MovePtr 								algorithmMiniMax(MovePtr currentMove, int  depth, int maxDepth);
 
 	//void 								emptyGameField(std::array<typeArr, N> & gamefield)
 
@@ -211,5 +212,6 @@ private:
 	windowCondition 					m_windowCondition;
 
 };
+
 
 #endif
