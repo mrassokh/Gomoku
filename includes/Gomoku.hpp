@@ -26,6 +26,14 @@
 typedef std::array<eType, 6> twoOpenSample;
 typedef std::array<eType, 5> oneOpenSample;
 
+static const int alfaInf = -10000000;
+static const int betaInf = 10000000;
+struct alfaBeta {
+	alfaBeta() {alpha = alfaInf; beta = betaInf;}
+	int		alpha;
+	int		beta;
+};
+
 // BLACK SAMPLES
 static const twoOpenSample blackFourTwoOpen = {{EMPTY,BLACK,BLACK,BLACK,BLACK,EMPTY}};
 static const oneOpenSample blackFourOneOpenLeft = {{EMPTY,BLACK,BLACK,BLACK,BLACK}};
@@ -192,7 +200,7 @@ private:
 	void 								moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingOptions);
 	void 								moveReset(Move* currentMove);
 
-	MovePtr 								algorithmMiniMax(MovePtr currentMove, int  depth, int maxDepth);
+	MovePtr 								algorithmMiniMax(MovePtr currentMove, int  depth, int maxDepth, alfaBeta ab);
 
 	//void 								emptyGameField(std::array<typeArr, N> & gamefield)
 

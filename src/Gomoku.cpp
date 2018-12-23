@@ -108,11 +108,12 @@ void 	Gomoku::render()
 
 
 
-MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth)
+MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth, alfaBeta ab)
 {
 	movePriorityQueue movingOptions;
 
-	MovePtr findedMove;
+	MovePtr findedMove = nullptr;
+
 	generateMoveOptions(currentMove,movingOptions);
 	int counter = 0;
 	if (depth == maxDepth - 1) {
@@ -127,6 +128,7 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 		counter++;
 	} else {
 		int moveCounter = 0;
+		int value = movingOptions.top()->getCurrentType() == BLACK ? alfaInf : betaInf;
 		//int currentDepth = ++depth;
 		++depth;
 		MovePtr checkingMove;
@@ -137,10 +139,10 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 
 
 		printf("Layer with depth = %d; maxDepth = %d; current turn = %d processed\n", depth, maxDepth, movingOptions.top()->getCurrentType());
-
+		printf ("alfaBeta.alpha = %d alfaBeta.beta =  %d\n",ab.alpha,ab.beta);
 
 		//depth++;
-		while (moveCounter < 5 && !movingOptions.empty()) {
+		while (moveCounter < 3 && !movingOptions.empty()) {
 
 			checkingMove = movingOptions.top();
 			counter++;
@@ -164,25 +166,50 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 
 
 			//printf("print returnedMove on Layer with depth = %d; maxDepth = %d; current turn = %d processed\n", depth, maxDepth, movingOptions.top()->getCurrentType());
-			returnedMove = algorithmMiniMax(furtherMove, depth, maxDepth);
-			//printMove(returnedMove);
+			returnedMove = algorithmMiniMax(furtherMove, depth, maxDepth,ab);
+			delete furtherMove;
+			moveCounter++;
+			if (returnedMove == nullptr) {
+				delete checkingMove;
+				movingOptions.pop();
+				continue ;
+			}
+					//printMove(returnedMove);
 			//furtherMove->setHeuristic(returnedMove->getHeuristic());
 			checkingMove->setHeuristic(returnedMove->getHeuristic());
+			delete returnedMove;
+
+			if (checkingMove->getCurrentType() == BLACK){
+				value = std::max(value,checkingMove->getHeuristic());
+				ab.alpha = std::max(ab.alpha, value);
+				printf ("BLACK: value = %d, alfaBeta.alpha = %d, alfaBeta.beta =  %d \n",value, ab.alpha,ab.beta);
+			} else {
+				value = std::min(value,checkingMove->getHeuristic());
+				ab.beta = std::min(ab.beta, value);
+				printf ("WHITE: value = %d, alfaBeta.alpha = %d, alfaBeta.beta =  %d \n",value, ab.alpha,ab.beta);
+			}
+
+			if (ab.alpha >= ab.beta){
+				printf("ab.alpha = %d, ab.beta = %d\n", ab.alpha,ab.beta);
+				break;
+			}
 			//checkMovingOptions.push(furtherMove);
 			checkMovingOptions.push(checkingMove);
 			movingOptions.pop();
 		//	printf("delete returnedMove");
-			delete returnedMove;
-			delete furtherMove;
+
 			//printf("movingOptions.top()");
 			//delete movingOptions.top();
 			//movingOptions.pop();
-			moveCounter++;
+
+
 		}
+		if (!checkMovingOptions.empty()){
 		findedMove = new Move(*checkMovingOptions.top());
 		moveProcessing(findedMove);
 		 printf("print findedMove in depth =  %d counter = %d\n", depth - 1, counter);
 		 printMove(findedMove);
+	 }
 		while (!checkMovingOptions.empty()) {
 			//printf("delete checkMovingOptions.top()");
 			delete checkMovingOptions.top();
@@ -248,7 +275,10 @@ void 		Gomoku::AI_Move(Move* currentMove)
 	m_turnTime =  0.0;//timeFromLastTurn;
 	m_start = clock();
 	int depth = 0;
-	MovePtr bestMove = algorithmMiniMax(currentMove, depth, 3);
+	alfaBeta ab;
+	printf ("initial alfaBeta.alpha = %d alfaBeta.beta =  %d\n",ab.alpha,ab.beta);
+	MovePtr bestMove = algorithmMiniMax(currentMove, depth, 5, ab);
+	printf ("final alfaBeta.alpha = %d alfaBeta.beta =  %d\n",ab.alpha,ab.beta);
 	if (bestMove->getResult() == WIN) {
 		std::string result_str =  bestMove->getCurrentType() == BLACK ? "BLACK WIN!!!" : "WHITE WIN!!!";
 		bestMove->emptyGameField();
