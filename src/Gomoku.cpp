@@ -106,66 +106,69 @@ void 	Gomoku::render()
 	m_render->deAttachSharedLibrary();
 }
 
+bool 				Gomoku::cutOff(MovePtr checkingMove, alfaBeta & ab, int & value)
+{
+	if (checkingMove->getCurrentType() == BLACK){
+		value = std::max(value, checkingMove->getHeuristic());
+		ab.alpha = std::max(ab.alpha, value);
+		printf ("BLACK: value = %d, alfaBeta.alpha = %d, alfaBeta.beta =  %d \n",value, ab.alpha,ab.beta);
+	} else {
+		value = std::min(value, checkingMove->getHeuristic());
+		ab.beta = std::min(ab.beta, value);
+		printf ("WHITE: value = %d, alfaBeta.alpha = %d, alfaBeta.beta =  %d \n",value, ab.alpha,ab.beta);
+	}
 
+	if (ab.alpha > ab.beta){
+		printf("ab.alpha = %d, ab.beta = %d\n", ab.alpha,ab.beta);
+	}
+	return ab.alpha > ab.beta;
+}
+
+void 					Gomoku::clearQueue(movePriorityQueue & Queue)
+{
+	while (!Queue.empty()) {
+		delete Queue.top();
+		Queue.pop();
+	}
+}
 
 MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth, alfaBeta ab)
 {
 	movePriorityQueue movingOptions;
-
 	MovePtr findedMove = nullptr;
 
 	generateMoveOptions(currentMove,movingOptions);
-	int counter = 0;
 	if (depth == maxDepth - 1) {
-		++depth;
 		printf("Leaf node finded; depth = %d; maxDepth = %d; current turn = %d\n", depth, maxDepth, movingOptions.top()->getCurrentType());
-
-		moveProcessing(movingOptions.top());
 		findedMove = new Move(*movingOptions.top());
-
+		moveProcessing(findedMove);
 		printMove(findedMove);
-
-		counter++;
 	} else {
-		int moveCounter = 0;
-		int value = movingOptions.top()->getCurrentType() == BLACK ? alfaInf : betaInf;
-		//int currentDepth = ++depth;
-		++depth;
 		MovePtr checkingMove;
 		MovePtr furtherMove;
 		MovePtr returnedMove;
 		movePriorityQueue checkMovingOptions;
-		//printf("depth = %d; maxDepth = %d\n", depth, maxDepth);
-
+		int moveCounter = 0;
+		int value = movingOptions.top()->getCurrentType() == BLACK ? alfaInf : betaInf;
+		++depth;
 
 		printf("Layer with depth = %d; maxDepth = %d; current turn = %d processed\n", depth, maxDepth, movingOptions.top()->getCurrentType());
 		printf ("alfaBeta.alpha = %d alfaBeta.beta =  %d\n",ab.alpha,ab.beta);
 
-		//depth++;
 		while (moveCounter < 3 && !movingOptions.empty()) {
-
 			checkingMove = movingOptions.top();
-			counter++;
 			if (checkingMove->getResult() == WIN) {
-				//if (checkingMove->getCurrentType() == WHITE) {
-					checkMovingOptions.push(checkingMove);
-					movingOptions.pop();
-					printf("FIND WIN\n");
-					break;
-				// } else {
-				// 	checkMovingOptions.push(checkingMove);
-				// 	movingOptions.pop();
-				// 	continue;
-				// }
+				checkMovingOptions.push(checkingMove);
+				movingOptions.pop();
+				printf("FIND WIN\n");
+				break;
 			}
 			furtherMove = new Move(*checkingMove);
 			moveProcessing(furtherMove);
-			//
+
 			printf("moveCounter = %d; print processed furtherMove \n", moveCounter);
 			printMove(furtherMove);
 
-
-			//printf("print returnedMove on Layer with depth = %d; maxDepth = %d; current turn = %d processed\n", depth, maxDepth, movingOptions.top()->getCurrentType());
 			returnedMove = algorithmMiniMax(furtherMove, depth, maxDepth,ab);
 			delete furtherMove;
 			moveCounter++;
@@ -174,67 +177,22 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 				movingOptions.pop();
 				continue ;
 			}
-					//printMove(returnedMove);
-			//furtherMove->setHeuristic(returnedMove->getHeuristic());
 			checkingMove->setHeuristic(returnedMove->getHeuristic());
 			delete returnedMove;
-
-			if (checkingMove->getCurrentType() == BLACK){
-				value = std::max(value,checkingMove->getHeuristic());
-				ab.alpha = std::max(ab.alpha, value);
-				printf ("BLACK: value = %d, alfaBeta.alpha = %d, alfaBeta.beta =  %d \n",value, ab.alpha,ab.beta);
-			} else {
-				value = std::min(value,checkingMove->getHeuristic());
-				ab.beta = std::min(ab.beta, value);
-				printf ("WHITE: value = %d, alfaBeta.alpha = %d, alfaBeta.beta =  %d \n",value, ab.alpha,ab.beta);
-			}
-
-			if (ab.alpha >= ab.beta){
-				printf("ab.alpha = %d, ab.beta = %d\n", ab.alpha,ab.beta);
+			if (cutOff(checkingMove, ab, value))
 				break;
-			}
-			//checkMovingOptions.push(furtherMove);
-			checkMovingOptions.push(checkingMove);
+ 			checkMovingOptions.push(checkingMove);
 			movingOptions.pop();
-		//	printf("delete returnedMove");
-
-			//printf("movingOptions.top()");
-			//delete movingOptions.top();
-			//movingOptions.pop();
-
-
 		}
 		if (!checkMovingOptions.empty()){
-		findedMove = new Move(*checkMovingOptions.top());
-		moveProcessing(findedMove);
-		 printf("print findedMove in depth =  %d counter = %d\n", depth - 1, counter);
-		 printMove(findedMove);
-	 }
-		while (!checkMovingOptions.empty()) {
-			//printf("delete checkMovingOptions.top()");
-			delete checkMovingOptions.top();
-			checkMovingOptions.pop();
-		}
-		// for (auto & move : movingOptions) {
-		// 	if (move->getResult() == WIN) {
-		// 		findedMove
-		// 	}
-		// }
-
+			findedMove = new Move(*checkMovingOptions.top());
+			moveProcessing(findedMove);
+			printf("print findedMove in depth =  %d \n", depth - 1);
+			printMove(findedMove);
+	 	}
+		clearQueue(checkMovingOptions);
 	}
-	//printf("counter = %d\n\n\n", counter);
-
-	// } else {
-	//
-	// }
-
-	while (!movingOptions.empty()) {
-		//	printf("delete movingOptions\n");
-		//printf(" heuristic of deletenig move is = %d\n\n\n\n", movingOptions.top()->getHeuristic());
-		//printMove(movingOptions.top());
-		delete movingOptions.top();
-		movingOptions.pop();
-	}
+	clearQueue(movingOptions);
 	return findedMove;
 }
 
@@ -309,18 +267,12 @@ void 		Gomoku::generateMoveOptions(MovePtr currentMove, movePriorityQueue & movi
 	int topY = currentMove->getLeftTop().y;
 	int rightX = currentMove->getRightBottom().x;
 	int bottomY = currentMove->getRightBottom().y;
-	//movePriorityQueue movingOptions;
 	std::array<typeArr, N> & gamefield = const_cast<std::array<typeArr, N> &>(currentMove->getGameField());
 	m_virtualGameField = gamefield;
-	//emptyGameField(virtualGameField);
 	for (int y =  topY; y <= bottomY; ++y) {
 		for (int x = lextX; x <= rightX; ++x){
-			//printf("Checked x = %d; y = %d; virtualGameField[y][x] = %d\n\n", x, y, virtualGameField[y][x]);
-	 	if (gamefield[y][x] != EMPTY ){
-			//if (virtualGameField[y][x] != EMPTY)
-			//&& virtualGameField[y - 1][x -1] != EMPTY;
+		 	if (gamefield[y][x] != EMPTY ){
 				fillMoveOptions(currentMove, x, y, movingOptions, m_virtualGameField);
-
 			}
 		}
 	}

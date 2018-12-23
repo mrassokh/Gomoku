@@ -145,7 +145,7 @@ private:
 	inline int 							defineTwoOpenHorizontalHeuristic(twoOpenSample const & blackSample, twoOpenSample const & whiteSample, std::array<typeArr, N> & gamefield,
 																			const int heuristic, eType currentTurn, t_pos const & leftTop, t_pos const & rightBottom);
 
-	inline int 								defineOneOpenHorizontalHeuristic( oneOpenSample const & blackSample,
+	inline int 							defineOneOpenHorizontalHeuristic( oneOpenSample const & blackSample,
 		 													 oneOpenSample const & whiteSample, std::array<typeArr, N> & gamefield,
 															  const int heuristic, eType currentTurn, t_pos const & leftTop, t_pos const & rightBottom);
 
@@ -159,7 +159,8 @@ private:
 
   inline int 							findTwoOpen(twoOpenSample const & sampleTwoOpen, std::vector<std::vector<eType>> const & gamefield);
   inline int 							findOneOpen(oneOpenSample const & sampleOneOpen, std::vector<std::vector<eType>> const & gamefield);
-
+  inline bool 							cutOff(MovePtr checkingMove,alfaBeta & ab, int & value);
+  inline void 							clearQueue(movePriorityQueue & Queue); 
 
 
 

@@ -26,7 +26,7 @@ LIB_SDL_PATH = lib1_sdl/
 
 CC = gcc
 CCXX = clang++
-FLAGS	= -Wall -Wextra -Werror -std=c++14 -O3
+FLAGS	= -Wall -Wextra -Werror -std=c++14 -O3 -march=native
 RUNFLAGS = "-Wl,-rpath," $(LIB_SDL_PATH)
 LIB_SO_FLAG = -shared -fPIC
 
