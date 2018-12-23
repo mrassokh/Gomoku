@@ -12,16 +12,16 @@
 
 #include "Gomoku.hpp"
 
-// static void printMove(MovePtr currentMove) {
-// 	std::array<typeArr, N>const & gamefield = currentMove->getGameField();
-// 	for (auto const & row : gamefield) {
-// 		for (auto const &cell : row) {
-// 			std::cout << cell << " ";
-// 		}
-// 		std::cout << "\n";
-// 	}
-// 	std::cout << "Move heuristic = " << currentMove->getHeuristic() << std::endl;
-// }
+static void printMove(MovePtr currentMove) {
+	std::array<typeArr, N>const & gamefield = currentMove->getGameField();
+	for (auto const & row : gamefield) {
+		for (auto const &cell : row) {
+			std::cout << cell << " ";
+		}
+		std::cout << "\n";
+	}
+	std::cout << "Move heuristic = " << currentMove->getHeuristic() << std::endl;
+}
 
 Gomoku::Gomoku(std::string input):m_N(18), m_exit(0)
 {
@@ -115,11 +115,15 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 	MovePtr findedMove;
 	generateMoveOptions(currentMove,movingOptions);
 	int counter = 0;
-	if (depth == maxDepth) {
-		//printf("depth = %d; maxDepth = %d\n", depth, maxDepth);
+	if (depth == maxDepth - 1) {
+		++depth;
+		printf("Leaf node finded; depth = %d; maxDepth = %d; current turn = %d\n", depth, maxDepth, movingOptions.top()->getCurrentType());
+
 		moveProcessing(movingOptions.top());
 		findedMove = new Move(*movingOptions.top());
-		//printMove(findedMove);
+
+		printMove(findedMove);
+
 		counter++;
 	} else {
 		int moveCounter = 0;
@@ -130,21 +134,36 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 		MovePtr returnedMove;
 		movePriorityQueue checkMovingOptions;
 		//printf("depth = %d; maxDepth = %d\n", depth, maxDepth);
+
+
+		printf("Layer with depth = %d; maxDepth = %d; current turn = %d processed\n", depth, maxDepth, movingOptions.top()->getCurrentType());
+
+
 		//depth++;
-		while (moveCounter < moveChoseCount && !movingOptions.empty()) {
+		while (moveCounter < 5 && !movingOptions.empty()) {
 
 			checkingMove = movingOptions.top();
 			counter++;
 			if (checkingMove->getResult() == WIN) {
-				checkMovingOptions.push(checkingMove);
-				movingOptions.pop();
-				break;
+				//if (checkingMove->getCurrentType() == WHITE) {
+					checkMovingOptions.push(checkingMove);
+					movingOptions.pop();
+					printf("FIND WIN\n");
+					break;
+				// } else {
+				// 	checkMovingOptions.push(checkingMove);
+				// 	movingOptions.pop();
+				// 	continue;
+				// }
 			}
 			furtherMove = new Move(*checkingMove);
 			moveProcessing(furtherMove);
-			//printf("moveCounter = %d; print processed furtherMove \n", moveCounter);
-			//printMove(furtherMove);
-			//printf("print returnedMove \n");
+			//
+			printf("moveCounter = %d; print processed furtherMove \n", moveCounter);
+			printMove(furtherMove);
+
+
+			//printf("print returnedMove on Layer with depth = %d; maxDepth = %d; current turn = %d processed\n", depth, maxDepth, movingOptions.top()->getCurrentType());
 			returnedMove = algorithmMiniMax(furtherMove, depth, maxDepth);
 			//printMove(returnedMove);
 			//furtherMove->setHeuristic(returnedMove->getHeuristic());
@@ -162,8 +181,8 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 		}
 		findedMove = new Move(*checkMovingOptions.top());
 		moveProcessing(findedMove);
-		//printf("print findedMove in depth =  %d counter = %d\n", depth - 1, counter);
-		//printMove(findedMove);
+		 printf("print findedMove in depth =  %d counter = %d\n", depth - 1, counter);
+		 printMove(findedMove);
 		while (!checkMovingOptions.empty()) {
 			//printf("delete checkMovingOptions.top()");
 			delete checkMovingOptions.top();
@@ -183,8 +202,9 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 	// }
 
 	while (!movingOptions.empty()) {
-			//printf("delete movingOptions.empty()");
+		//	printf("delete movingOptions\n");
 		//printf(" heuristic of deletenig move is = %d\n\n\n\n", movingOptions.top()->getHeuristic());
+		//printMove(movingOptions.top());
 		delete movingOptions.top();
 		movingOptions.pop();
 	}
@@ -192,12 +212,12 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 }
 
 
-// void 	Gomoku::emptyGameField(std::array<typeArr, N> & gamefield)
-// {
-// 	for (int i = 0; i < N; i++){
-// 		gameField[i].fill(EMPTY);
-// 	}
-// }
+void 	Gomoku::emptyGameField(std::array<typeArr, N> & gamefield)
+{
+	for (int i = 0; i < N; i++){
+		gamefield[i].fill(EMPTY);
+	}
+}
 //void 		Gomoku::moving(Move* currentMove)
 void 		Gomoku::moving(Move *currentMove)
 {
@@ -228,7 +248,7 @@ void 		Gomoku::AI_Move(Move* currentMove)
 	m_turnTime =  0.0;//timeFromLastTurn;
 	m_start = clock();
 	int depth = 0;
-	MovePtr bestMove = algorithmMiniMax(currentMove, depth, 5);
+	MovePtr bestMove = algorithmMiniMax(currentMove, depth, 3);
 	if (bestMove->getResult() == WIN) {
 		std::string result_str =  bestMove->getCurrentType() == BLACK ? "BLACK WIN!!!" : "WHITE WIN!!!";
 		bestMove->emptyGameField();
@@ -244,41 +264,11 @@ void 		Gomoku::AI_Move(Move* currentMove)
 		rightBottom.y = -1;
 		bestMove->setWhiteCapture(0);
 		bestMove->setBlackCapture(0);
+		sleep(2);
 		m_render->GameOver(result_str);
 	}
 	m_currentMove = *bestMove;
 	delete bestMove;
-
-	// int lextX = currentMove->getLeftTop().x;
-	// int topY = currentMove->getLeftTop().y;
-	// int rightX = currentMove->getRightBottom().x;
-	// int bottomY = currentMove->getRightBottom().y;
-	// movePriorityQueue movingOptions;
-	// std::array<typeArr, N> & gamefield = const_cast<std::array<typeArr, N> &>(currentMove->getGameField());
-	// for (int y =  topY; y <= bottomY; ++y) {
-	// 	for (int x = lextX; x <= rightX; ++x){
-	// 		printf("Checked x = %d; y = %d;\n\n", x, y);
-	// 		if (gamefield[y][x] != EMPTY)
-	// 			fillMoveOptions(currentMove, x, y, movingOptions);
-	// 	}
-	// }
-	// //printf(" heuristic of movingOptions.top() before processing is = %d\n", movingOptions.top()->getHeuristic());
-	// moveProcessing(movingOptions.top());
-	// //printf(" heuristic of movingOptions.top() after processing is = %d\n", movingOptions.top()->getHeuristic());
-	// m_currentMove = *movingOptions.top();
-	// //printf(" heuristic of chosen move is = %d\n\n\n\n", m_currentMove.getHeuristic());
-	// while (!movingOptions.empty()) {
-	// 	//printf(" heuristic of deletenig move is = %d\n\n\n\n", movingOptions.top()->getHeuristic());
-	// 	delete movingOptions.top();
-	// 	movingOptions.pop();
-	// }
-	// //movingOptions.clear();
-	// // for (int i = 0; i < 1000000; i++){
-	// // 	double x = pow(sqrt(0.56789) / sqrt(1.234), 2);
-	// // 	//printf("%f\n", x);
-	// // 	printf("Left top x = %d; y = %d; Right bottom x = %d; y = %d\n\n\n", currentMove->getLeftTop().x, currentMove->getLeftTop().y, currentMove->getRightBottom().x, currentMove->getRightBottom().y);
-	// // 	x = 0;
-	// // }
 	m_turnTime = static_cast<double>((clock() - m_start ))/ CLOCKS_PER_SEC;
 
 }
@@ -291,16 +281,22 @@ void 		Gomoku::generateMoveOptions(MovePtr currentMove, movePriorityQueue & movi
 	int bottomY = currentMove->getRightBottom().y;
 	//movePriorityQueue movingOptions;
 	std::array<typeArr, N> & gamefield = const_cast<std::array<typeArr, N> &>(currentMove->getGameField());
+	m_virtualGameField = gamefield;
+	//emptyGameField(virtualGameField);
 	for (int y =  topY; y <= bottomY; ++y) {
 		for (int x = lextX; x <= rightX; ++x){
-		//	printf("Checked x = %d; y = %d;\n\n", x, y);
-			if (gamefield[y][x] != EMPTY)
-				fillMoveOptions(currentMove, x, y, movingOptions);
+			//printf("Checked x = %d; y = %d; virtualGameField[y][x] = %d\n\n", x, y, virtualGameField[y][x]);
+	 	if (gamefield[y][x] != EMPTY ){
+			//if (virtualGameField[y][x] != EMPTY)
+			//&& virtualGameField[y - 1][x -1] != EMPTY;
+				fillMoveOptions(currentMove, x, y, movingOptions, m_virtualGameField);
+
+			}
 		}
 	}
 }
 
-void 		Gomoku::fillMoveOptions(MovePtr currentMove, int x_center, int y_center, movePriorityQueue & movingOptions)
+void 		Gomoku::fillMoveOptions(MovePtr currentMove, int x_center, int y_center, movePriorityQueue & movingOptions, std::array<typeArr, N> &virtualGameField)
 {
 	for (int y = y_center - 1; y <= y_center + 1; ++y) {
 		if (y < 0 || y > 17)
@@ -308,8 +304,14 @@ void 		Gomoku::fillMoveOptions(MovePtr currentMove, int x_center, int y_center, 
 		for (int x = x_center - 1; x <= x_center + 1; ++x) {
 			if (x < 0 || x > 17 || (y == y_center && x == x_center))
 				continue;
+			if (virtualGameField[y][x] != EMPTY){
+				//printf("x = %d; y = %d is not EMPTY\n", x, y);
+				continue;
+			}
 			MovePtr newMove = new Move(*currentMove);
 			moveChecking(newMove, x, y);
+			virtualGameField[y][x] = currentMove->getCurrentType();
+			//printf("Checked after fill x = %d; y = %d; virtualGameField[y][x] = %d\n\n", x, y, virtualGameField[y][x]);
 			moveAI_Processing(newMove, movingOptions);
 		}
 	}
@@ -448,16 +450,16 @@ int 		Gomoku::defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eTyp
 	}
 
 	//FIND TWO ALLIGNMENT
-	if ((horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
-		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
-		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, gamefield, threeTwoOpenHeuristic, currentTurn, leftTop, rightBottom))){
+	if ((horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, gamefield, twoTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, gamefield, twoTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineTwoOpenHorizontalHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, gamefield, twoTwoOpenHeuristic, currentTurn, leftTop, rightBottom))){
 		//printf("TwoTwoOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
 	}
 
 
-	if ((horizontalHeur = defineOneOpenHorizontalHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
-		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, gamefield, threeOneOpenHeuristic, currentTurn, leftTop, rightBottom))
+	if ((horizontalHeur = defineOneOpenHorizontalHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, gamefield, oneTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
+		|| (horizontalHeur = defineOneOpenHorizontalHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, gamefield, oneTwoOpenHeuristic, currentTurn, leftTop, rightBottom))
 	) {
 	//	printf("TwoOneOpen heuristic = %d\n\n\n\n", horizontalHeur);
 		return horizontalHeur;
@@ -626,15 +628,15 @@ int						Gomoku::resolveHeuristicFromField(std::vector<std::vector<eType>> const
 	}
 
 	//FIND TWO ALLIGNMENT
-	if ((heuristic = defineTwoOpenHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, heuristicField, threeTwoOpenHeuristic, currentTurn))
-		|| (heuristic = defineTwoOpenHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, heuristicField, threeTwoOpenHeuristic, currentTurn))
-		|| (heuristic = defineTwoOpenHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, heuristicField, threeTwoOpenHeuristic, currentTurn))){
+	if ((heuristic = defineTwoOpenHeuristic(blackTwoTwoOpen_1, whiteTwoTwoOpen_1, heuristicField, twoTwoOpenHeuristic, currentTurn))
+		|| (heuristic = defineTwoOpenHeuristic(blackTwoTwoOpen_2, whiteTwoTwoOpen_2, heuristicField, twoTwoOpenHeuristic, currentTurn))
+		|| (heuristic = defineTwoOpenHeuristic(blackTwoTwoOpen_3, whiteTwoTwoOpen_3, heuristicField, twoTwoOpenHeuristic, currentTurn))){
 		//printf("TwoTwoOpen heuristic = %d\n\n\n\n", heuristic);
 		return heuristic;
 	}
 
-	if ((heuristic = defineOneOpenHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, heuristicField, threeOneOpenHeuristic, currentTurn))
-		|| (heuristic = defineOneOpenHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, heuristicField, threeOneOpenHeuristic, currentTurn))
+	if ((heuristic = defineOneOpenHeuristic(blackTwoOneOpenRight, whiteTwoOneOpenRight, heuristicField, oneTwoOpenHeuristic, currentTurn))
+		|| (heuristic = defineOneOpenHeuristic(blackTwoOneOpenLeft, whiteTwoOneOpenLeft, heuristicField, oneTwoOpenHeuristic, currentTurn))
 	) {
 		//printf("TwoOneOpen heuristic = %d\n\n\n\n", heuristic);
 		return heuristic;
@@ -768,7 +770,9 @@ void 		Gomoku::defineHeuristic(MovePtr optionMove, eMoveResult result)
 	// if (result == CAPTURE) {
 	// 	heur += BLACK ? -10000 : 10000;
 	// }
+	//printf("heur = %d\n", heur);
 	heur += optionMove->getWhiteCapture() * (-15000) + optionMove->getBlackCapture() * 15000;
+	//printf("heur1 = %d\n", heur);
 	optionMove->setHeuristic(heur);
 }
 

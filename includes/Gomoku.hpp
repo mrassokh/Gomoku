@@ -13,6 +13,7 @@
 #ifndef GOMOKU_HPP
 # define GOMOKU_HPP
 # include "IWindow.hpp"
+#include <unistd.h>
 # include <dlfcn.h>
 # include <vector>
 # include <ctime>
@@ -84,8 +85,8 @@ static const int threeOneOpenHeuristic = 1000;
 static const int twoTwoOpenHeuristic = 1000;
 static const int oneTwoOpenHeuristic = 100;
 
-static const int maximumDepth = 5;
-static const int moveChoseCount = 3;
+static const int maximumDepth = 3;
+static const int moveChoseCount = 7;
 
 typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQueue;
 
@@ -116,7 +117,7 @@ private:
 	//void 								checkNewMove(currentMove,gamefield,x,y);
 	// void 								moveChecking(Move* currentMove);
 	inline void 						generateMoveOptions(MovePtr currentMove, movePriorityQueue & movingOptions);
-	void 								fillMoveOptions(MovePtr currentMove, int x_center, int y_center, movePriorityQueue & movingOptions);
+	void 								fillMoveOptions(MovePtr currentMove, int x_center, int y_center, movePriorityQueue & movingOptions,  std::array<typeArr, N> &virtualGameField);
 	void 								defineHeuristic(MovePtr optionMove, eMoveResult result);
 	int 								defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
 																		t_pos const & leftTop, t_pos const & rightBottom);
@@ -198,6 +199,7 @@ private:
 	Render								*m_render;
 	//std::array<typeArr, N>				m_heuristicField;
 	std::vector<std::vector<eType>>		m_heuristicField;
+	std::array<typeArr, N>  			m_virtualGameField;
 	//std::vector<vecInt *>				m_gameField;
 	int 								m_N;
 	//int 								m_AI_play;
