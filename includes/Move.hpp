@@ -10,6 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef MOVE_HPP
+# define MOVE_HPP
+
 #include "IWindow.hpp"
 #include <deque>
 
@@ -32,6 +35,7 @@ public:
 	posSet const &					getWhiteFreeThree() const {return m_whiteFreeThree;}
 	posSet const &					getBlackFreeThree() const {return m_blackFreeThree;}
 	std::array<typeArr, N>const & 	getGameField() const {return m_gameField;}
+	std::array<typeArr, N> & 		getGameFieldMod() {return m_gameField;}
 
 	void							setCurrentType(eType const & type) { m_currentTurn = type;}
 	void							setResult(eMoveResult const & result) { m_moveResult = result;}
@@ -70,3 +74,5 @@ struct MoveCmp {
 			return left->getHeuristic() > right->getHeuristic();
 	}
 };
+
+#endif
