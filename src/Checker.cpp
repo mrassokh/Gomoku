@@ -585,7 +585,7 @@ inline int		Checker::validFreeThreeHorisontal(Move & currentMove, t_pos & start,
 	if  (gamefield[y][start.x - 1] != EMPTY)
 	{
 		if  (gamefield[y][start.x - 1] == currentMove.getCurrentType()
-				&& start.x - 2 >= 0
+				&& start.x - 2 >= 0 && gamefield[y][start.x - 2] == EMPTY
 				&& (gamefield[y][start.x + 2] == EMPTY || gamefield[y][start.x + 1] == EMPTY))
 		{
 			start.x--;
@@ -607,7 +607,7 @@ inline int		Checker::validFreeThreeVertical(Move & currentMove, t_pos & start, t
 		return 0;
 	if  (gamefield[start.y - 1][x] != EMPTY){
 		if  (gamefield[start.y - 1][x] == currentMove.getCurrentType()
-				&& start.y - 2 >= 0
+				&& start.y - 2 >= 0 && gamefield[start.y - 2][x] == EMPTY
 					&& (gamefield[start.y + 2][x] == EMPTY || gamefield[start.y + 1][x] == EMPTY)) {
 			start.y--;
 			end.y--;
@@ -631,7 +631,7 @@ inline int		Checker::validFreeThreeDiagonalLeft(Move & currentMove, t_pos & star
 	if  (gamefield[start.y - 1][start.x - 1] != EMPTY)
 	{
 		if  (gamefield[start.y - 1][start.x - 1] == currentMove.getCurrentType()
-				&& start.y - 2 > 0 && start.x - 2 > 0
+				&& start.y - 2 > 0 && start.x - 2 > 0 && gamefield[start.y - 2][start.x - 2] == EMPTY
 					&& (gamefield[start.y + 2][start.x + 2] == EMPTY || gamefield[start.y + 1][start.x + 1] == EMPTY)){
 			start.y--;
 			end.y--;
@@ -655,7 +655,7 @@ inline int			Checker::validFreeThreeDiagonalRight(Move & currentMove, t_pos & st
 		return 0;
 	if  (gamefield[start.y - 1][start.x + 1] != EMPTY){
 		if  (gamefield[start.y - 1][start.x + 1] == currentMove.getCurrentType()
-				&& start.y - 2 > 0 && start.x + 2 < 17
+				&& start.y - 2 > 0 && start.x + 2 < 17 && gamefield[start.y - 2][start.x + 2] == EMPTY
 					&& (gamefield[start.y + 2][start.x - 2] == EMPTY || gamefield[start.y + 1][start.x - 1] == EMPTY)){
 			start.y--;
 			end.y--;
