@@ -77,17 +77,18 @@ static const int twoTwoOpenHeuristic = 1000;
 static const int oneTwoOpenHeuristic = 100;
 
 
-class HeuristicSolver {
+class HeuristicSolver final {
 public:
-	static HeuristicSolver &	Instance();
+	HeuristicSolver(){};
+	~HeuristicSolver(){};
 
 	void 			 			defineHeuristic(MovePtr optionMove, eMoveResult result);
 
 private:
-	HeuristicSolver(){};
+
 	HeuristicSolver(HeuristicSolver const & rhs) = delete;
 	HeuristicSolver& operator = (HeuristicSolver const & rhs) = delete;
-	~HeuristicSolver(){};
+
 
 	inline int 					defineHorizontalHeuristic(std::array<typeArr, N> & gamefield, eType currentTurn,
 																		t_pos const & leftTop, t_pos const & rightBottom);

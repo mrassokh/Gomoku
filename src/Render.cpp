@@ -33,13 +33,6 @@ Render::~Render()
 
 }
 
-Render		&Render::Instance()
-{
-	static Render instance;
-	return instance;
-}
-
-
 void 		Render::dlerror_wrapper(void) {
 	std::cerr << "Error:" << dlerror() << std::endl;
 	exit(EXIT_FAILURE);

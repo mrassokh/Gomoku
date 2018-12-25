@@ -11,11 +11,11 @@
 /* ************************************************************************** */
 
 #include "HeuristicSolver.hpp"
-HeuristicSolver &	HeuristicSolver::Instance()
-{
-	static HeuristicSolver instance;
-	return instance;
-}
+// HeuristicSolver &	HeuristicSolver::Instance()
+// {
+// 	static HeuristicSolver instance;
+// 	return instance;
+// }
 
 // void 		HeuristicSolver::defineHeuristic(MovePtr optionMove, eMoveResult result)
 // {
@@ -287,7 +287,7 @@ void 		HeuristicSolver::defineHeuristic(MovePtr optionMove, eMoveResult result)
 		optionMove->setHeuristic(optionMove->getCurrentType() == BLACK ? winHeuristic : -winHeuristic);
 		return;
 	}
-	std::array<typeArr, N> & gamefield = optionMove->getGameFieldMod();
+	auto & gamefield = optionMove->getGameFieldMod();
 	int heur = 0;
 	heur +=	defineHorizontalHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());
 	heur +=	defineVerticalHeuristic(gamefield, optionMove->getCurrentType(), optionMove->getLeftTop(), optionMove->getRightBottom());

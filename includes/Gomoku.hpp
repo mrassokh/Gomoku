@@ -24,6 +24,7 @@
 # include <queue>
 # include "Checker.hpp"
 # include "HeuristicSolver.hpp"
+# include <memory>
 
 
 
@@ -39,8 +40,9 @@ struct alfaBeta {
 static const int maximumDepth = 3;
 static const int moveChoseCount = 7;
 
-typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQueue;
+//typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQueue;
 
+typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQueue;
 
 class Gomoku
 {
@@ -50,30 +52,28 @@ public:
 	Gomoku(Gomoku & rhs) = delete;
 	Gomoku& operator = (Gomoku & rhs) = delete;
 	virtual ~Gomoku();
-
-	//void 								game();
 	void 								render();
 private:
 
 	void 								initGameField(int N);
 	void 								clearGameField(int N);
 	inline void 						emptyGameField(std::array<typeArr, N> &	gamefield);
-	void 								moving(Move *currentMove);
-	void 								AI_Move(Move* currentMove);
+	void 								moving(MovePtr currentMove);
+	void 								AI_Move(MovePtr currentMove);
 	inline void 						generateMoveOptions(MovePtr currentMove, movePriorityQueue & movingOptions);
 	inline void 						fillMoveOptions(MovePtr currentMove, int x_center, int y_center,
 															movePriorityQueue & movingOptions,  std::array<typeArr, N> &virtualGameField);
   	inline bool 						cutOff(MovePtr checkingMove,alfaBeta & ab, int & value);
   	inline void 						clearQueue(movePriorityQueue & Queue);
   	inline MovePtr 						findMove(MovePtr move);
-	void 								moveProcessing(Move* currentMove);
+	void 								moveProcessing(MovePtr currentMove);
 	void 								moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingOptions);
-	void 								moveReset(Move* currentMove);
-
+	void 								moveReset(MovePtr currentMove);
 	MovePtr 							algorithmMiniMax(MovePtr currentMove, int  depth, int maxDepth, alfaBeta ab);
-	Render								*m_render;
-	Checker								*m_checker;
-	HeuristicSolver						*m_heuristicSolver;
+
+	std::unique_ptr<Render>				m_render;
+	std::unique_ptr<Checker>			m_checker;
+	std::unique_ptr<HeuristicSolver>	m_heuristicSolver;
 	std::vector<std::vector<eType>>		m_heuristicField;
 	std::array<typeArr, N>  			m_virtualGameField;
 	int 								m_N;

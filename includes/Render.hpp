@@ -27,10 +27,12 @@ typedef	enum windowState
 }			eWindowState;
 
 
-class Render
+class Render final
 {
 public:
-	static Render	&Instance();
+	Render();
+	virtual ~Render();
+
 	void 			renderConfigure(Move *currentMove,
 		 									event *ev, int *ex, double *turnTime, int AI, windowCondition *condition);
 	void 			drawField(std::array<typeArr, N> const & gameField) const;
@@ -43,10 +45,8 @@ public:
 	void 			eventHandling();
 
 private:
-	Render();
 	Render(Render const & rhs) = delete;
 	Render & operator = (Render const & rhs) = delete;
-	virtual ~Render();
 
 	void 			dlerror_wrapper();
 
@@ -55,10 +55,7 @@ private:
 	void 					*dl_handle;
 	IWindow 				*m_newWindow;
 
-	//std::vector<vecInt *>	*m_gameField;
-	//eType					*m_currentTurn;
 	double 					*m_turnTime;
-	//clock_t 				*m_start;
 
 	std::array<void (Render::*)(), 3>	m_eventFunctions;
 	std::array<void (Render::*)(), 3>	m_windowStateFunctions;

@@ -64,7 +64,7 @@ private:
 
 };
 
-typedef Move* MovePtr;
+typedef std::shared_ptr<Move> MovePtr;
 struct MoveCmp {
 	bool operator()(const MovePtr left, const MovePtr right) const
 	{
@@ -74,5 +74,15 @@ struct MoveCmp {
 			return left->getHeuristic() > right->getHeuristic();
 	}
 };
+
+// struct MoveCmpShr {
+// 	bool operator()(const MovePtr left, const MovePtr right) const
+// 	{
+// 		if (right->getCurrentType() == BLACK)
+// 			return left->getHeuristic() < right->getHeuristic();
+// 		else
+// 			return left->getHeuristic() > right->getHeuristic();
+// 	}
+// };
 
 #endif
