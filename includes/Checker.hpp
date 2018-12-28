@@ -106,14 +106,15 @@ static eType		findOppositeType(eType type) {
 // }
 
 
-// static std::function< bool (const Move &, const int x, const int y) > closeCapture = [](Move const & currentMove, const int x, const int y){
-// 	if ((currentMove.getGameField()[y - 1])[x] == findOppositeType(currentMove.getCurrentType())
-// 		&& (currentMove.getGameField()[y])[x] == currentMove.getCurrentType()
-// 		&& (currentMove.getGameField()[y])[x] == EMPTY){
-// 			return true;
-// 	}
-// 	return false;
-// };
+static std::function< bool (const Move &, const int, const int, const int , const int , const int , const int ,const int , const int ) > closeCapture
+= [](Move const & currentMove, const int x, const int y, const int mult_X0, const int mult_Y0, const int mult_X1, const int mult_Y1,const int mult_X2, const int mult_Y2){
+	if ((currentMove.getGameField()[y + mult_Y0])[x + mult_X0] == findOppositeType(currentMove.getCurrentType())
+		&& (currentMove.getGameField()[y + mult_Y1])[x + mult_X1] == currentMove.getCurrentType()
+		&& (currentMove.getGameField()[y + mult_Y2])[x + mult_X2] == EMPTY){
+			return true;
+	}
+	return false;
+};
 //
 // static std::function< bool (const Move &, const int x, const int y) > farCapture = [](Move const & currentMove, const int x, const int y){
 // 	if ((currentMove.getGameField()[y])[x] == EMPTY)
@@ -124,35 +125,47 @@ static eType		findOppositeType(eType type) {
 // 	return false;
 // };
 
+// template <class myType>
+// myType GetMax (myType a, myType b) {
+//  return (a>b?a:b);
+// }
+
 static captureOnWinFunc isPossibleCaptureHorizontalWin = [](Move const & currentMove, const t_pos & match){
 	int y = match.y;
 
 	if (y < 1 || y > 16)
 		return false;
 	if (y + 2 <= 17){
-		if ((currentMove.getGameField()[y - 1])[match.x] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[y + 1])[match.x] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[y + 2])[match.x] == EMPTY){
-				return true;
-		}
-		if ((currentMove.getGameField()[y - 1])[match.x] == EMPTY
-			&& (currentMove.getGameField()[y + 1])[match.x] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[y + 2])[match.x] == findOppositeType(currentMove.getCurrentType())){
+		if (closeCapture(currentMove, match.x, y, 0, -1, 0, 1, 0, 2)
+			|| closeCapture(currentMove, match.x, y, 0, 2, 0, 1, 0, -1))
 			return true;
-		}
+				//|| closeCapture(currentMove, match.x, y, 0, 2, 0, 1, 0, -1);
+		// if ((currentMove.getGameField()[y - 1])[match.x] == findOppositeType(currentMove.getCurrentType())
+		// 	&& (currentMove.getGameField()[y + 1])[match.x] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[y + 2])[match.x] == EMPTY){
+		// 		return true;
+		// }
+		// if ((currentMove.getGameField()[y - 1])[match.x] == EMPTY
+		// 	&& (currentMove.getGameField()[y + 1])[match.x] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[y + 2])[match.x] == findOppositeType(currentMove.getCurrentType())){
+		// 	return true;
+		//}
 	}
 
 	if (y - 2 >= 0) {
-		if ((currentMove.getGameField()[y + 1])[match.x] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[y - 1])[match.x] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[y - 2])[match.x] == EMPTY){
+		if (closeCapture(currentMove, match.x, y, 0, 1, 0, -1, 0, -2)
+			|| closeCapture(currentMove, match.x, y, 0, -2, 0, -1, 0, 1))
 			return true;
-		}
-		if ((currentMove.getGameField()[y + 1])[match.x] == EMPTY
-			&& (currentMove.getGameField()[y - 1])[match.x] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[y - 2])[match.x] == findOppositeType(currentMove.getCurrentType())){
-			return true;
-		}
+		// if ((currentMove.getGameField()[y + 1])[match.x] == findOppositeType(currentMove.getCurrentType())
+		// 	&& (currentMove.getGameField()[y - 1])[match.x] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[y - 2])[match.x] == EMPTY){
+		// 	return true;
+		// }
+		// if ((currentMove.getGameField()[y + 1])[match.x] == EMPTY
+		// 	&& (currentMove.getGameField()[y - 1])[match.x] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[y - 2])[match.x] == findOppositeType(currentMove.getCurrentType())){
+		// 	return true;
+		//}
 	}
 	return false;
 };
@@ -164,28 +177,34 @@ static captureOnWinFunc  isPossibleCaptureVerticalWin = [](Move const & currentM
 	if (x < 1 || x > 16)
 		return false;
 	if (x + 2 <= 17){
-			if ((currentMove.getGameField()[match.y])[x - 1] == findOppositeType(currentMove.getCurrentType())
-				&& (currentMove.getGameField()[match.y])[x + 1] == currentMove.getCurrentType()
-				&& (currentMove.getGameField()[match.y])[x + 2] == EMPTY){
-					return true;
-				}
-			if ((currentMove.getGameField()[match.y])[x - 1] == EMPTY
-				&& (currentMove.getGameField()[match.y])[x + 1] == currentMove.getCurrentType()
-				&& (currentMove.getGameField()[match.y])[x + 2] == findOppositeType(currentMove.getCurrentType())){
-					return true;
-				}
+		if (closeCapture(currentMove, x, match.y, -1, 0, 1, 0, 2, 0)
+			|| closeCapture(currentMove, x, match.y, 2, 0, 1, 0, -1, 0))
+			return true;
+			// if ((currentMove.getGameField()[match.y])[x - 1] == findOppositeType(currentMove.getCurrentType())
+			// 	&& (currentMove.getGameField()[match.y])[x + 1] == currentMove.getCurrentType()
+			// 	&& (currentMove.getGameField()[match.y])[x + 2] == EMPTY){
+			// 		return true;
+			// 	}
+			// if ((currentMove.getGameField()[match.y])[x - 1] == EMPTY
+			// 	&& (currentMove.getGameField()[match.y])[x + 1] == currentMove.getCurrentType()
+			// 	&& (currentMove.getGameField()[match.y])[x + 2] == findOppositeType(currentMove.getCurrentType())){
+			// 		return true;
+			// 	}
 	}
 	if (x - 2 >= 0) {
-		if ((currentMove.getGameField()[match.y])[x + 1] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[match.y])[x - 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[match.y])[x - 2] == EMPTY){
-				return true;
-		}
-		if ((currentMove.getGameField()[match.y])[x + 1] == EMPTY
-			&& (currentMove.getGameField()[match.y])[x - 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[match.y])[x - 2] == findOppositeType(currentMove.getCurrentType())){
-				return true;
-		}
+		if (closeCapture(currentMove, x, match.y, 1, 0, -1, 0, -2, 0)
+			|| closeCapture(currentMove, x, match.y, -2, 0, -1, 0, 1, 0))
+			return true;
+		// if ((currentMove.getGameField()[match.y])[x + 1] == findOppositeType(currentMove.getCurrentType())
+		// 	&& (currentMove.getGameField()[match.y])[x - 1] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[match.y])[x - 2] == EMPTY){
+		// 		return true;
+		// }
+		// if ((currentMove.getGameField()[match.y])[x + 1] == EMPTY
+		// 	&& (currentMove.getGameField()[match.y])[x - 1] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[match.y])[x - 2] == findOppositeType(currentMove.getCurrentType())){
+		// 		return true;
+		// }
 	}
 	return false;
 };
@@ -195,31 +214,37 @@ static captureOnWinFunc  isPossibleCaptureDiagonalLeftlWin = [](Move const & cur
 	int posY = match.y;
 	if (posX + 2 <= 17 && posY - 2 >= 0 && posX - 1 >=0 && posY + 1 <= 17)
 	{
-		if ((currentMove.getGameField()[posY + 1])[posX - 1] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[posY - 1])[posX + 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY - 2])[posX + 2] == EMPTY) {
-				return true;
-		}
-
-		if ((currentMove.getGameField()[posY + 1])[posX - 1] == EMPTY
-			&& (currentMove.getGameField()[posY - 1])[posX + 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY - 2])[posX + 2] == findOppositeType(currentMove.getCurrentType())) {
-				return true;
-		}
+		if (closeCapture(currentMove, posX, posY, -1, 1, 1, -1, 2, -2)
+			|| closeCapture(currentMove, posX, posY, 2, -2, 1, -1, -1, 1))
+			return true;
+		// if ((currentMove.getGameField()[posY + 1])[posX - 1] == findOppositeType(currentMove.getCurrentType())
+		// 	&& (currentMove.getGameField()[posY - 1])[posX + 1] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[posY - 2])[posX + 2] == EMPTY) {
+		// 		return true;
+		// }
+		//
+		// if ((currentMove.getGameField()[posY + 1])[posX - 1] == EMPTY
+		// 	&& (currentMove.getGameField()[posY - 1])[posX + 1] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[posY - 2])[posX + 2] == findOppositeType(currentMove.getCurrentType())) {
+		// 		return true;
+		// }
 	}
 
 	if (posX + 1 <= 17 && posY - 1 >= 0 && posX - 2 >=0  && posY + 2 <= 17) {
-		if ((currentMove.getGameField()[posY - 1])[posX + 1] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[posY + 1])[posX - 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY + 2])[posX - 2] == EMPTY) {
-				return true;
-		}
-
-		if ((currentMove.getGameField()[posY - 1])[posX + 1] == EMPTY
-			&& (currentMove.getGameField()[posY + 1])[posX - 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY + 2])[posX - 2] == findOppositeType(currentMove.getCurrentType())) {
-				return true;
-		}
+		if (closeCapture(currentMove, posX, posY, 1, -1, -1, 1, -2, 2)
+			|| closeCapture(currentMove, posX, posY, -2, 2, -1, 1, 1, -1))
+			return true;
+		// if ((currentMove.getGameField()[posY - 1])[posX + 1] == findOppositeType(currentMove.getCurrentType())
+		// 	&& (currentMove.getGameField()[posY + 1])[posX - 1] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[posY + 2])[posX - 2] == EMPTY) {
+		// 		return true;
+		// }
+		//
+		// if ((currentMove.getGameField()[posY - 1])[posX + 1] == EMPTY
+		// 	&& (currentMove.getGameField()[posY + 1])[posX - 1] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[posY + 2])[posX - 2] == findOppositeType(currentMove.getCurrentType())) {
+		// 		return true;
+		// }
 	}
 	return false;
 };
@@ -228,29 +253,35 @@ static captureOnWinFunc isPossibleCaptureDiagonalRightWin = [](Move const & curr
 	int posX = match.x;
 	int posY = match.y;
 	if (posX + 2 <= 17 && posY + 2 <= 17 && posX - 1 >=0 && posY - 1 >= 0) {
-		if ((currentMove.getGameField()[posY - 1])[posX - 1] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[posY + 1])[posX + 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY + 2])[posX + 2] == EMPTY) {
-				return true;
-			}
-
-		if ((currentMove.getGameField()[posY - 1])[posX - 1] == EMPTY
-			&& (currentMove.getGameField()[posY + 1])[posX + 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY + 2])[posX + 2] == findOppositeType(currentMove.getCurrentType())) {
-				return true;
-			}
+		if (closeCapture(currentMove, posX, posY, -1, -1, 1, 1, 2, 2)
+			|| closeCapture(currentMove, posX, posY, 2, 2, 1, 1, -1, -1))
+			return true;
+		// if ((currentMove.getGameField()[posY - 1])[posX - 1] == findOppositeType(currentMove.getCurrentType())
+		// 	&& (currentMove.getGameField()[posY + 1])[posX + 1] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[posY + 2])[posX + 2] == EMPTY) {
+		// 		return true;
+		// 	}
+		//
+		// if ((currentMove.getGameField()[posY - 1])[posX - 1] == EMPTY
+		// 	&& (currentMove.getGameField()[posY + 1])[posX + 1] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[posY + 2])[posX + 2] == findOppositeType(currentMove.getCurrentType())) {
+		// 		return true;
+		// 	}
 	}
 	if (posX + 1 <= 17 && posY + 1 <= 17 && posX - 2 >=0 && posY - 2 >= 0) {
-		if ((currentMove.getGameField()[posY + 1])[posX + 1] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[posY - 1])[posX - 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY - 2])[posX - 2] == EMPTY) {
-				return true;
-			}
-		if ((currentMove.getGameField()[posY + 1])[posX + 1] == EMPTY
-			&& (currentMove.getGameField()[posY - 1])[posX - 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY - 2])[posX - 2] == findOppositeType(currentMove.getCurrentType())) {
-				return true;
-			}
+		if (closeCapture(currentMove, posX, posY, 1, 1, -1, -1, -2, -2)
+			|| closeCapture(currentMove, posX, posY, -2, -2, -1, -1, 1, 1))
+			return true;
+		// if ((currentMove.getGameField()[posY + 1])[posX + 1] == findOppositeType(currentMove.getCurrentType())
+		// 	&& (currentMove.getGameField()[posY - 1])[posX - 1] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[posY - 2])[posX - 2] == EMPTY) {
+		// 		return true;
+		// 	}
+		// if ((currentMove.getGameField()[posY + 1])[posX + 1] == EMPTY
+		// 	&& (currentMove.getGameField()[posY - 1])[posX - 1] == currentMove.getCurrentType()
+		// 	&& (currentMove.getGameField()[posY - 2])[posX - 2] == findOppositeType(currentMove.getCurrentType())) {
+		// 		return true;
+		// 	}
 	}
 	return false;
 };
