@@ -211,7 +211,7 @@ void 		Gomoku::AI_Move(MovePtr currentMove)
 	int depth = 0;
 	alfaBeta ab;
 	auto testedMove = std::make_shared<Move>(*currentMove);
-	auto bestMove = algorithmMiniMax(testedMove, depth, 6, ab);
+	auto bestMove = algorithmMiniMax(testedMove, depth, 5, ab);
 	m_turnTime = static_cast<double>((clock() - m_start ))/ CLOCKS_PER_SEC;
 	if (bestMove->getResult() == WIN) {
 		std::string result_str =  bestMove->getCurrentType() == BLACK ? "BLACK WIN!!!" : "WHITE WIN!!!";
