@@ -21,7 +21,6 @@ class Move final
 public:
 	Move();
 	Move(Move const & rhs);
-	//Move(Move const & rhs, int);
 	Move & operator = (Move const & rhs);
 	~Move(){};
 
@@ -74,15 +73,5 @@ struct MoveCmp {
 			return left->getHeuristic() > right->getHeuristic();
 	}
 };
-
-// struct MoveCmpShr {
-// 	bool operator()(const MovePtr left, const MovePtr right) const
-// 	{
-// 		if (right->getCurrentType() == BLACK)
-// 			return left->getHeuristic() < right->getHeuristic();
-// 		else
-// 			return left->getHeuristic() > right->getHeuristic();
-// 	}
-// };
 
 #endif

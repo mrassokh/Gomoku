@@ -15,7 +15,6 @@
 Move::Move() : m_currentTurn(BLACK), m_moveResult(NO_RESULT),
 				m_whiteCaptures(0), m_blackCaptures(0), m_heuristic(0)
 {
-	emptyGameField();
 	m_leftTop.x = -1;
 	m_leftTop.y = -1;
 	m_rightBottom.x = -1;
@@ -44,11 +43,8 @@ Move & Move::operator = (Move const & rhs)
 	m_leftTop = rhs.getLeftTop();
 	m_rightBottom = rhs.getRightBottom();
 	m_heuristic = rhs.getHeuristic();
-	//printf("Assignment!!\n\n\n");
 	return *this;
 }
-//Move::~Move() {}
-
 
 void 	Move::emptyGameField()
 {

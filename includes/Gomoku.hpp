@@ -40,8 +40,6 @@ struct alfaBeta {
 static const int maximumDepth = 3;
 static const int moveChoseCount = 7;
 
-//typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQueue;
-
 typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQueue;
 
 class Gomoku
@@ -55,8 +53,6 @@ public:
 	void 								render();
 private:
 
-	void 								initGameField(int N);
-	void 								clearGameField(int N);
 	inline void 						emptyGameField(std::array<typeArr, N> &	gamefield);
 	void 								moving(MovePtr currentMove);
 	void 								AI_Move(MovePtr currentMove);

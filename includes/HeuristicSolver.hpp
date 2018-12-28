@@ -24,7 +24,7 @@ static const oneOpenSample blackFourOneOpenRight = {{BLACK,BLACK,BLACK,BLACK,EMP
 static const oneOpenSample blackFourOneOpenCenter_1 = {{BLACK,BLACK,EMPTY,BLACK,BLACK}};
 static const oneOpenSample blackFourOneOpenCenter_2 = {{BLACK,EMPTY,BLACK,BLACK,BLACK}};
 static const oneOpenSample blackFourOneOpenCenter_3 = {{BLACK,BLACK,BLACK,EMPTY,BLACK}};
-//
+
 static const twoOpenSample blackThreeTwoOpen_1 = {{EMPTY,BLACK,BLACK,BLACK,EMPTY,EMPTY}};
 static const twoOpenSample blackThreeTwoOpen_2 = {{EMPTY,EMPTY,BLACK,BLACK,BLACK,EMPTY}};
 static const oneOpenSample blackThreeOneOpenRight = {{BLACK,BLACK,BLACK,EMPTY,EMPTY}};
@@ -33,11 +33,11 @@ static const oneOpenSample blackThreeOneOpenCenter_1 = {{EMPTY,BLACK,EMPTY,BLACK
 static const oneOpenSample blackThreeOneOpenCenter_2 = {{EMPTY,BLACK,BLACK,EMPTY,BLACK}};
 static const oneOpenSample blackThreeOneOpenCenter_3 = {{BLACK,EMPTY,BLACK,BLACK,EMPTY}};
 static const oneOpenSample blackThreeOneOpenCenter_4 = {{BLACK,BLACK,EMPTY,BLACK,EMPTY}};
-//
+
 static const twoOpenSample blackTwoTwoOpen_1 = {{EMPTY,BLACK,BLACK,EMPTY,EMPTY,EMPTY}};
 static const twoOpenSample blackTwoTwoOpen_2 = {{EMPTY,EMPTY,BLACK,BLACK,EMPTY,EMPTY}};
 static const twoOpenSample blackTwoTwoOpen_3 = {{EMPTY,EMPTY,EMPTY,BLACK,BLACK,EMPTY}};
-//
+
 static const oneOpenSample blackTwoOneOpenRight = {{BLACK,BLACK,EMPTY,EMPTY,EMPTY}};
 static const oneOpenSample blackTwoOneOpenLeft = {{EMPTY,EMPTY,EMPTY,BLACK,BLACK}};
 
@@ -63,7 +63,7 @@ static const oneOpenSample whiteThreeOneOpenCenter_4 = {{WHITE,WHITE,EMPTY,WHITE
 static const twoOpenSample whiteTwoTwoOpen_1 = {{EMPTY,WHITE,WHITE,EMPTY,EMPTY,EMPTY}};
 static const twoOpenSample whiteTwoTwoOpen_2 = {{EMPTY,EMPTY,WHITE,WHITE,EMPTY,EMPTY}};
 static const twoOpenSample whiteTwoTwoOpen_3 = {{EMPTY,EMPTY,EMPTY,WHITE,WHITE,EMPTY}};
-//
+
 static const oneOpenSample whiteTwoOneOpenRight = {{WHITE,WHITE,EMPTY,EMPTY,EMPTY}};
 static const oneOpenSample whiteTwoOneOpenLeft = {{EMPTY,EMPTY,EMPTY,WHITE,WHITE}};
 
@@ -103,8 +103,8 @@ private:
 	inline int 					defineTwoOpenHeuristic(twoOpenSample const & blackSample, twoOpenSample const & whiteSample,
 																std::vector<std::vector<eType>> const & gamefield, const int heuristic, eType currentTurn);
 
-	inline int 					defineOneOpenHeuristic( oneOpenSample const & blackSample, oneOpenSample const & whiteSample, std::vector<std::vector<eType>> const & gamefield,
-															  const int heuristic, eType currentTurn);
+	inline int 					defineOneOpenHeuristic( oneOpenSample const & blackSample, oneOpenSample const & whiteSample,
+																std::vector<std::vector<eType>> const & gamefield, const int heuristic, eType currentTurn);
   	inline int 					findTwoOpen(twoOpenSample const & sampleTwoOpen, std::vector<std::vector<eType>> const & gamefield);
   	inline int 					findOneOpen(oneOpenSample const & sampleOneOpen, std::vector<std::vector<eType>> const & gamefield);
 

@@ -62,6 +62,7 @@ void 	Gomoku::render()
 	m_render->init();
 	m_render->renderConfigure(&m_currentMove, &m_event, &m_exit, &m_turnTime, m_AI, &m_windowCondition);
 	m_turnTime =0.0;
+	m_currentMove.emptyGameField();
 	m_start = clock();
 	while (!m_exit) {
 		m_render->mainLoop();
@@ -172,14 +173,6 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 	}
 	clearQueue(movingOptions);
 	return findedMove;
-}
-
-
-void 	Gomoku::emptyGameField(std::array<typeArr, N> & gamefield)
-{
-	for (int i = 0; i < N; i++){
-		gamefield[i].fill(EMPTY);
-	}
 }
 
 void 		Gomoku::moving(MovePtr currentMove)
