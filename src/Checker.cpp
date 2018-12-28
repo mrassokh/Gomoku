@@ -70,72 +70,87 @@ int 			Checker::checkWin(Move & currentMove, int x, int y)
 
 
 
-inline int 			Checker::checkPossibleCaptureWin(Move & currentMove)
+// inline int 			Checker::checkPossibleCaptureWin(Move & currentMove)
+// {
+// 	int winAllignmentIsCaptured = std::count_if(m_winAllignment.begin(), m_winAllignment.end(),
+// 		[&](t_pos match)->bool
+// 			{
+// 				for (size_t i = 0; i < m_isPossibleCaptureWinFunc.size();++i) {
+// 					if ((*this->m_isPossibleCaptureWinFunc[i])(currentMove, match)){
+// 						return true;
+// 					}
+// 				}
+// 				return false;
+// 			});
+// 	m_winAllignment.clear();
+// 	return winAllignmentIsCaptured == 0;
+// }
+
+inline int 			Checker::checkPossibleCaptureWin(Move & currentMove, int x, int y)
 {
-	int winAllignmentIsCaptured = std::count_if(m_winAllignment.begin(), m_winAllignment.end(),
-		[&](t_pos match)->bool
+	t_pos match;
+	match.x = x;
+	match.y = y;
+
+	int winAllignmentIsCaptured = std::count_if(m_isPossibleCaptureWinFunc.begin(), m_isPossibleCaptureWinFunc.end(),
+		[&](captureOnWinFunc *func)->bool
 			{
-				for (size_t i = 0; i < m_isPossibleCaptureWinFunc.size();++i) {
-					if ((*this->m_isPossibleCaptureWinFunc[i])(currentMove, match)){
-						return true;
-					}
-				}
-				return false;
+				return (*func)(currentMove, match);
 			});
-	m_winAllignment.clear();
-	return winAllignmentIsCaptured == 0;
+	//m_winAllignment.clear();
+	return winAllignmentIsCaptured;
 }
 
-inline int 			Checker::checkPossibleCaptureVerticalWin(Move & currentMove, int startY, int endY, int x)
-{
-	if (x < 1 || x > 16)
-		return 1;
-	for (int i = startY; i <= endY; ++i)
-	{
-		if (x + 2 <= 17
-			&& (currentMove.getGameField()[i])[x - 1] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[i])[x + 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[i])[x + 2] == EMPTY){
-			//printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
-			return 0;
-		}
-		if (x - 2 >= 0
-			&& (currentMove.getGameField()[i])[x + 1] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[i])[x - 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[i])[x - 2] == EMPTY){
-				//printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
-				return 0;
-		}
-	}
-	return 1;
-}
-
-inline int 		Checker::checkPossibleCaptureDiagonalLeftWin(Move & currentMove, t_pos const & start)
-{
-	int posX = start.x;
-	int posY = start.y;
-	for (int i = 0; i < 5; ++i)
-	{
-		if (posX + 2 <= 17 && posY - 2 >= 0 && posX - 1 >=0 && posY + 1 <= 17
-			&& (currentMove.getGameField()[posY + 1])[posX - 1] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[posY - 1])[posX + 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY - 2])[posX + 2] == EMPTY) {
-			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
-			return 0;
-		}
-
-		if (posX + 1 <= 17 && posY - 1 >= 0 && posX - 2 >=0  && posY + 2 <= 17
-			&& (currentMove.getGameField()[posY - 1])[posX + 1] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[posY + 1])[posX - 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY + 2])[posX - 2] == EMPTY) {
-			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
-			return 0;
-		}
-		posX++;
-		posY++;
-	}
- 	return 1;
-}
+// inline int 			Checker::checkPossibleCaptureVerticalWin(Move & currentMove, int startY, int endY, int x)
+// {
+// 	if (x < 1 || x > 16)
+// 		return 1;
+// 	for (int i = startY; i <= endY; ++i)
+// 	{
+// 		if (x + 2 <= 17
+// 			&& (currentMove.getGameField()[i])[x - 1] == findOppositeType(currentMove.getCurrentType())
+// 			&& (currentMove.getGameField()[i])[x + 1] == currentMove.getCurrentType()
+// 			&& (currentMove.getGameField()[i])[x + 2] == EMPTY){
+// 			//printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
+// 			return 0;
+// 		}
+// 		if (x - 2 >= 0
+// 			&& (currentMove.getGameField()[i])[x + 1] == findOppositeType(currentMove.getCurrentType())
+// 			&& (currentMove.getGameField()[i])[x - 1] == currentMove.getCurrentType()
+// 			&& (currentMove.getGameField()[i])[x - 2] == EMPTY){
+// 				//printf("checkPossibleCaptureVerticalWin for x =%d and x =%d \n", i, x);
+// 				return 0;
+// 		}
+// 	}
+// 	return 1;
+// }
+//
+// inline int 		Checker::checkPossibleCaptureDiagonalLeftWin(Move & currentMove, t_pos const & start)
+// {
+// 	int posX = start.x;
+// 	int posY = start.y;
+// 	for (int i = 0; i < 5; ++i)
+// 	{
+// 		if (posX + 2 <= 17 && posY - 2 >= 0 && posX - 1 >=0 && posY + 1 <= 17
+// 			&& (currentMove.getGameField()[posY + 1])[posX - 1] == findOppositeType(currentMove.getCurrentType())
+// 			&& (currentMove.getGameField()[posY - 1])[posX + 1] == currentMove.getCurrentType()
+// 			&& (currentMove.getGameField()[posY - 2])[posX + 2] == EMPTY) {
+// 			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+// 			return 0;
+// 		}
+//
+// 		if (posX + 1 <= 17 && posY - 1 >= 0 && posX - 2 >=0  && posY + 2 <= 17
+// 			&& (currentMove.getGameField()[posY - 1])[posX + 1] == findOppositeType(currentMove.getCurrentType())
+// 			&& (currentMove.getGameField()[posY + 1])[posX - 1] == currentMove.getCurrentType()
+// 			&& (currentMove.getGameField()[posY + 2])[posX - 2] == EMPTY) {
+// 			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+// 			return 0;
+// 		}
+// 		posX++;
+// 		posY++;
+// 	}
+//  	return 1;
+// }
 
 void 					Checker::redefineGameArea(Move & currentMove, std::array<typeArr, N> & gamefield, int x, int y)
 {
@@ -159,31 +174,31 @@ void 					Checker::redefineGameArea(Move & currentMove, std::array<typeArr, N> &
 	gamefield[y][x] = currentMove.getCurrentType();
 }
 
-inline int 		Checker::checkPossibleCaptureDiagonalRightWin(Move & currentMove, t_pos const & start)
-{
-	int posX = start.x;
-	int posY = start.y;
-	for (int i = 0; i < 5; ++i)
-	{
-		if (posX + 2 <= 17 && posY + 2 <= 17 && posX - 1 >=0 && posY - 1 >= 0
-			&& (currentMove.getGameField()[posY - 1])[posX - 1] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[posY + 1])[posX + 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY + 2])[posX + 2] == EMPTY) {
-			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
-			return 0;
-		}
-		if (posX + 1 <= 17 && posY + 1 <= 17 && posX - 2 >=0 && posY - 2 >= 0
-			&& (currentMove.getGameField()[posY + 1])[posX + 1] == findOppositeType(currentMove.getCurrentType())
-			&& (currentMove.getGameField()[posY - 1])[posX - 1] == currentMove.getCurrentType()
-			&& (currentMove.getGameField()[posY - 2])[posX - 2] == EMPTY) {
-			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
-			return 0;
-		}
-		posX--;
-		posY++;
-	}
- 	return 1;
-}
+// inline int 		Checker::checkPossibleCaptureDiagonalRightWin(Move & currentMove, t_pos const & start)
+// {
+// 	int posX = start.x;
+// 	int posY = start.y;
+// 	for (int i = 0; i < 5; ++i)
+// 	{
+// 		if (posX + 2 <= 17 && posY + 2 <= 17 && posX - 1 >=0 && posY - 1 >= 0
+// 			&& (currentMove.getGameField()[posY - 1])[posX - 1] == findOppositeType(currentMove.getCurrentType())
+// 			&& (currentMove.getGameField()[posY + 1])[posX + 1] == currentMove.getCurrentType()
+// 			&& (currentMove.getGameField()[posY + 2])[posX + 2] == EMPTY) {
+// 			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+// 			return 0;
+// 		}
+// 		if (posX + 1 <= 17 && posY + 1 <= 17 && posX - 2 >=0 && posY - 2 >= 0
+// 			&& (currentMove.getGameField()[posY + 1])[posX + 1] == findOppositeType(currentMove.getCurrentType())
+// 			&& (currentMove.getGameField()[posY - 1])[posX - 1] == currentMove.getCurrentType()
+// 			&& (currentMove.getGameField()[posY - 2])[posX - 2] == EMPTY) {
+// 			//printf("checkPossibleCaptureDiagonalLeftWin for x =%d and x =%d \n", posX, posY);
+// 			return 0;
+// 		}
+// 		posX--;
+// 		posY++;
+// 	}
+//  	return 1;
+// }
 
 inline void			Checker::writeHorizontalAllignment(int startX, int endX, int y, std::deque<t_pos> & winAllignment)
 {
@@ -192,6 +207,7 @@ inline void			Checker::writeHorizontalAllignment(int startX, int endX, int y, st
 	matchPos.y = y;
 	for (int i = startX; i <= endX; ++i) {
 		matchPos.x = i;
+		printf("matchPos.x =%d ", matchPos.x);
 		winAllignment.push_back(matchPos);
 	}
 }
@@ -238,11 +254,15 @@ int 			Checker::checkWinHorizontal(Move & currentMove, int x, int y)
 		int posX = x + i;
 		if (posX > 17 || (currentMove.getGameField()[y])[posX] != currentMove.getCurrentType())
 			break;
+		if (checkPossibleCaptureWin(currentMove, posX, y))
+			break;
 		else {
 			endX = posX;
 			if(++match == 5){
-				writeHorizontalAllignment(startX, endX, y, m_winAllignment);
-				return checkPossibleCaptureWin(currentMove);
+				//if (checkPossibleCaptureWin(currentMove, posX, y))
+					return 1;
+				// writeHorizontalAllignment(startX, endX, y, m_winAllignment);
+				// return checkPossibleCaptureWin(currentMove);
 			}
 		}
 	}
@@ -250,11 +270,15 @@ int 			Checker::checkWinHorizontal(Move & currentMove, int x, int y)
 		int posX = x - i;
 		if (posX < 0 || (currentMove.getGameField()[y])[posX] != currentMove.getCurrentType())
 			break;
+		if (checkPossibleCaptureWin(currentMove, posX, y))
+			break;
 		else {
 			startX = posX;
 			if (++match == 5){
-				writeHorizontalAllignment(startX, endX, y, m_winAllignment);
-				return checkPossibleCaptureWin(currentMove);
+				//if (checkPossibleCaptureWin(currentMove, posX, y))
+					return 1;
+				// writeHorizontalAllignment(startX, endX, y, m_winAllignment);
+				// return checkPossibleCaptureWin(currentMove);
 			}
 		}
 	}
@@ -273,11 +297,15 @@ int 			Checker::checkWinVertical(Move & currentMove, int x, int y)
 		int posY = y + i;
 		if (posY > 17 || (currentMove.getGameField()[posY])[x] != currentMove.getCurrentType())
 			break;
+		if (checkPossibleCaptureWin(currentMove, x, posY))
+			break;
 		else {
 			endY = posY;
-			if(++match == 5) {
-				writeVerticalAllignment(startY, endY, x, m_winAllignment);
-				return checkPossibleCaptureWin(currentMove);
+			if (++match == 5) {
+				//if (checkPossibleCaptureWin(currentMove, x, posY))
+					return 1;
+				// writeVerticalAllignment(startY, endY, x, m_winAllignment);
+				// return checkPossibleCaptureWin(currentMove);
 			}
 		}
 	}
@@ -285,11 +313,15 @@ int 			Checker::checkWinVertical(Move & currentMove, int x, int y)
 		int posY = y - i;
 		if (posY < 0 || (currentMove.getGameField()[posY])[x] != currentMove.getCurrentType())
 			break;
+		if (checkPossibleCaptureWin(currentMove, x, posY))
+			break;
 		else {
 			startY = posY;
 			if (++match == 5) {
-				writeVerticalAllignment(startY, endY, x, m_winAllignment);
-				return checkPossibleCaptureWin(currentMove);
+				//if (checkPossibleCaptureWin(currentMove, x, posY))
+					return 1;
+				// writeVerticalAllignment(startY, endY, x, m_winAllignment);
+				// return checkPossibleCaptureWin(currentMove);
 			}
 		}
 	}
@@ -310,9 +342,13 @@ int 			Checker::checkWinDiagonalLeft(Move & currentMove, int x, int y)
 		int posY = y + i;
 		if (posX > 17 || posY > 17 || (currentMove.getGameField()[posY])[posX] != currentMove.getCurrentType())
 			break;
+		if (checkPossibleCaptureWin(currentMove, posX, posY))
+			break;
 		else if (++match == 5) {
-			writeDiagonalLeftAllignment(start.x, start.y, m_winAllignment);
-			return checkPossibleCaptureWin(currentMove);
+			//if (checkPossibleCaptureWin(currentMove, posX, posY))
+				return 1;
+			// writeDiagonalLeftAllignment(start.x, start.y, m_winAllignment);
+			// return checkPossibleCaptureWin(currentMove);
 		}
 	}
 	for (int i = 1; i < 5 ; ++i){
@@ -320,11 +356,15 @@ int 			Checker::checkWinDiagonalLeft(Move & currentMove, int x, int y)
 		int posY = y - i;
 		if (posX < 0 || posY < 0 || (currentMove.getGameField()[posY])[posX] != currentMove.getCurrentType())
 			break;
+		if (checkPossibleCaptureWin(currentMove, posX, posY))
+			break;
 		else if (++match == 5){
 			start.x = posX;
 			start.y = posY;
-			writeDiagonalLeftAllignment(start.x, start.y, m_winAllignment);
-			return checkPossibleCaptureWin(currentMove);
+			//if (checkPossibleCaptureWin(currentMove, posX, posY))
+				return 1;
+			// writeDiagonalLeftAllignment(start.x, start.y, m_winAllignment);
+			// return checkPossibleCaptureWin(currentMove);
 		}
 	}
 	return 0;
@@ -342,9 +382,13 @@ int 			Checker::checkWinDiagonalRight(Move & currentMove, int x, int y)
 		int posY = y + i;
 		if (posX < 0 || posY > 17 || (currentMove.getGameField()[posY])[posX] != currentMove.getCurrentType())
 			break;
+		if (checkPossibleCaptureWin(currentMove, posX, posY))
+			break;
 		else if(++match == 5) {
-			writeDiagonalRightAllignment(start.x, start.y, m_winAllignment);
-			return checkPossibleCaptureWin(currentMove);
+			//if (checkPossibleCaptureWin(currentMove, posX, posY))
+				return 1;
+			// writeDiagonalRightAllignment(start.x, start.y, m_winAllignment);
+			// return checkPossibleCaptureWin(currentMove);
 		}
 	}
 	for (int i = 1; i < 5 ; ++i){
@@ -352,11 +396,15 @@ int 			Checker::checkWinDiagonalRight(Move & currentMove, int x, int y)
 		int posY = y - i;
 		if (posX > 17 || posY < 0 || (currentMove.getGameField()[posY])[posX] != currentMove.getCurrentType())
 			break;
+		if (checkPossibleCaptureWin(currentMove, posX, posY))
+			break;
 		else if (++match == 5){
 			start.x = posX;
 			start.y = posY;
-			writeDiagonalRightAllignment(start.x, start.y, m_winAllignment);
-			return checkPossibleCaptureWin(currentMove);
+			//if (checkPossibleCaptureWin(currentMove, posX, posY))
+				return 1;
+			// writeDiagonalRightAllignment(start.x, start.y, m_winAllignment);
+			// return checkPossibleCaptureWin(currentMove);
 		}
 	}
 	return 0;
