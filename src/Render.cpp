@@ -17,6 +17,8 @@ Render::Render() : m_gameOverMessage("")
 	m_eventFunctions[0] = &Render::handlePushSquare;
 	m_eventFunctions[1] = &Render::handleNewGame;
 	m_eventFunctions[2] = &Render::handleExit;
+	m_eventFunctions[3] = &Render::handleChangeMove;
+	m_eventFunctions[4] = &Render::handleChangeAIColor;
 
 	m_windowStateFunctions[0] = &Render::drawStart;
 	m_windowStateFunctions[1] = &Render::drawGame;
@@ -84,12 +86,14 @@ void 			Render::drawField(std::array<typeArr, N> const	&gameField) const
 	}
 
 	m_newWindow->drawTime(m_currentMove->getCurrentType(), m_currentMove->getWhiteCapture(),
-							m_currentMove->getBlackCapture(), m_turnTime, m_AI);
+							m_currentMove->getBlackCapture(), m_turnTime, m_AI, m_step);
 	m_newWindow->endCycl();
 }
 
 void 			Render::renderConfigure(Move *currentMove,
-											event *ev, int *ex, double *turnTime, int AI, windowCondition *condition)
+											event *ev, int *ex, double *turnTime,
+											int AI, windowCondition *condition,
+											 eType	*AIColor, int *step)
 {
 	m_currentMove = currentMove;
 	// m_gameField = gameField;
@@ -99,6 +103,8 @@ void 			Render::renderConfigure(Move *currentMove,
 	m_turnTime = turnTime;
 	m_AI = AI;
 	m_windowCondition = condition;
+	m_AIColor = AIColor;
+	m_step = step;
 }
 
 void 			Render::mainLoop()
@@ -166,6 +172,16 @@ void 			Render::GameOver(std::string const & message)
 	printf("handleGameOVER\n");
 }
 
+void Render::handleChangeMove()
+{
+	auto type = m_currentMove->getCurrentType();
+	m_currentMove->setCurrentType(type == BLACK ? WHITE :  BLACK);
+}
+
+void 			Render::handleChangeAIColor()
+{
+	*m_AIColor = *m_AIColor == BLACK ? WHITE :  BLACK;
+}
 void 			Render::handleNewGame()
 {
 	m_windowCondition->startCondition = 0;

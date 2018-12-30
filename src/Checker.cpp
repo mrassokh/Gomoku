@@ -33,6 +33,8 @@ Checker::~Checker()
 
 void 		Checker::moveChecking(Move & currentMove, int x, int y)
 {
+	if (x < 0 || x > 17 || y < 0 || y > 17)
+		return;
 	auto & gamefield = currentMove.getGameFieldMod();
 	if (gamefield[y][x] != EMPTY){
 		currentMove.setResult(NON_EMPTY);

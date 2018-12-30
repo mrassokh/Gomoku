@@ -53,7 +53,6 @@ public:
 	void 								render();
 private:
 
-	inline void 						emptyGameField(std::array<typeArr, N> &	gamefield);
 	void 								moving(MovePtr currentMove);
 	void 								AI_Move(MovePtr currentMove);
 	inline void 						generateMoveOptions(MovePtr currentMove, movePriorityQueue & movingOptions);
@@ -67,6 +66,7 @@ private:
 	void 								moveReset(MovePtr currentMove);
 	MovePtr 							algorithmMiniMax(MovePtr currentMove, int  depth, int maxDepth, alfaBeta ab);
 
+	void 								pushToCentre(Move &currentMove);
 	std::unique_ptr<Render>				m_render;
 	std::unique_ptr<Checker>			m_checker;
 	std::unique_ptr<HeuristicSolver>	m_heuristicSolver;
@@ -80,6 +80,8 @@ private:
 	double 								m_turnTime;
 	clock_t 							m_start;
 	windowCondition 					m_windowCondition;
+	eType								m_AIType;
+	int 								m_step;
 };
 
 

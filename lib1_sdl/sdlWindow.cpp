@@ -85,14 +85,17 @@ void 					SdlWindow::endCycl()
 	SDL_RenderPresent(m_renderer);
 }
 
-void 					SdlWindow::drawTime(eType type, int wCaptures, int bCaptures, double 	*turnTime, int 	AI)
+void 					SdlWindow::drawTime(eType type, int wCaptures, int bCaptures, double 	*turnTime, int 	AI, int *step)
 {
 	std::ostringstream results;
+	std::ostringstream timer;
 	results << "Turn : "  << (type == BLACK ? "BLACK" : "WHITE")
-	<< "\nCaptures:" << "W (" + std::to_string(wCaptures) << ") B(" + std::to_string(bCaptures) << ")"
-	<< "\nAI_Timer: " + (AI ? std::to_string(*turnTime) : " - ")+ "\n";
+	<< "\nStep: " << *step ;
+	timer << "AI_Timer: " + (AI ? std::to_string(*turnTime) : " - ") <<"\nCaptures:" << "W (" + std::to_string(wCaptures) << ") B(" + std::to_string(bCaptures) << ")";
 	std::string output = results.str();
-	showText(m_width - 240, 50,output.c_str());
+	showText(20, 20,output.c_str());
+	output = timer.str();
+	showText(m_width - 240, 20,output.c_str());
 }
 
 void 			SdlWindow::getEvent(event *ev)
@@ -130,10 +133,12 @@ void 			SdlWindow::handleKeyDown(int key, event *ev) const
 		ev->event = NEW_GAME;
 		return ;
 	}
-	if (key == SDLK_p) {
-		ev->event = PUSH_SQUARE;
-		ev->x = 10;
-		ev->y = 10;
+	if (key == SDLK_m) {
+		ev->event = CHANGE_MOVE;
+		return;
+	}
+	if (key == SDLK_a) {
+		ev->event = CHANGE_AI_COLOR;
 		return;
 	}
 	ev->event = DEFAULT;

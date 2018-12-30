@@ -37,6 +37,8 @@ enum EVENTS
 	PUSH_SQUARE,
 	NEW_GAME,
 	EXIT,
+	CHANGE_MOVE,
+	CHANGE_AI_COLOR,
 	DEFAULT
 };
 
@@ -97,7 +99,7 @@ public:
 	virtual void 			getEvent(event *ev)  = 0;
 	virtual void 			drawTile(int x, int y, eType type) = 0;
 	virtual void 			drawLine(int i, int j) = 0;
-	virtual void 			drawTime(eType type, int wCaptures, int bCaptures, double *turnTime, int AI) = 0;
+	virtual void 			drawTime(eType type, int wCaptures, int bCaptures, double *turnTime, int AI, int *step) = 0;
 	virtual void 			drawStart() = 0;
  	virtual void 			drawGameOver(std::string const & finishMessage) = 0;
 	virtual void 			startCycl() = 0;

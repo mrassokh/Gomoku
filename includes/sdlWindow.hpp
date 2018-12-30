@@ -30,7 +30,7 @@ public:
 	virtual void 					getEvent(event *ev);
 	virtual void 					drawTile(int x, int y, eType type);
 	virtual void 					drawLine(int i, int j);
-	virtual void 					drawTime(eType type, int wCaptures, int bCaptures, double *turnTime, int AI);
+	virtual void 					drawTime(eType type, int wCaptures, int bCaptures, double *turnTime, int AI, int *step);
 	virtual void 					drawStart();
 	virtual void 					drawGameOver(std::string const & finishMessage);
 	virtual void 					startCycl(void);
