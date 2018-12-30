@@ -26,7 +26,13 @@
 # include "HeuristicSolver.hpp"
 # include <memory>
 
-
+enum eStartGame
+{
+	EMPTY_FIELD,
+	PRO_FIELD,
+	SWAP_FIELD,
+	SWAP_TWO_FIELD
+};
 
 static const int alfaInf = -10000000;
 static const int betaInf = 10000000;
@@ -53,7 +59,7 @@ public:
 	void 								render();
 private:
 
-	void 								moving(MovePtr currentMove);
+	void 								moving(MovePtr currentMove, int x, int y);
 	void 								AI_Move(MovePtr currentMove);
 	inline void 						generateMoveOptions(MovePtr currentMove, movePriorityQueue & movingOptions);
 	inline void 						fillMoveOptions(MovePtr currentMove, int x_center, int y_center,
@@ -66,7 +72,12 @@ private:
 	void 								moveReset(MovePtr currentMove);
 	MovePtr 							algorithmMiniMax(MovePtr currentMove, int  depth, int maxDepth, alfaBeta ab);
 
+	void 								initPRO(Move & currentMove);
 	void 								pushToCentre(Move &currentMove);
+	void 								pushNearestToCentre(Move & currentMove);
+	void 								pushFarThenThreeFromCentre(Move & currentMove);
+
+	void 								winProcessing(MovePtr currentMove);
 	std::unique_ptr<Render>				m_render;
 	std::unique_ptr<Checker>			m_checker;
 	std::unique_ptr<HeuristicSolver>	m_heuristicSolver;
@@ -82,6 +93,7 @@ private:
 	windowCondition 					m_windowCondition;
 	eType								m_AIType;
 	int 								m_step;
+	eStartGame							m_startGame;
 };
 
 

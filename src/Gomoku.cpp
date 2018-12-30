@@ -37,6 +37,8 @@ Gomoku::Gomoku(std::string input):m_N(18), m_exit(0)
 	m_windowCondition.gameOverCondition = 0;
 	m_AIType = WHITE;
 	m_step = 0;
+	m_startGame = PRO_FIELD;//EMPTY_FIELD;//PRO_FIELD
+	srand(time(NULL));
 }
 
 Gomoku::~Gomoku()
@@ -58,18 +60,73 @@ void 		Gomoku::moveReset(MovePtr currentMove)
 	m_currentMove = *currentMove.get();
 }
 
+void 		Gomoku::initPRO(Move & currentMove)
+{
+	pushToCentre(currentMove);
+	pushNearestToCentre(currentMove);
+	//pushFarThenThreeFromCentre(currentMove);
+
+}
+
 void 		Gomoku::pushToCentre(Move & currentMove)
 {
-	auto type = currentMove.getCurrentType();
-	currentMove.getGameFieldMod()[8][8] = type;
-	type = BLACK ? WHITE :  BLACK;
-	currentMove.setCurrentType(type);
-	t_pos & leftTop = const_cast<t_pos &>(currentMove.getLeftTop());
-	t_pos & rightBottom = const_cast<t_pos &>(currentMove.getRightBottom());
-	leftTop.x = 8;
-	leftTop.y = 8;
-	rightBottom.x = 8;
-	rightBottom.y = 8;
+	auto pushMove = std::make_shared<Move>(currentMove);
+	moving(pushMove, 8, 8);
+	m_currentMove = *pushMove.get();
+	m_step++;
+}
+
+void 		Gomoku::pushNearestToCentre(Move & currentMove)
+{
+	auto pushMove = std::make_shared<Move>(currentMove);
+
+	int x = 0;
+	int y = 0;
+	while (true) {
+		x = (rand() % 10);
+		if (x < 7 || x > 10)
+			continue;
+		y = (rand() % 10);
+		if (y < 7 || y > 10)
+			continue;
+		if (y == 8 && x == 8)
+			continue;
+		break;
+	}
+	moving(pushMove, x, y);
+	m_step++;
+	m_currentMove = *pushMove.get();
+}
+
+// void 	emptyGameField(Move & currentMove)
+// {
+//
+// }
+
+void 		Gomoku::pushFarThenThreeFromCentre(Move & currentMove)
+{
+	auto pushMove = std::make_shared<Move>(currentMove);
+	auto & gamefield = currentMove.getGameFieldMod();
+	// for (int i = 0; i < N; i++){
+	// 	m_virtualGameField[i].fill(EMPTY);
+	// }
+	m_virtualGameField = gamefield;
+	for (int y =  6; y < 11; ++y) {
+		for (int x = 6; x < 11; ++x){
+			m_virtualGameField[y][x] = currentMove.getCurrentType();
+		}
+	}
+	int x = 0;
+	int y = 0;
+	while (true) {
+		x = (rand() % 18);
+		y = (rand() % 18);
+		if (m_virtualGameField[y][x] == EMPTY)
+			break;
+	}
+	m_step++;
+	moving(pushMove, x, y);
+	m_currentMove = *pushMove.get();
 }
 
 void 	Gomoku::render()
@@ -79,14 +136,17 @@ void 	Gomoku::render()
 	m_render->renderConfigure(&m_currentMove, &m_event, &m_exit, &m_turnTime, m_AI, &m_windowCondition, &m_AIType, &m_step);
 	m_turnTime =0.0;
 	m_currentMove.emptyGameField();
+	if (m_startGame == PRO_FIELD)
+		initPRO(m_currentMove);
 	m_start = clock();
 	while (!m_exit) {
 		m_render->mainLoop();
 
 		if (m_AI && m_currentMove.getCurrentType() == m_AIType){
-			printf("staep = %d\n", m_step);
-			if (m_step++ == 0){
+			printf("step = %d\n", m_step);
+			if (m_step == 0){
 				pushToCentre(m_currentMove);
+				//m_step++;
 				continue;
 			}
 			auto currentMove = std::make_shared<Move>(m_currentMove);
@@ -99,8 +159,9 @@ void 	Gomoku::render()
 		if (m_event.event == PUSH_SQUARE){
 			printf("Push point with x =%d and y =%d\n", m_event.x, m_event.y);
 			auto currentMove = std::make_shared<Move>(m_currentMove);
-			moving(currentMove);
 			m_step++;
+			moving(currentMove, m_event.x, m_event.y);
+
 		}
 	}
 	m_render->deAttachSharedLibrary();
@@ -205,37 +266,27 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 	return findedMove;
 }
 
-void 		Gomoku::moving(MovePtr currentMove)
+void 		Gomoku::moving(MovePtr currentMove, int x, int y)
 {
-	m_checker->moveChecking(*currentMove.get(), m_event.x, m_event.y);
+	m_checker->moveChecking(*currentMove.get(), x, y);
+	// if (m_startGame == PRO_FIELD && m_step == 3) {
+	// 	pushFarThenThreeFromCentre(*currentMove);
+	// 	return;
+	// }
+	if (m_startGame == PRO_FIELD && m_step == 3) {
+		for (int y =  6; y < 11; ++y) {
+			for (int x = 6; x < 11; ++x){
+				m_virtualGameField[y][x] = currentMove->getCurrentType();
+			}
+		}
+		if (m_virtualGameField[y][x] != EMPTY){
+			m_step--;
+			return;
+		}
+	}
 	moveProcessing(currentMove);
 	if (currentMove->getResult() == WIN) {
-		m_currentMove =  *currentMove.get();
-		m_render->drawField(m_currentMove.getGameField());
-		sleep(2);
-		std::string win_reason = "";
-		if (currentMove->getWhiteCapture() >= 5 || currentMove->getBlackCapture() >= 5)
-			win_reason = "BY CAPTURED!";
-		else
-			win_reason = "BY ALLIGNMENT!";
-		std::string result_str =  currentMove->getCurrentType() == BLACK ? "BLACK WIN : " : "WHITE WIN :";
-		result_str += win_reason;
-		m_currentMove.emptyGameField();
-		std::cout << result_str << std::endl;
-		m_currentMove.setCurrentType(BLACK);
-		t_pos & leftTop = const_cast<t_pos &>(m_currentMove.getLeftTop());
-		t_pos & rightBottom = const_cast<t_pos &>(m_currentMove.getRightBottom());
-		leftTop.x = -1;
-		leftTop.y = -1;
-		rightBottom.x = -1;
-		rightBottom.y = -1;
-		m_currentMove.setWhiteCapture(0);
-		m_currentMove.setBlackCapture(0);
-		m_render->GameOver(result_str);
-		m_step = 0;
-		m_AIType = WHITE;
-		m_turnTime =0.0;
-
+		winProcessing(currentMove);
 	}
 }
 
@@ -247,38 +298,19 @@ void 		Gomoku::AI_Move(MovePtr currentMove)
 	int depth = 0;
 	alfaBeta ab;
 	auto testedMove = std::make_shared<Move>(*currentMove);
+	if (m_startGame == PRO_FIELD && m_step == 2) {
+		pushFarThenThreeFromCentre(*testedMove.get());
+		return;
+	}
+    m_step++;
 	printf("minimax\n");
 	auto bestMove = algorithmMiniMax(testedMove, depth, 5, ab);
 	printf("minimax finished\n");
 	m_turnTime = static_cast<double>((clock() - m_start ))/ CLOCKS_PER_SEC;
 	m_currentMove = *bestMove.get();
-	if (bestMove->getResult() == WIN) {
-		m_render->drawField(m_currentMove.getGameField());
-		sleep(2);
-		std::string win_reason = "";
-		if (bestMove->getWhiteCapture() >= 5 || bestMove->getBlackCapture() >= 5)
-			win_reason = "BY CAPTURED!";
-		else
-			win_reason = "BY ALLIGNMENT!";
-		std::string result_str =  bestMove->getCurrentType() == BLACK ? "BLACK WIN : " : "WHITE WIN :";
-		result_str += win_reason;
-		printMove(bestMove);
-		m_currentMove.emptyGameField();
-		std::cout << result_str << std::endl;
-		m_currentMove.setCurrentType(BLACK);
-		t_pos & leftTop = const_cast<t_pos &>(m_currentMove.getLeftTop());
-		t_pos & rightBottom = const_cast<t_pos &>(m_currentMove.getRightBottom());
-		leftTop.x = -1;
-		leftTop.y = -1;
-		rightBottom.x = -1;
-		rightBottom.y = -1;
-		m_currentMove.setWhiteCapture(0);
-		m_currentMove.setBlackCapture(0);
-		m_render->GameOver(result_str);
-		m_step = 0;
-		m_AIType = WHITE;
-		m_turnTime =0.0;
 
+	if (bestMove->getResult() == WIN) {
+		winProcessing(bestMove);
 	}
 
 
@@ -343,4 +375,35 @@ void 		Gomoku::moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingO
 	}
 	m_heuristicSolver->defineHeuristic(optionMove, result);
 	movingOptions.push(optionMove);
+}
+
+void 		Gomoku::winProcessing(MovePtr currentMove)
+{
+	m_currentMove =  *currentMove.get();
+	m_render->drawField(m_currentMove.getGameField());
+	sleep(2);
+	std::string win_reason = "";
+	if (currentMove->getWhiteCapture() >= 5 || currentMove->getBlackCapture() >= 5)
+		win_reason = "BY CAPTURED!";
+	else
+		win_reason = "BY ALLIGNMENT!";
+	std::string result_str =  currentMove->getCurrentType() == BLACK ? "BLACK WIN : " : "WHITE WIN :";
+	result_str += win_reason;
+	std::cout << result_str << std::endl;
+	m_currentMove.emptyGameField();
+	m_currentMove.setCurrentType(BLACK);
+	t_pos & leftTop = const_cast<t_pos &>(m_currentMove.getLeftTop());
+	t_pos & rightBottom = const_cast<t_pos &>(m_currentMove.getRightBottom());
+	leftTop.x = -1;
+	leftTop.y = -1;
+	rightBottom.x = -1;
+	rightBottom.y = -1;
+	m_currentMove.setWhiteCapture(0);
+	m_currentMove.setBlackCapture(0);
+	m_render->GameOver(result_str);
+	m_step = 0;
+	m_AIType = WHITE;
+	m_turnTime =0.0;
+	if(m_startGame == PRO_FIELD)
+		initPRO(m_currentMove);
 }
