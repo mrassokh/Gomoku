@@ -17,7 +17,6 @@
 # include <ctime>
 # include <vector>
 #include <array>
-//# include "Move.hpp"
 
 static const int N = 18;
 
@@ -77,16 +76,14 @@ typedef enum  	moveResult
 }				eMoveResult;
 
 typedef std::vector<t_pos>  posSet;
+
 typedef struct  			s_move
 {
 	eType					currentTurn;
-	//std::vector<vecInt>		gameField;
 	std::array<typeArr, N>	gameField;
 	eMoveResult				moveResult;
 	int 					whiteCaptures;
 	int 					blackCaptures;
-	// std::vector <posSet>	whiteFreeTree;
-	// std::vector <posSet>	blackFreeTree;
 	posSet					whiteFreeTree;
 	posSet					blackFreeTree;
 	t_pos					leftTop;

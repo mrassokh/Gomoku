@@ -50,7 +50,6 @@ typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQ
 
 class Gomoku
 {
-
 public:
 	Gomoku(std::string input, eStartGame startCondition);
 	Gomoku(Gomoku & rhs) = delete;
@@ -60,26 +59,34 @@ public:
 private:
 
 	void 								moving(MovePtr currentMove, int x, int y);
+	int 								movingStartProcessing(MovePtr currentMove, int x, int y);
+	int 								movingAIStartProcessing(MovePtr testedMove);
+
 	void 								AI_Move(MovePtr currentMove);
 	inline void 						generateMoveOptions(MovePtr currentMove, movePriorityQueue & movingOptions);
 	inline void 						fillMoveOptions(MovePtr currentMove, int x_center, int y_center,
 															movePriorityQueue & movingOptions,  std::array<typeArr, N> &virtualGameField);
-  	inline bool 						cutOff(MovePtr checkingMove,alfaBeta & ab, int & value);
-  	inline void 						clearQueue(movePriorityQueue & Queue);
-  	inline MovePtr 						findMove(MovePtr move);
+
 	void 								moveProcessing(MovePtr currentMove);
 	void 								moveAI_Processing(MovePtr optionMove, movePriorityQueue & movingOptions);
 	void 								moveReset(MovePtr currentMove);
+
 	MovePtr 							algorithmMiniMax(MovePtr currentMove, int  depth, int maxDepth, alfaBeta ab);
+	inline bool 						cutOff(MovePtr checkingMove,alfaBeta & ab, int & value);
+	inline void 						clearQueue(movePriorityQueue & Queue);
+	inline MovePtr 						findMove(MovePtr move);
 
 	void 								initPRO(Move & currentMove);
+	void 								initSWAP(Move & currentMove);
+
 	void 								pushToCentre(Move &currentMove);
 	void 								pushNearestToCentre(Move & currentMove);
 	void 								pushFarThenThreeFromCentre(Move & currentMove);
-
-	void 								initSWAP(Move & currentMove);
 	void 								preventInequalPush(std::array<typeArr, N> & virtualGameField, int x, int y, eType type);
+
 	void 								winProcessing(MovePtr currentMove);
+	void 								clearVirtualGamefield();
+
 	std::unique_ptr<Render>				m_render;
 	std::unique_ptr<Checker>			m_checker;
 	std::unique_ptr<HeuristicSolver>	m_heuristicSolver;

@@ -15,13 +15,15 @@
 
 void 		printUsage()
 {
-	std::cout << "Usage" << std::endl;
+	std::cout << "Usage:	./gomoku  		for two players\n"
+				<<"	./gomoku AI  		for playing with bot\n"
+				 << "	./gomoku AI [CONDITION]	for playing with bot and start condition\n"
+				 << "	Posible CONDITION: \n"
+				 << "		PRO \n		SWAP\n		SWAP2\n" << std::endl;
 }
 
-int main(int ac, char **av)
+int 		inputProcess(int ac, char **av, std::shared_ptr<Gomoku> &gomoku)
 {
-
-	Gomoku *gomoku;
 	eStartGame condition = EMPTY_FIELD;
 	if (ac > 3) {
 		printUsage();
@@ -40,18 +42,28 @@ int main(int ac, char **av)
 			return 0;
 		}
 		else {
-			gomoku = new Gomoku("AI",condition);
+			gomoku = std::make_shared<Gomoku>("AI",condition);
 		}
 	} else if (ac == 2 ) {
 		if (strcmp(av[1],"AI") == 0)
-			gomoku = new Gomoku("AI",EMPTY_FIELD);
+			gomoku = std::make_shared<Gomoku>("AI",EMPTY_FIELD);
 		else {
 			printUsage();
 			return 0;
 		}
 	} else {
-	 	gomoku = new Gomoku("none", EMPTY_FIELD);
+		gomoku = std::make_shared<Gomoku>("none",EMPTY_FIELD);
 	}
-	gomoku->render();
+	return 1;
+}
+
+int main(int ac, char **av)
+{
+	std::shared_ptr<Gomoku> gomoku;
+
+	if (inputProcess(ac, av, gomoku)){
+		if (gomoku)
+			gomoku->render();
+	};
 	return 0;
 }

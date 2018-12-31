@@ -27,7 +27,6 @@ Render::Render() : m_gameOverMessage("")
 
 	m_exit = 0;
 	m_windowState = START;
-	//m_windowState = GAME_OVER;
 }
 
 
@@ -72,9 +71,7 @@ void 			Render::drawField(std::array<typeArr, N> const	&gameField) const
 {
 	 m_newWindow->startCycl();
 
-	 //std::vector<vecInt *> game = *(gamefield);
-	 //std::array<typeArr, N>	game = *(gameField);
-	  int k;
+	int k;
 	for (int i = 0; i < 19; i++){
 		m_newWindow->drawLine(i, 0);
 		m_newWindow->drawLine(0, i);
@@ -97,8 +94,6 @@ void 			Render::renderConfigure(Move *currentMove,
 											 eType	*AIColor, int *step, int *putTwoStone)
 {
 	m_currentMove = currentMove;
-	// m_gameField = gameField;
-	// m_currentTurn = currentTurn;
 	m_event = ev;
 	m_exit = ex;
 	m_turnTime = turnTime;
@@ -111,14 +106,12 @@ void 			Render::renderConfigure(Move *currentMove,
 
 void 			Render::mainLoop()
 {
-		//printf("Current state is %d\n", static_cast<int>(m_windowState));
-		(this->*m_windowStateFunctions[m_windowState])();
+	(this->*m_windowStateFunctions[m_windowState])();
 }
 
 void 			Render::drawStart()
 {
 	m_windowCondition->startCondition = 1;
-	printf("start\n");
 	while (m_windowCondition->startCondition){
 		m_newWindow->drawStart();
 		eventHandling();
@@ -128,7 +121,6 @@ void 			Render::drawStart()
 void 			Render::drawGame()
 {
 	m_windowCondition->gameCondition = 1;
-//	std::array<typeArr, N> & gamefield = const_cast<std::array<typeArr, N> &>(currentMove->getGameField());
 	drawField(m_currentMove->getGameField());
 	eventHandling();
 }
@@ -145,7 +137,6 @@ void 			Render::drawGameOver()
 void 			Render::eventHandling()
 {
  	m_newWindow->getEvent(m_event);
-	//printf("Current EVENTS is %d\n", static_cast<int>(m_event->event));
 	if (m_event->event != DEFAULT)
 		(this->*m_eventFunctions[m_event->event])();
 }
@@ -156,12 +147,10 @@ void 			Render::handleExit()
 	m_windowCondition->gameCondition = 0;
 	m_windowCondition->gameOverCondition = 0;
 	*m_exit = 1;
-	printf("handleEXIT\n");
 }
 
 void 			Render::handlePushSquare()
 {
-	printf("handlePUSH\n");
 }
 
 void 			Render::GameOver(std::string const & message)
@@ -171,7 +160,6 @@ void 			Render::GameOver(std::string const & message)
 	m_windowCondition->gameOverCondition = 1;
 	m_windowState = GAME_OVER;
 	m_gameOverMessage = message;
-	printf("handleGameOVER\n");
 }
 
 void Render::handleChangeMove()
@@ -196,5 +184,4 @@ void 			Render::handleNewGame()
 	m_windowCondition->gameCondition = 0;
 	m_windowCondition->gameOverCondition = 0;
 	m_windowState = GAME;
-	printf("handleNEWGame\n");
 }

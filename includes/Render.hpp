@@ -33,8 +33,9 @@ public:
 	Render();
 	virtual ~Render();
 
-	void 			renderConfigure(Move *currentMove,
-		 									event *ev, int *ex, double *turnTime, int AI, windowCondition *condition, eType	*AIColor, int *step, int *putTwoStone);
+	void 			renderConfigure(Move *currentMove, event *ev, int *ex, double *turnTime,
+									int AI, windowCondition *condition,
+									eType	*AIColor, int *step, int *putTwoStone);
 	void 			drawField(std::array<typeArr, N> const & gameField) const;
 	void 			init() const;
 	void 			attachSharedLibrary(const char* sharedLibrary, int height, int weight);
