@@ -19,6 +19,7 @@ Render::Render() : m_gameOverMessage("")
 	m_eventFunctions[2] = &Render::handleExit;
 	m_eventFunctions[3] = &Render::handleChangeMove;
 	m_eventFunctions[4] = &Render::handleChangeAIColor;
+	m_eventFunctions[5] = &Render::handlePutTwoStone;
 
 	m_windowStateFunctions[0] = &Render::drawStart;
 	m_windowStateFunctions[1] = &Render::drawGame;
@@ -93,7 +94,7 @@ void 			Render::drawField(std::array<typeArr, N> const	&gameField) const
 void 			Render::renderConfigure(Move *currentMove,
 											event *ev, int *ex, double *turnTime,
 											int AI, windowCondition *condition,
-											 eType	*AIColor, int *step)
+											 eType	*AIColor, int *step, int *putTwoStone)
 {
 	m_currentMove = currentMove;
 	// m_gameField = gameField;
@@ -105,6 +106,7 @@ void 			Render::renderConfigure(Move *currentMove,
 	m_windowCondition = condition;
 	m_AIColor = AIColor;
 	m_step = step;
+	m_putTwoStone = putTwoStone;
 }
 
 void 			Render::mainLoop()
@@ -182,6 +184,12 @@ void 			Render::handleChangeAIColor()
 {
 	*m_AIColor = *m_AIColor == BLACK ? WHITE :  BLACK;
 }
+
+void 			Render::handlePutTwoStone()
+{
+	*m_putTwoStone = *m_putTwoStone == 1 ? 0 : 1;
+}
+
 void 			Render::handleNewGame()
 {
 	m_windowCondition->startCondition = 0;

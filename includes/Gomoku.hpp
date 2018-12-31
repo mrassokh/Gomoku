@@ -52,7 +52,7 @@ class Gomoku
 {
 
 public:
-	Gomoku(std::string input);
+	Gomoku(std::string input, eStartGame startCondition);
 	Gomoku(Gomoku & rhs) = delete;
 	Gomoku& operator = (Gomoku & rhs) = delete;
 	virtual ~Gomoku();
@@ -77,6 +77,8 @@ private:
 	void 								pushNearestToCentre(Move & currentMove);
 	void 								pushFarThenThreeFromCentre(Move & currentMove);
 
+	void 								initSWAP(Move & currentMove);
+	void 								preventInequalPush(std::array<typeArr, N> & virtualGameField, int x, int y, eType type);
 	void 								winProcessing(MovePtr currentMove);
 	std::unique_ptr<Render>				m_render;
 	std::unique_ptr<Checker>			m_checker;
@@ -94,6 +96,7 @@ private:
 	eType								m_AIType;
 	int 								m_step;
 	eStartGame							m_startGame;
+	int 								m_putTwoStone;
 };
 
 

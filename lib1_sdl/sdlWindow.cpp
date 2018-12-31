@@ -141,6 +141,10 @@ void 			SdlWindow::handleKeyDown(int key, event *ev) const
 		ev->event = CHANGE_AI_COLOR;
 		return;
 	}
+	if (key == SDLK_p) {
+		ev->event = PUT_TWO_STONE;
+		return;
+	}
 	ev->event = DEFAULT;
 	return ;
 }

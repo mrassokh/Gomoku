@@ -34,7 +34,7 @@ public:
 	virtual ~Render();
 
 	void 			renderConfigure(Move *currentMove,
-		 									event *ev, int *ex, double *turnTime, int AI, windowCondition *condition, eType	*AIColor, int *step);
+		 									event *ev, int *ex, double *turnTime, int AI, windowCondition *condition, eType	*AIColor, int *step, int *putTwoStone);
 	void 			drawField(std::array<typeArr, N> const & gameField) const;
 	void 			init() const;
 	void 			attachSharedLibrary(const char* sharedLibrary, int height, int weight);
@@ -57,7 +57,7 @@ private:
 
 	double 					*m_turnTime;
 
-	std::array<void (Render::*)(), 5>	m_eventFunctions;
+	std::array<void (Render::*)(), 6>	m_eventFunctions;
 	std::array<void (Render::*)(), 3>	m_windowStateFunctions;
 
 	void 			drawStart();
@@ -69,6 +69,7 @@ private:
 	void 			handleNewGame();
 	void 			handleChangeMove();
 	void 			handleChangeAIColor();
+	void 			handlePutTwoStone();
 
 	Move			*m_currentMove;
 	windowCondition *m_windowCondition;
@@ -78,7 +79,8 @@ private:
 	eWindowState	m_windowState;
 	std::string		m_gameOverMessage;
 	eType			*m_AIColor;
-	int 			*m_step; 			
+	int 			*m_step;
+	int 			*m_putTwoStone;
 };
 
 #endif
