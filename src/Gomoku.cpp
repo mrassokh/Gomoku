@@ -148,7 +148,7 @@ void 		Gomoku::AI_Move(MovePtr currentMove)
 		return ;
 
     m_step++;
-	auto bestMove = algorithmMiniMax(testedMove, depth, 5, ab);
+	auto bestMove = algorithmMiniMax(testedMove, depth, maximumDepth, ab);
 	m_turnTime = static_cast<double>((clock() - m_start ))/ CLOCKS_PER_SEC;
 	if (!bestMove)
 		return ;
@@ -252,7 +252,7 @@ MovePtr 			Gomoku::algorithmMiniMax(MovePtr currentMove, int depth, int maxDepth
 		int value = movingOptions.top()->getCurrentType() == BLACK ? alfaInf : betaInf;
 		++depth;
 
-		while (moveCounter < 3 && !movingOptions.empty()) {
+		while (moveCounter < moveChoseCount && !movingOptions.empty()) {
 			checkingMove = movingOptions.top();
 			if (checkingMove->getResult() == WIN) {
 				checkMovingOptions.push(checkingMove);

@@ -43,8 +43,8 @@ struct alfaBeta {
 };
 
 
-static const int maximumDepth = 3;
-static const int moveChoseCount = 7;
+static const int maximumDepth = 5;
+static const int moveChoseCount = 3;
 
 typedef std::priority_queue<MovePtr, std::deque<MovePtr>, MoveCmp>	movePriorityQueue;
 
